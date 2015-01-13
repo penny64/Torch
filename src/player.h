@@ -1,0 +1,2 @@
+void createPlayer();
+void playerInputLogic();

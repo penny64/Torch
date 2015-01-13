@@ -1,8 +1,13 @@
+#include <stdlib.h>
+
 typedef struct character {
-	int x, y, hp;
+	int x, y, vx, vy, hp;
 	struct character *next, *prev;
 } character;
 
-void createActor(void);
+character *createActor(void);
+void actorLogic(void);
+void drawActors(void);
 
-static character *characters = NULL;
+static character *CHARACTERS = NULL;
+static character *PLAYER_ACTOR = NULL;
