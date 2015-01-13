@@ -1,2 +1,2 @@
-void createPlayer();
-void playerInputLogic();
+void createPlayer(void);
+void playerInputLogic(void);

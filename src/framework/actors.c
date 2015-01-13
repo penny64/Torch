@@ -3,6 +3,7 @@
 #include "actors.h"
 #include "draw.h"
 
+
 TCOD_console_t ACTOR_CONSOLE;
 
 

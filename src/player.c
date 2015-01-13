@@ -1,7 +1,11 @@
+#include "player.h"
 #include "framework/actors.h"
 #include "framework/input.h"
 #include "libtcod.h"
-#include "player.h"
+
+
+static struct character *PLAYER_ACTOR;
+
 
 void createPlayer() {
 	PLAYER_ACTOR = createActor();
