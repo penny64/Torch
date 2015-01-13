@@ -10,12 +10,16 @@
 
 
 void setup() {
+	//Setup systems
 	startLogging(LOGGING_DEBUG);
 	startInput();
 	createDisplay();
 	actorSetup();
 	levelSetup();
+
+	//Generate level just for demonstration purposes
 	generateLevel();
+	createPlayer();
 
 	logString(LOGGING_DEBUG, WINDOW_TITLE);
 }
@@ -23,10 +27,7 @@ void setup() {
 int main() {
 	setup();
 	
-	createActor();
-	createPlayer();
-	
-	while (1) {
+	while (!TCOD_console_is_window_closed()) {
 		inputLogic();
 		playerInputLogic();
 		actorLogic();
