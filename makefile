@@ -1,6 +1,6 @@
 CC     = gcc
 CFLAGS = -Wall -Iinclude -I/usr/local/include
-OFILES = src/framework/logging.o src/framework/display.o src/framework/draw.o src/framework/actors.o src/framework/input.o src/player.o src/main.o
+OFILES = src/framework/logging.o src/framework/display.o src/framework/draw.o src/framework/actors.o src/framework/input.o src/level.o src/graphics.o src/player.o src/main.o
 LDFLAGS = -Wl,-rpath,. -Llib -ltcod
 
 linux: cgame cgame_linux

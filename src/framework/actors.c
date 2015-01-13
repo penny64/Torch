@@ -1,10 +1,14 @@
-#include <stdlib.h>
-
 #include "display.h"
 #include "logging.h"
 #include "actors.h"
 #include "draw.h"
 
+TCOD_console_t ACTOR_CONSOLE;
+
+
+void actorSetup() {
+	ACTOR_CONSOLE = TCOD_console_new(WINDOW_WIDTH, WINDOW_HEIGHT);
+}
 
 character *createActor() {
 	character *_c, *_p_c;
@@ -61,4 +65,8 @@ void drawActors() {
 
 		ptr = ptr->next;
 	}
+}
+
+TCOD_console_t getActorConsole() {
+	return ACTOR_CONSOLE;
 }

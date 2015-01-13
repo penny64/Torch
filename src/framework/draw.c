@@ -1,3 +1,5 @@
+#include "logging.h"
+#include "draw.h"
 #include "libtcod.h"
 
 
