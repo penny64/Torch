@@ -13,12 +13,12 @@ void setup() {
 }
 
 int main() {
-	int i, x = 0, y = 0, fade_rate = 0;
+	int i = 0, x = 0, y = 0;
 	float float_fade_mod;
 	
 	setup();
 	
-	logString(LOGGING_DEBUG, "cGame - flagsdev 2015");
+	logString(LOGGING_DEBUG, WINDOW_TITLE);
 	
 	createActor();
 	createActor();
@@ -33,9 +33,8 @@ int main() {
 		for (y = 0; y < WINDOW_HEIGHT; y++) {
 			for (x = 0; x < WINDOW_WIDTH; x++) {
 				float_fade_mod = (float) (x + y + i) / (float) WINDOW_WIDTH / 2;
-				
-				TCOD_console_set_char_foreground(NULL, x, y, TCOD_color_RGB((int)(255 * float_fade_mod), y, 255));
-				TCOD_console_set_char(NULL, x, y, 26);
+
+				drawChar(NULL, x, y, (int)'#', TCOD_color_RGB((int)(255 * float_fade_mod), y, 255), TCOD_color_RGB((int)(255 * float_fade_mod), y, 255));
 			}
 		}
 		
