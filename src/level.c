@@ -66,25 +66,26 @@ void generateLevel() {
 	
 	for (y = 0; y < WINDOW_HEIGHT; y++) {
 		for (x = 0; x < WINDOW_WIDTH; x++) {
+			p[0] = (float) x / WINDOW_WIDTH;
+			p[1] = (float) y / WINDOW_HEIGHT;
+
+			fogValue = TCOD_noise_get_fbm_ex(fog, p, 32.0f, TCOD_NOISE_PERLIN) + .2f;
+
+			if (fogValue < 0) {
+				fogValue = 0;
+			}
+
+			if (fogValue > .6) {
+				fogValue = .6;
+			}
+
 			if (x > 10 && x < 20 && y > 10 && y < 20) {
-				drawCharBackEx(FOG_CONSOLE, x, y, TCOD_color_RGB(70, 120, 100), TCOD_BKGND_SET);
+				drawCharBackEx(FOG_CONSOLE, x, y, TCOD_color_RGB(12, 0, 0), TCOD_BKGND_SET);
 
 				TCOD_map_set_properties(LEVEL_MAP, x, y, 0, 0);
 			} else {
-				p[0] = (float) x / WINDOW_WIDTH;
-				p[1] = (float) y / WINDOW_HEIGHT;
-
-				fogValue = TCOD_noise_get_fbm_ex(fog, p, 32.0f, TCOD_NOISE_PERLIN) + .2f;
-
-				if (fogValue < 0) {
-					fogValue = 0;
-				}
-
-				if (fogValue > .6) {
-					fogValue = .6;
-				}
-
 				drawCharBackEx(FOG_CONSOLE, x, y, TCOD_color_RGB(235, 200, 200), TCOD_BKGND_ALPHA(fogValue));
+				
 				TCOD_map_set_properties(LEVEL_MAP, x, y, 1, 1);
 			}
 		}
