@@ -20,6 +20,7 @@ void setup() {
 	//Generate level just for demonstration purposes
 	generateLevel();
 	createPlayer();
+	createActor();
 
 	logString(LOGGING_DEBUG, WINDOW_TITLE);
 }

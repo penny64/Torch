@@ -47,6 +47,13 @@ TCOD_map_t getLevelMap() {
 	return LEVEL_MAP;
 }
 
+TCOD_map_t copyLevelMap() {
+	TCOD_map_t newMap = TCOD_map_new(WINDOW_WIDTH, WINDOW_HEIGHT);
+	TCOD_map_copy(LEVEL_MAP, newMap);
+	
+	return newMap;
+}
+
 int isPositionWalkable(int x, int y) {
 	return TCOD_map_is_walkable(LEVEL_MAP, x, y);
 }

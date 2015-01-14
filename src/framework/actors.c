@@ -1,3 +1,4 @@
+#include "../level.h" //Will fix this later
 #include "display.h"
 #include "logging.h"
 #include "actors.h"
@@ -21,6 +22,7 @@ character *createActor() {
 	_c->vy = 0;
 	_c->prev = NULL;
 	_c->next = NULL;
+	_c->fov = copyLevelMap();
 	
 	if (CHARACTERS == NULL) {
 		CHARACTERS = _c;
@@ -41,6 +43,8 @@ void _actorLogic(character *actor) {
 	if (isPositionWalkable(nx, ny)) {
 		actor->x = nx;
 		actor->y = ny;
+		
+		TCOD_map_compute_fov(actor->fov, actor->x, actor->y, 16, 1, FOV_SHADOW);
 	}
 
 	actor->vx = 0;
@@ -75,6 +79,10 @@ void drawActors() {
 
 void actorCleanup() {
 	TCOD_console_clear(ACTOR_CONSOLE);
+}
+
+character *getActors() {
+	return CHARACTERS;
 }
 
 TCOD_console_t getActorConsole() {

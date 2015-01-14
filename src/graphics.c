@@ -19,14 +19,36 @@ void generateFov() {
 }
 
 void applyFov() {
+	int visible;
 	TCOD_map_t map = getLevelMap();
 	TCOD_console_t shadowConsole = getShadowConsole();
 	TCOD_console_clear(shadowConsole);
 	character *player = getPlayer();
+	character *actor;
 	
 	for (y = 0; y < WINDOW_HEIGHT; y++) {
 		for (x = 0; x < WINDOW_WIDTH; x++) {
-			if (!TCOD_map_is_in_fov(map, x, y)) {
+			visible = 0;
+			actor = getActors();
+			
+			//if (!TCOD_map_is_in_fov(map, x, y)) {
+			//	visible = 0;
+				//drawCharBackEx(shadowConsole, x, y, TCOD_color_RGB(0, 0, 0), TCOD_BKGND_SET);
+			//} else {
+				while (actor != NULL) {
+					//if (actor == player) {
+					//	continue;
+					//}
+					
+					if (TCOD_map_is_in_fov(actor->fov, x, y) && TCOD_map_is_in_fov(map, x, y)) {
+						visible = 1;
+					}
+
+					actor = actor->next;
+				}
+			//}
+			
+			if (!visible) {
 				drawCharBackEx(shadowConsole, x, y, TCOD_color_RGB(0, 0, 0), TCOD_BKGND_SET);
 			}
 		}
