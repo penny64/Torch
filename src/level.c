@@ -17,7 +17,7 @@ void levelSetup() {
 	LEVEL_MAP = TCOD_map_new(WINDOW_WIDTH, WINDOW_HEIGHT);
 	FOG_NOISE = TCOD_noise_new(2, TCOD_NOISE_DEFAULT_HURST, TCOD_NOISE_DEFAULT_LACUNARITY, NULL);
 
-	TCOD_console_set_default_background(LEVEL_CONSOLE, TCOD_color_RGB(50, 30, 30));
+	TCOD_console_set_default_background(LEVEL_CONSOLE, TCOD_color_RGB(40, 30, 30));
 	TCOD_console_set_default_background(SHADOW_CONSOLE, TCOD_color_RGB(255, 255, 255));
 	TCOD_console_set_key_color(SHADOW_CONSOLE, TCOD_color_RGB(255, 255, 255));
 
@@ -47,6 +47,10 @@ TCOD_map_t getLevelMap() {
 	return LEVEL_MAP;
 }
 
+int isPositionWalkable(int x, int y) {
+	return TCOD_map_is_walkable(LEVEL_MAP, x, y);
+}
+
 void generateLevel() {
 	int x, y;
 	float fogValue;
@@ -56,7 +60,8 @@ void generateLevel() {
 	for (y = 0; y < WINDOW_HEIGHT; y++) {
 		for (x = 0; x < WINDOW_WIDTH; x++) {
 			if (x > 10 && x < 20 && y > 10 && y < 20) {
-				drawChar(LEVEL_CONSOLE, x, y, (int)'#', TCOD_color_RGB(200, 200, 200), TCOD_color_RGB(5, 5, 5));
+				drawCharBackEx(FOG_CONSOLE, x, y, TCOD_color_RGB(70, 120, 100), TCOD_BKGND_SET);
+
 				TCOD_map_set_properties(LEVEL_MAP, x, y, 0, 0);
 			} else {
 				p[0] = (float) x / WINDOW_WIDTH;
@@ -72,7 +77,7 @@ void generateLevel() {
 					fogValue = .6;
 				}
 
-				drawCharBackEx(FOG_CONSOLE, x, y, TCOD_color_RGB(255, 200, 200), TCOD_BKGND_ALPHA(fogValue));
+				drawCharBackEx(FOG_CONSOLE, x, y, TCOD_color_RGB(235, 200, 200), TCOD_BKGND_ALPHA(fogValue));
 				TCOD_map_set_properties(LEVEL_MAP, x, y, 1, 1);
 			}
 		}

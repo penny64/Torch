@@ -35,8 +35,13 @@ character *createActor() {
 }
 
 void _actorLogic(character *actor) {
-	actor->x += actor->vx;
-	actor->y += actor->vy;
+	int nx = actor->x + actor->vx;
+	int ny = actor->y + actor->vy;
+
+	if (isPositionWalkable(nx, ny)) {
+		actor->x = nx;
+		actor->y = ny;
+	}
 
 	actor->vx = 0;
 	actor->vy = 0;
