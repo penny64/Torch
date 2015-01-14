@@ -11,6 +11,10 @@ void createPlayer() {
 	PLAYER_ACTOR = createActor();
 }
 
+character *getPlayer() {
+	return PLAYER_ACTOR;
+}
+
 void playerInputLogic() {
 	if (isTCODCharPressed(TCODK_LEFT)) {
 		PLAYER_ACTOR->vx = -1;

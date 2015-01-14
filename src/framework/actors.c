@@ -68,6 +68,10 @@ void drawActors() {
 	}
 }
 
+void actorCleanup() {
+	TCOD_console_clear(ACTOR_CONSOLE);
+}
+
 TCOD_console_t getActorConsole() {
 	return ACTOR_CONSOLE;
 }

@@ -41,6 +41,8 @@ int main() {
 		composeScene();
 
 		displayLogic();
+		
+		actorCleanup();
 	}
 	
 	return 0;
