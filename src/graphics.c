@@ -23,6 +23,7 @@ void applyFov() {
 	int visible, visibleToPlayer;
 	float distMod, fadeValue;
 	TCOD_map_t map = getLevelMap();
+	TCOD_console_t seenConsole = getSeenConsole();
 	TCOD_console_t shadowConsole = getShadowConsole();
 	character *player = getPlayer();
 	character *actor;
@@ -52,14 +53,13 @@ void applyFov() {
 				fadeValue = 1.f - ((float) distMod / 32.f);
 				
 				if (fadeValue < .03126) {
-					fadeValue = 0;
-					
 					drawCharBackEx(shadowConsole, x, y, TCOD_color_RGB(1, 0, 0), TCOD_BKGND_SET);
 				} else {
-					drawCharBackEx(shadowConsole, x, y, TCOD_color_RGB(22, 10, 10), TCOD_BKGND_ALPHA(fadeValue));
+					drawCharBackEx(shadowConsole, x, y, TCOD_color_RGB(55, 15, 15), TCOD_BKGND_ALPHA(fadeValue));
 				}
+			} else {
+				drawCharBack(seenConsole, x, y, TCOD_color_RGB(255, 0, 255));
 			}
-			
 		}
 	}
 }
@@ -69,6 +69,7 @@ void composeScene() {
 	
 	TCOD_console_t levelConsole = getLevelConsole();
 	TCOD_console_t actorConsole = getActorConsole();
+	TCOD_console_t seenConsole = getSeenConsole();
 	TCOD_console_t shadowConsole = getShadowConsole();
 	TCOD_console_t fogConsole = getFogConsole();
 	
@@ -77,6 +78,7 @@ void composeScene() {
 	TCOD_console_blit(levelConsole, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, NULL, 0, 0, 1, 1);
 	TCOD_console_blit(actorConsole, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, NULL, 0, 0, 1, 0);
 	TCOD_console_blit(fogConsole, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, NULL, 0, 0, 1, 0.3f);
-	TCOD_console_blit(shadowConsole, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, NULL, 0, 0, 1, 0.9f);
+	TCOD_console_blit(seenConsole, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, NULL, 0, 0, 1, 1);
+	TCOD_console_blit(shadowConsole, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, NULL, 0, 0, 1, 0.55f);
 	
 }

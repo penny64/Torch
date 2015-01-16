@@ -1,6 +1,6 @@
 //#include "framework/actors.h"
 
-typedef struct character character;
+//typedef struct character character;
 
 
 void createPlayer(void);
