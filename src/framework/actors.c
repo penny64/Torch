@@ -16,9 +16,9 @@ character *createActor() {
 	character *_c, *_p_c;
 	
 	_c = malloc(sizeof(character));
-	_c->x = 0;
-	_c->y = 0;
-	_c->vx = 0;
+	_c->x = WINDOW_WIDTH / 2;
+	_c->y = WINDOW_HEIGHT / 2;
+	_c->vx = 1;
 	_c->vy = 0;
 	_c->prev = NULL;
 	_c->next = NULL;

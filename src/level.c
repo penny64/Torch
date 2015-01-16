@@ -9,6 +9,7 @@ TCOD_console_t SHADOW_CONSOLE;
 TCOD_console_t FOG_CONSOLE;
 TCOD_map_t LEVEL_MAP;
 TCOD_noise_t FOG_NOISE;
+TCOD_random_t RANDOM;
 
 void levelSetup() {
 	LEVEL_CONSOLE = TCOD_console_new(WINDOW_WIDTH, WINDOW_HEIGHT);
@@ -16,10 +17,11 @@ void levelSetup() {
 	FOG_CONSOLE = TCOD_console_new(WINDOW_WIDTH, WINDOW_HEIGHT);
 	LEVEL_MAP = TCOD_map_new(WINDOW_WIDTH, WINDOW_HEIGHT);
 	FOG_NOISE = TCOD_noise_new(2, TCOD_NOISE_DEFAULT_HURST, TCOD_NOISE_DEFAULT_LACUNARITY, NULL);
+	RANDOM = TCOD_random_get_instance();
 
 	TCOD_console_set_default_background(LEVEL_CONSOLE, TCOD_color_RGB(40, 30, 30));
-	TCOD_console_set_default_background(SHADOW_CONSOLE, TCOD_color_RGB(255, 255, 255));
-	TCOD_console_set_key_color(SHADOW_CONSOLE, TCOD_color_RGB(255, 255, 255));
+	TCOD_console_set_default_background(SHADOW_CONSOLE, TCOD_color_RGB(0, 0, 0));
+	TCOD_console_set_key_color(SHADOW_CONSOLE, TCOD_color_RGB(0, 0, 0));
 
 	TCOD_console_clear(LEVEL_CONSOLE);
 	TCOD_console_clear(SHADOW_CONSOLE);
@@ -58,11 +60,105 @@ int isPositionWalkable(int x, int y) {
 	return TCOD_map_is_walkable(LEVEL_MAP, x, y);
 }
 
+void carve() {
+	int x1, y1;
+	int x = TCOD_random_get_int(RANDOM, 16, WINDOW_WIDTH - 16);
+	int y = TCOD_random_get_int(RANDOM, 16, WINDOW_HEIGHT - 16);
+	int i;
+	
+	for (i = 0; i < 64; i++) {
+		for (y1 = -1; y1 <= 1; y1++) {
+			for (x1 = -1; x1 <= 1; x1++) {
+				if (x + x1 <= 1 || x + x1 >= WINDOW_WIDTH - 2 || y + y1 <= 1 || y + y1 >= WINDOW_HEIGHT - 2) {
+					continue;
+				}
+				TCOD_map_set_properties(LEVEL_MAP, x + x1, y + y1, 1, 1);
+			}
+		}
+		
+		while (TCOD_map_is_walkable(LEVEL_MAP, x, y)) {
+			if (TCOD_random_get_int(RANDOM, 0, 1)) {
+				x += TCOD_random_get_int(RANDOM, -1, 1);
+			} else {
+				y += TCOD_random_get_int(RANDOM, -1, 1);
+			}
+		}
+	}
+}
+
+void smooth() {
+	int x, y, i, x1, y1, count;
+	
+	for (i = 0; i < 32; i++) {
+		TCOD_map_t mapCopy = copyLevelMap();
+		
+		for (y = 0; y < WINDOW_HEIGHT; y++) {
+			for (x = 0; x < WINDOW_WIDTH; x++) {
+				if (TCOD_map_is_walkable(mapCopy, x, y)) {
+					continue;
+				}
+				
+				count = 0;
+				
+				for (y1 = -1; y1 <= 1; y1++) {
+					for (x1 = -1; x1 <= 1; x1++) {
+						if (y1 == -1 && x1 == 1 || y1 == -1 && x1 == -1 || y1 == 1 && x1 == 1 || y1 == 1 && x1 == -1) {
+							continue;
+						}
+						
+						if (TCOD_map_is_walkable(mapCopy, x, y)) {
+							count ++;
+						}
+					}
+				}
+				
+				if (count == 4) {
+					TCOD_map_set_properties(LEVEL_MAP, x, y, 1, 1);
+				}
+			}
+		}
+	}
+}
+
+void placeLights() {
+	int x, y, x1, y1, count;
+	TCOD_map_t mapCopy = copyLevelMap();
+	
+	for (y = 0; y < WINDOW_HEIGHT; y++) {
+		for (x = 0; x < WINDOW_WIDTH; x++) {
+			count = 0;
+			
+			for (y1 = -1; y1 <= 1; y1++) {
+				for (x1 = -1; x1 <= 1; x1++) {
+					if (TCOD_map_is_walkable(mapCopy, x + x1, y + y1)) {
+						count ++;
+					}
+				}
+			}
+			
+			if (count == 8) {
+				for (y1 = -1; y1 <= 1; y1++) {
+					for (x1 = -1; x1 <= 1; x1++) {
+						
+					}
+				}
+			}
+		}
+	}
+}
+
 void generateLevel() {
-	int x, y;
-	float fogValue;
+	int x, y, i;
+	float fogValue, colorMod;
 	float p[2];
 	TCOD_noise_t fog = getFogNoise();
+	
+	for (i = 0; i < 16; i++) {
+		carve();
+		smooth();
+	}
+	
+	placeLights();
 	
 	for (y = 0; y < WINDOW_HEIGHT; y++) {
 		for (x = 0; x < WINDOW_WIDTH; x++) {
@@ -79,14 +175,11 @@ void generateLevel() {
 				fogValue = .6;
 			}
 
-			if (x > 10 && x < 20 && y > 10 && y < 20) {
-				drawCharBackEx(FOG_CONSOLE, x, y, TCOD_color_RGB(12, 0, 0), TCOD_BKGND_SET);
-
-				TCOD_map_set_properties(LEVEL_MAP, x, y, 0, 0);
+			if (!TCOD_map_is_walkable(LEVEL_MAP, x, y)) {
+				drawCharBackEx(LEVEL_CONSOLE, x, y, TCOD_color_RGB(22, 0, 0), TCOD_BKGND_SET);
 			} else {
-				drawCharBackEx(FOG_CONSOLE, x, y, TCOD_color_RGB(235, 200, 200), TCOD_BKGND_ALPHA(fogValue));
-				
-				TCOD_map_set_properties(LEVEL_MAP, x, y, 1, 1);
+				colorMod = (int)(fogValue * 150);
+				drawCharBackEx(FOG_CONSOLE, x, y, TCOD_color_RGB(135 - colorMod, 100 - colorMod, 100 - colorMod), TCOD_BKGND_ALPHA(1));
 			}
 		}
 	}
