@@ -23,6 +23,7 @@ void applyFov() {
 	int visible, visibleToPlayer;
 	float distMod, fadeValue;
 	TCOD_map_t map = getLevelMap();
+	TCOD_console_t actorConsole = getActorConsole();
 	TCOD_console_t seenConsole = getSeenConsole();
 	TCOD_console_t shadowConsole = getShadowConsole();
 	character *player = getPlayer();
@@ -50,7 +51,15 @@ void applyFov() {
 			
 			if (!visible) {
 				distMod = distanceFloat(player->x, player->y, x, y);
+				distMod -= getRandomInt(0, 3);
+				
+				if (distMod < 0) {
+					distMod = 0;
+				}
+				
 				fadeValue = 1.f - ((float) distMod / 32.f);
+				
+				setChar(actorConsole, x, y, (int)' ');
 				
 				if (fadeValue < .03126) {
 					drawCharBackEx(shadowConsole, x, y, TCOD_color_RGB(1, 0, 0), TCOD_BKGND_SET);

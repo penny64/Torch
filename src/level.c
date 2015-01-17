@@ -34,6 +34,10 @@ void levelSetup() {
 	TCOD_noise_set_type(FOG_NOISE, TCOD_NOISE_PERLIN);
 }
 
+int getRandomInt(int min, int max) {
+	return TCOD_random_get_int(RANDOM, min, max);
+}
+
 TCOD_console_t getLevelConsole() {
 	return LEVEL_CONSOLE;
 }

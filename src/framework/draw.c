@@ -3,6 +3,10 @@
 #include "libtcod.h"
 
 
+void setChar(TCOD_console_t console, int x, int y, int chr) {
+	TCOD_console_set_char(console, x, y, chr);
+}
+
 void drawChar(TCOD_console_t console, int x, int y, int chr, TCOD_color_t foreColor, TCOD_color_t backColor) {
 	TCOD_console_put_char_ex(console, x, y, chr, foreColor, backColor);
 }
