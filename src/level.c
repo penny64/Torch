@@ -11,8 +11,14 @@ TCOD_console_t SEEN_CONSOLE;
 TCOD_map_t LEVEL_MAP;
 TCOD_noise_t FOG_NOISE;
 TCOD_random_t RANDOM;
+int ROOM_MAP[255][255];
+int CLOSED_MAP[255][255];
+int ROOM_COUNT;
+
 
 void levelSetup() {
+	int i;
+
 	LEVEL_CONSOLE = TCOD_console_new(WINDOW_WIDTH, WINDOW_HEIGHT);
 	SHADOW_CONSOLE = TCOD_console_new(WINDOW_WIDTH, WINDOW_HEIGHT);
 	FOG_CONSOLE = TCOD_console_new(WINDOW_WIDTH, WINDOW_HEIGHT);
@@ -75,16 +81,18 @@ int isPositionWalkable(int x, int y) {
 
 void carve(int x, int y) {
 	int x1, y1;
-	int i;
+	int i, ii;
 	
 	for (i = 0; i < TCOD_random_get_int(RANDOM, 24, 32); i++) {
-		for (y1 = -1; y1 <= 1; y1++) {
-			for (x1 = -1; x1 <= 1; x1++) {
-				if (x + x1 <= 1 || x + x1 >= WINDOW_WIDTH - 2 || y + y1 <= 1 || y + y1 >= WINDOW_HEIGHT - 2) {
-					continue;
+		for (ii = 0; ii < TCOD_random_get_int(RANDOM, 0, 1); ii++) {
+			for (y1 = -1 - ii; y1 <= 1 + ii; y1++) {
+				for (x1 = -1; x1 <= 1; x1++) {
+					if (x + x1 <= 1 || x + x1 >= WINDOW_WIDTH - 2 || y + y1 <= 1 || y + y1 >= WINDOW_HEIGHT - 2) {
+						continue;
+					}
+					
+					TCOD_map_set_properties(LEVEL_MAP, x + x1, y + y1, 1, 1);
 				}
-				
-				TCOD_map_set_properties(LEVEL_MAP, x + x1, y + y1, 1, 1);
 			}
 		}
 		
@@ -159,13 +167,115 @@ void placeLights() {
 	}
 }
 
+void findRooms() {
+	int i, x, y, x1, y1, w_x, w_y, oLen, cLen, added = 1;
+	int openList[WINDOW_WIDTH * WINDOW_HEIGHT][2];
+	//int closedList[WINDOW_WIDTH * WINDOW_HEIGHT][1];
+
+	ROOM_COUNT = 0;
+
+	for (y = 0; y <= WINDOW_HEIGHT; y++) {
+		for (x = 0; x <= WINDOW_WIDTH; x++) {
+			//openList[0][0] = 0;
+			//openList[0][1] = 0;
+			CLOSED_MAP[x][y] = 0;
+		}
+	}
+	
+	while (added) {
+		printf("Found new room: %i\n", ROOM_COUNT);
+		
+		cLen = 0;
+		oLen = 0;
+		added = 0;
+		ROOM_COUNT ++;
+
+		//Find starting position
+		for (y = 0; y < WINDOW_HEIGHT; y++) {
+			for (x = 0; x < WINDOW_WIDTH; x++) {
+				if (!TCOD_map_is_walkable(LEVEL_MAP, x, y) || ROOM_MAP[x][y]) {
+					continue;
+				}
+
+				openList[0][0] = x;
+				openList[0][1] = y;
+				oLen ++;
+
+				break;
+			}
+
+			if (oLen) {
+				break;
+			}
+		}
+
+		while (cLen < oLen) {
+			w_x = openList[cLen][0];
+			w_y = openList[cLen][1];
+
+			cLen ++;
+
+			for (y1 = -1; y1 <= 1; y1++) {
+				for (x1 = -1; x1 <= 1; x1++) {
+					x = w_x + x1;
+					y = w_y + y1;
+
+					if (!TCOD_map_is_walkable(LEVEL_MAP, x, y)) {
+						continue;
+					}
+
+					if (x <= 1 || x >= WINDOW_WIDTH - 2 || y <= 1 || y >= WINDOW_HEIGHT - 2) {
+						continue;
+					}
+
+					if (ROOM_MAP[x][y]) {
+						continue;
+					}
+
+					//for (i = 0; i <= oLen; i++) {
+					if (y >= 47 || x >= 76) {
+						x = 76;
+						y = 46;
+					}
+
+					printf("Here, %i, %i, %i\n", x, y, CLOSED_MAP[y][x]);
+
+					if (CLOSED_MAP[x][y] > 0) {
+						continue;
+					}
+
+					//printf("Now\n");
+					//}
+
+					openList[oLen][0] = x;
+					openList[oLen][1] = y;
+					//closedList[cLen][0] = x;
+					//closedList[cLen][1] = y;
+					CLOSED_MAP[x][y] = 1;
+					oLen ++;
+					added ++;
+				}
+			}
+		}
+
+		for (i = 0; i <= oLen; i++) {
+			x = openList[i][0];
+			y = openList[i][1];
+			
+			ROOM_MAP[x][y] = ROOM_COUNT;
+
+			//setChar(LEVEL_CONSOLE, x, y, 64+ROOM_COUNT);
+		}
+	}
+}
+
 void generateLevel() {
 	int x, y, i;
 	float fogValue, colorMod;
 	float p[2];
 	TCOD_noise_t fog = getFogNoise();
 	
-	for (i = 0; i < 4; i++) {
+	for (i = 0; i < 6; i++) {
 		if (!i) {
 			x = WINDOW_WIDTH / 2;
 			y = WINDOW_HEIGHT / 2;
@@ -175,10 +285,11 @@ void generateLevel() {
 		}
 
 		carve(x, y);
-		smooth();
 	}
-	
+
+	smooth();
 	placeLights();
+	findRooms();
 	
 	for (y = 0; y < WINDOW_HEIGHT; y++) {
 		for (x = 0; x < WINDOW_WIDTH; x++) {
