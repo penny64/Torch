@@ -3,6 +3,9 @@
 #include "logging.h"
 
 
+static int LOGGING_LEVEL;
+
+
 void startLogging(int level) {
 	LOGGING_LEVEL = level;
 }

@@ -2,6 +2,9 @@
 #include "libtcod.h"
 
 
+static TCOD_key_t KEY;
+
+
 void startInput() {
 	TCOD_console_set_keyboard_repeat(10, 0);
 }

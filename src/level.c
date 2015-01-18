@@ -1,3 +1,6 @@
+#include <stdlib.h>
+#include <stdio.h>
+
 #include "framework/display.h"
 #include "framework/draw.h"
 #include "level.h"
@@ -11,14 +14,12 @@ TCOD_console_t SEEN_CONSOLE;
 TCOD_map_t LEVEL_MAP;
 TCOD_noise_t FOG_NOISE;
 TCOD_random_t RANDOM;
-int ROOM_MAP[255][255];
-int CLOSED_MAP[255][255];
+//int **ROOM_MAP;
+//int **CLOSED_MAP;
 int ROOM_COUNT;
 
 
 void levelSetup() {
-	int i;
-
 	LEVEL_CONSOLE = TCOD_console_new(WINDOW_WIDTH, WINDOW_HEIGHT);
 	SHADOW_CONSOLE = TCOD_console_new(WINDOW_WIDTH, WINDOW_HEIGHT);
 	FOG_CONSOLE = TCOD_console_new(WINDOW_WIDTH, WINDOW_HEIGHT);
@@ -169,15 +170,14 @@ void placeLights() {
 
 void findRooms() {
 	int i, x, y, x1, y1, w_x, w_y, oLen, cLen, added = 1;
-	int openList[WINDOW_WIDTH * WINDOW_HEIGHT][2];
-	//int closedList[WINDOW_WIDTH * WINDOW_HEIGHT][1];
+	int (*openList)[WINDOW_WIDTH * WINDOW_HEIGHT] = malloc(sizeof(double[WINDOW_WIDTH * WINDOW_HEIGHT][WINDOW_WIDTH * WINDOW_HEIGHT]));
+	int (*ROOM_MAP)[255] = malloc(sizeof(double[255][255]));
+	int (*CLOSED_MAP)[255] = malloc(sizeof(double[255][255]));
 
 	ROOM_COUNT = 0;
 
 	for (y = 0; y <= WINDOW_HEIGHT; y++) {
 		for (x = 0; x <= WINDOW_WIDTH; x++) {
-			//openList[0][0] = 0;
-			//openList[0][1] = 0;
 			CLOSED_MAP[x][y] = 0;
 		}
 	}
@@ -231,26 +231,13 @@ void findRooms() {
 					if (ROOM_MAP[x][y]) {
 						continue;
 					}
-
-					//for (i = 0; i <= oLen; i++) {
-					if (y >= 47 || x >= 76) {
-						x = 76;
-						y = 46;
-					}
-
-					printf("Here, %i, %i, %i\n", x, y, CLOSED_MAP[y][x]);
-
+					
 					if (CLOSED_MAP[x][y] > 0) {
 						continue;
 					}
 
-					//printf("Now\n");
-					//}
-
 					openList[oLen][0] = x;
 					openList[oLen][1] = y;
-					//closedList[cLen][0] = x;
-					//closedList[cLen][1] = y;
 					CLOSED_MAP[x][y] = 1;
 					oLen ++;
 					added ++;

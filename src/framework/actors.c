@@ -6,6 +6,7 @@
 
 
 TCOD_console_t ACTOR_CONSOLE;
+static character *CHARACTERS = NULL;
 
 
 void actorSetup() {

@@ -18,5 +18,3 @@ void actorLogic(void);
 void drawActors(void);
 void actorSetup(void);
 void actorCleanup(void);
-
-static character *CHARACTERS = NULL;
