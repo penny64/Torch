@@ -8,10 +8,10 @@ all: cgame
 debug: cgame-debug
 
 cgame: $(OFILES)
-		$(CC) $(LDFLAGS) -o cgame $^
+		$(CC) $(LDFLAGS) -o torch $^
 
 cgame-debug: $(OFILES)
 		$(CC) -g -O0 $(LDFLAGS) -o cgame $^
 
 clean:
-	rm src/*.o src/framework/*.o
+	rm torch src/*.o src/framework/*.o

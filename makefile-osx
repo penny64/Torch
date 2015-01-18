@@ -6,7 +6,7 @@ LDFLAGS = -Wl,-rpath,. -Llib -L. -ltcod
 all: cgame
 
 cgame: $(OFILES)
-		$(CC) $(LDFLAGS) -o cgame $^
+		$(CC) $(LDFLAGS) -o torch $^
 
 clean:
-	rm src/*.o src/framework/*.o
+	rm torch src/*.o src/framework/*.o
