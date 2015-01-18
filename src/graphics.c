@@ -5,11 +5,11 @@
 #include "framework/actors.h"
 #include "framework/draw.h"
 #include "framework/numbers.h"
+#include "graphics.h"
 #include "player.h"
+#include "lights.h"
 #include "level.h"
 
-
-int x, y;
 
 void generateFov() {
 	TCOD_map_t map = getLevelMap();
@@ -82,6 +82,7 @@ void composeScene() {
 	TCOD_console_t shadowConsole = getShadowConsole();
 	TCOD_console_t fogConsole = getFogConsole();
 	
+	drawLights();
 	applyFov();
 	
 	TCOD_console_blit(levelConsole, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, NULL, 0, 0, 1, 1);

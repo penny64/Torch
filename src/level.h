@@ -2,6 +2,7 @@
 
 
 TCOD_console_t getLevelConsole(void);
+TCOD_console_t getLightConsole(void);
 TCOD_console_t getShadowConsole(void);
 TCOD_console_t getFogConsole(void);
 TCOD_console_t getSeenConsole(void);

@@ -8,6 +8,7 @@
 
 
 TCOD_console_t LEVEL_CONSOLE;
+TCOD_console_t LIGHT_CONSOLE;
 TCOD_console_t SHADOW_CONSOLE;
 TCOD_console_t FOG_CONSOLE;
 TCOD_console_t SEEN_CONSOLE;
@@ -21,9 +22,11 @@ int ROOM_COUNT;
 
 void levelSetup() {
 	LEVEL_CONSOLE = TCOD_console_new(WINDOW_WIDTH, WINDOW_HEIGHT);
+	LIGHT_CONSOLE = TCOD_console_new(WINDOW_WIDTH, WINDOW_HEIGHT);
 	SHADOW_CONSOLE = TCOD_console_new(WINDOW_WIDTH, WINDOW_HEIGHT);
 	FOG_CONSOLE = TCOD_console_new(WINDOW_WIDTH, WINDOW_HEIGHT);
 	SEEN_CONSOLE = TCOD_console_new(WINDOW_WIDTH, WINDOW_HEIGHT);
+	LIGHT_CONSOLE = TCOD_console_new(WINDOW_WIDTH, WINDOW_HEIGHT);
 	LEVEL_MAP = TCOD_map_new(WINDOW_WIDTH, WINDOW_HEIGHT);
 	FOG_NOISE = TCOD_noise_new(2, TCOD_NOISE_DEFAULT_HURST, TCOD_NOISE_DEFAULT_LACUNARITY, NULL);
 	RANDOM = TCOD_random_get_instance();
@@ -47,6 +50,10 @@ int getRandomInt(int min, int max) {
 
 TCOD_console_t getLevelConsole() {
 	return LEVEL_CONSOLE;
+}
+
+TCOD_console_t getLightConsole() {
+	return LIGHT_CONSOLE;
 }
 
 TCOD_console_t getShadowConsole() {
