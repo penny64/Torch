@@ -4,6 +4,7 @@
 #include "framework/display.h"
 #include "framework/draw.h"
 #include "level.h"
+#include "lights.h"
 #include "libtcod.h"
 
 
@@ -32,16 +33,21 @@ void levelSetup() {
 	RANDOM = TCOD_random_get_instance();
 
 	TCOD_console_set_default_background(LEVEL_CONSOLE, TCOD_color_RGB(40, 30, 30));
+	TCOD_console_set_default_background(LIGHT_CONSOLE, TCOD_color_RGB(0, 0, 0));
 	TCOD_console_set_default_background(SHADOW_CONSOLE, TCOD_color_RGB(0, 0, 0));
 	TCOD_console_set_default_background(SEEN_CONSOLE, TCOD_color_RGB(0, 0, 0));
+	TCOD_console_set_key_color(LIGHT_CONSOLE, TCOD_color_RGB(0, 0, 0));
 	TCOD_console_set_key_color(SHADOW_CONSOLE, TCOD_color_RGB(0, 0, 0));
 	TCOD_console_set_key_color(SEEN_CONSOLE, TCOD_color_RGB(255, 0, 255));
 
 	TCOD_console_clear(LEVEL_CONSOLE);
+	TCOD_console_clear(LIGHT_CONSOLE);
 	TCOD_console_clear(SHADOW_CONSOLE);
 	TCOD_console_clear(SEEN_CONSOLE);
 	
 	TCOD_noise_set_type(FOG_NOISE, TCOD_NOISE_PERLIN);
+	
+	startLights();
 }
 
 int getRandomInt(int min, int max) {
@@ -154,22 +160,27 @@ void placeLights() {
 	
 	for (y = 0; y < WINDOW_HEIGHT; y++) {
 		for (x = 0; x < WINDOW_WIDTH; x++) {
+			if (!TCOD_map_is_walkable(mapCopy, x, y)) {
+				continue;
+			}
+			
 			count = 0;
 			
 			for (y1 = -1; y1 <= 1; y1++) {
 				for (x1 = -1; x1 <= 1; x1++) {
-					if (TCOD_map_is_walkable(mapCopy, x + x1, y + y1)) {
+					if (!TCOD_map_is_walkable(mapCopy, x + x1, y + y1)) {
 						count ++;
 					}
 				}
 			}
 			
-			if (count == 8) {
-				for (y1 = -1; y1 <= 1; y1++) {
-					for (x1 = -1; x1 <= 1; x1++) {
+			if (count == 1 && TCOD_random_get_int(RANDOM, 0, 5)) {
+				//for (y1 = -1; y1 <= 1; y1++) {
+				//	for (x1 = -1; x1 <= 1; x1++) {
 						//TODO: "Tree" lighting
-					}
-				}
+				createLight(x, y);
+				//	}
+				//}
 			}
 		}
 	}
@@ -284,6 +295,10 @@ void generateLevel() {
 	smooth();
 	placeLights();
 	findRooms();
+	
+	createLight(WINDOW_WIDTH/2, WINDOW_HEIGHT/2);
+	
+	drawLights();
 	
 	for (y = 0; y < WINDOW_HEIGHT; y++) {
 		for (x = 0; x < WINDOW_WIDTH; x++) {
