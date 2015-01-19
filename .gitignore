@@ -1,6 +1,10 @@
 bin/
 include/
 
+torch
 
 *.o
+*.so
+*.so.*
 *.gch
+

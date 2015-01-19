@@ -1,6 +1,7 @@
 #include "player.h"
 #include "framework/actors.h"
 #include "framework/input.h"
+#include "lights.h"
 #include "libtcod.h"
 
 
@@ -26,5 +27,9 @@ void playerInputLogic() {
 		PLAYER_ACTOR->vy = -1;
 	} else if (isTCODCharPressed(TCODK_DOWN)) {
 		PLAYER_ACTOR->vy = 1;
+	}
+	
+	if (isCharPressed('c')) {
+		createDynamicLight(PLAYER_ACTOR->x, PLAYER_ACTOR->y);
 	}
 }

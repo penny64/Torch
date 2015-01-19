@@ -32,6 +32,7 @@ int main() {
 		inputLogic();
 		playerInputLogic();
 		actorLogic();
+		lightLogic();
 		
 		if (isTCODCharPressed(TCODK_ESCAPE)) {
 			break;

@@ -23,6 +23,7 @@ void applyFov() {
 	int visible, visibleToPlayer;
 	float distMod, fadeValue;
 	TCOD_map_t map = getLevelMap();
+	TCOD_map_t lightMap = getLightMap();
 	TCOD_console_t actorConsole = getActorConsole();
 	TCOD_console_t seenConsole = getSeenConsole();
 	TCOD_console_t shadowConsole = getShadowConsole();
@@ -38,7 +39,7 @@ void applyFov() {
 			actor = getActors();
 			
 			while (actor != NULL) {
-				if (TCOD_map_is_walkable(getLightMap(), x, y) && TCOD_map_is_in_fov(map, x, y) && TCOD_map_is_in_fov(actor->fov, x, y)) {
+				if (TCOD_map_is_walkable(lightMap, x, y) && TCOD_map_is_in_fov(map, x, y) && TCOD_map_is_in_fov(actor->fov, x, y)) {
 					visible = 1;
 					
 					if (visibleToPlayer && !TCOD_map_is_in_fov(player->fov, x, y)) {
@@ -78,16 +79,19 @@ void composeScene() {
 	
 	TCOD_console_t levelConsole = getLevelConsole();
 	TCOD_console_t lightConsole = getLightConsole();
+	TCOD_console_t dynamicLightConsole = getDynamicLightConsole();
 	TCOD_console_t actorConsole = getActorConsole();
 	TCOD_console_t seenConsole = getSeenConsole();
 	TCOD_console_t shadowConsole = getShadowConsole();
 	TCOD_console_t fogConsole = getFogConsole();
 	
+	drawDynamicLights();
 	applyFov();
 	
 	TCOD_console_blit(levelConsole, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, NULL, 0, 0, 1, 1);
+	TCOD_console_blit(lightConsole, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, NULL, 0, 0, 0, .9f);
+	TCOD_console_blit(dynamicLightConsole, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, NULL, 0, 0, 0, .9f);
 	TCOD_console_blit(actorConsole, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, NULL, 0, 0, 1, 0);
-	TCOD_console_blit(lightConsole, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, NULL, 0, 0, 1, .3f);
 	TCOD_console_blit(fogConsole, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, NULL, 0, 0, 1, 0.3f);
 	TCOD_console_blit(seenConsole, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, NULL, 0, 0, 1, 1);
 	TCOD_console_blit(shadowConsole, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, NULL, 0, 0, 1, 0.55f);
