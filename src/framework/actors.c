@@ -1,4 +1,5 @@
 #include "../level.h" //Will fix this later
+#include "../lights.h"
 #include "display.h"
 #include "logging.h"
 #include "actors.h"
@@ -24,6 +25,7 @@ character *createActor() {
 	_c->prev = NULL;
 	_c->next = NULL;
 	_c->fov = copyLevelMap();
+	_c->itemLight = createDynamicLight(_c->x, _c->y);
 	
 	if (CHARACTERS == NULL) {
 		CHARACTERS = _c;
@@ -47,6 +49,9 @@ void _actorLogic(character *actor) {
 		
 		TCOD_map_compute_fov(actor->fov, actor->x, actor->y, 16, 1, FOV_SHADOW);
 	}
+	
+	actor->itemLight->x = actor->x;
+	actor->itemLight->y = actor->y;
 
 	actor->vx = 0;
 	actor->vy = 0;

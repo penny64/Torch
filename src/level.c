@@ -174,7 +174,7 @@ void placeLights() {
 				}
 			}
 			
-			if (count == 1 && TCOD_random_get_int(RANDOM, 0, 5)) {
+			if (count == 1 && !TCOD_random_get_int(RANDOM, 0, 5)) {
 				//for (y1 = -1; y1 <= 1; y1++) {
 				//	for (x1 = -1; x1 <= 1; x1++) {
 						//TODO: "Tree" lighting
@@ -293,10 +293,10 @@ void generateLevel() {
 	}
 
 	smooth();
-	placeLights();
+	//placeLights();
 	findRooms();
 	
-	createLight(WINDOW_WIDTH/2, WINDOW_HEIGHT/2);
+	//createLight(WINDOW_WIDTH/2, WINDOW_HEIGHT/2);
 	
 	drawLights();
 	

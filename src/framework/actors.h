@@ -8,6 +8,7 @@ typedef struct character character;
 struct character {
 	int x, y, vx, vy, hp;
 	struct character *next, *prev;
+	struct light *itemLight;
 	TCOD_console_t fov;
 };
 

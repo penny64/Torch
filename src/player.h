@@ -5,4 +5,5 @@
 
 void createPlayer(void);
 void playerInputLogic(void);
+int getPlayerMoveCount(void);
 struct character *getPlayer(void);

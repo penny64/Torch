@@ -31,8 +31,11 @@ int main() {
 	while (!TCOD_console_is_window_closed()) {
 		inputLogic();
 		playerInputLogic();
-		actorLogic();
-		lightLogic();
+		
+		if (getPlayerMoveCount()) {
+			actorLogic();
+			lightLogic();
+		}
 		
 		if (isTCODCharPressed(TCODK_ESCAPE)) {
 			break;

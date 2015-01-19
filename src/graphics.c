@@ -20,7 +20,7 @@ void generateFov() {
 
 void applyFov() {
 	int x, y;
-	int visible, visibleToPlayer;
+	int visible, visibleToPlayer, isLit;
 	float distMod, fadeValue;
 	TCOD_map_t map = getLevelMap();
 	TCOD_map_t lightMap = getLightMap();
@@ -29,6 +29,7 @@ void applyFov() {
 	TCOD_console_t shadowConsole = getShadowConsole();
 	character *player = getPlayer();
 	character *actor;
+	light *lght;
 
 	TCOD_console_clear(shadowConsole);
 	
@@ -36,10 +37,26 @@ void applyFov() {
 		for (x = 0; x < WINDOW_WIDTH; x++) {
 			visible = 0;
 			visibleToPlayer = 1;
+			isLit = 0;
 			actor = getActors();
+			lght = getDynamicLights();
+			
+			if (TCOD_map_is_walkable(lightMap, x, y)) {
+				isLit = 1;
+			}
+			
+			while (lght != NULL && !isLit) {
+				if (TCOD_map_is_walkable(lght->lightMap, x, y)) {
+					isLit = 1;
+					
+					break;
+				}
+				
+				lght = lght->next;
+			}
 			
 			while (actor != NULL) {
-				if (TCOD_map_is_walkable(lightMap, x, y) && TCOD_map_is_in_fov(map, x, y) && TCOD_map_is_in_fov(actor->fov, x, y)) {
+				if (isLit && TCOD_map_is_in_fov(map, x, y) && TCOD_map_is_in_fov(actor->fov, x, y)) {
 					visible = 1;
 					
 					if (visibleToPlayer && !TCOD_map_is_in_fov(player->fov, x, y)) {

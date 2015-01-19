@@ -16,6 +16,10 @@ character *getPlayer() {
 	return PLAYER_ACTOR;
 }
 
+int getPlayerMoveCount() {
+	return abs(PLAYER_ACTOR->vx) + abs(PLAYER_ACTOR->vy);
+}
+
 void playerInputLogic() {
 	if (isTCODCharPressed(TCODK_LEFT)) {
 		PLAYER_ACTOR->vx = -1;

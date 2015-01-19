@@ -26,6 +26,7 @@ light *createLight(int x, int y) {
 	_c->prev = NULL;
 	_c->next = NULL;
 	_c->fov = copyLevelMap();
+	_c->lightMap = TCOD_map_new(WINDOW_WIDTH, WINDOW_HEIGHT);
 	
 	TCOD_map_compute_fov(_c->fov, x, y, 32, 1, FOV_SHADOW);
 	
@@ -47,13 +48,15 @@ light *createDynamicLight(int x, int y) {
 	_c = malloc(sizeof(light));
 	_c->x = x;
 	_c->y = y;
-	//_c->vx = 0;
-	//_c->vy = 0;
+	_c->fuelMax = 70;
+	_c->fuel = _c->fuelMax;
+	_c->size = 8;
 	_c->prev = NULL;
 	_c->next = NULL;
 	_c->fov = copyLevelMap();
+	_c->lightMap = copyLevelMap();
 	
-	TCOD_map_compute_fov(_c->fov, x, y, 32, 1, FOV_SHADOW);
+	TCOD_map_compute_fov(_c->fov, x, y, _c->size, 1, FOV_SHADOW);
 	
 	if (DYNAMIC_LIGHTS == NULL) {
 		DYNAMIC_LIGHTS = _c;
@@ -159,8 +162,8 @@ void drawLights() {
 				}
 				
 				
-				if (highest > 12) {
-					highest -= 12;
+				if (highest > 14) {
+					highest -= 14;
 					
 					if (highest <= 0) {
 						continue;
@@ -186,7 +189,17 @@ void drawLights() {
 }
 
 void _lightLogic(light *lght) {
-	TCOD_map_compute_fov(lght->fov, lght->x, lght->y, 32, 1, FOV_SHADOW);
+	int newSize = lght->size;
+	
+	if (lght->fuel < lght->size) {
+		newSize -= lght->size - lght->fuel;
+	}
+	
+	TCOD_map_compute_fov(lght->fov, lght->x, lght->y, newSize, 1, FOV_SHADOW);
+	
+	if (lght->fuel > 0) {
+		lght->fuel --;
+	}
 }
 
 void lightLogic() {
@@ -203,13 +216,24 @@ void _drawDynamicLight(light *lght) {
 	int x, y;
 	int distMod;
 	
-	for (y = lght->y - 64; y < lght->y + 64; y++) {
-		for (x = lght->x - 64; x < lght->x + 64; x++) {
+	TCOD_map_clear(lght->lightMap, 0, 0);
+	
+	if (!lght->fuel) {
+		return;
+	}
+	
+	for (y = lght->y - 32; y < lght->y + 32; y++) {
+		for (x = lght->x - 32; x < lght->x + 32; x++) {
 			if (TCOD_map_is_in_fov(lght->fov, x, y)) {
-				distMod = 64 - distanceFloat(lght->x, lght->y, x, y);
+				distMod = (lght->size * 4) - ((distanceFloat(lght->x, lght->y, x, y) + ((lght->fuelMax - lght->fuel) / 5)));
+				distMod -= getRandomInt(0, 3);
 				
-				drawCharBackEx(DYNAMIC_LIGHT_CONSOLE, x, y, TCOD_color_RGB(65, 65, 65), TCOD_BKGND_ALPHA(distMod / 64.f));
-				TCOD_map_set_properties(LIGHT_MAP, x, y, 1, 1);
+				if (distMod < 0) {
+					distMod = 0;
+				}
+				
+				drawCharBackEx(DYNAMIC_LIGHT_CONSOLE, x, y, TCOD_color_RGB(95, 35, 35), TCOD_BKGND_ALPHA(distMod / 64.f));
+				TCOD_map_set_properties(lght->lightMap, x, y, 1, 1);
 			}
 		}
 	}

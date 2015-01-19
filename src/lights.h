@@ -1,9 +1,10 @@
 typedef struct light light;
 
 struct light {
-	int x, y;
+	int x, y, fuel, fuelMax, size;
 	struct light *next, *prev;
-	TCOD_console_t fov;
+	TCOD_map_t fov;
+	TCOD_map_t lightMap;
 };
 
 
