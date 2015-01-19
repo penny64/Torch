@@ -214,7 +214,7 @@ void lightLogic() {
 
 void _drawDynamicLight(light *lght) {
 	int x, y;
-	int distMod;
+	int distMod, penalty;
 	
 	TCOD_map_clear(lght->lightMap, 0, 0);
 	
@@ -225,14 +225,25 @@ void _drawDynamicLight(light *lght) {
 	for (y = lght->y - 32; y < lght->y + 32; y++) {
 		for (x = lght->x - 32; x < lght->x + 32; x++) {
 			if (TCOD_map_is_in_fov(lght->fov, x, y)) {
-				distMod = (lght->size * 4) - ((distanceFloat(lght->x, lght->y, x, y) + ((lght->fuelMax - lght->fuel) / 5)));
-				distMod -= getRandomInt(0, 3);
+				if (lght->fuel < lght->size) {
+					penalty = lght->size - lght->fuel;
+				} else {
+					penalty = 0;
+				}
+				
+				distMod = lght->size - (distanceFloat(lght->x, lght->y, x, y) + penalty);
 				
 				if (distMod < 0) {
 					distMod = 0;
+				} else if (distMod > lght->size) {
+					distMod = lght->size;
 				}
 				
-				drawCharBackEx(DYNAMIC_LIGHT_CONSOLE, x, y, TCOD_color_RGB(95, 35, 35), TCOD_BKGND_ALPHA(distMod / 64.f));
+				if (distMod > lght->size / 2) {
+					distMod -= getRandomInt(0, 1);
+				}
+				
+				drawCharBackEx(DYNAMIC_LIGHT_CONSOLE, x, y, TCOD_color_RGB(95, 35, 35), TCOD_BKGND_ALPHA(distMod / (float) lght->size));
 				TCOD_map_set_properties(lght->lightMap, x, y, 1, 1);
 			}
 		}
