@@ -5,8 +5,10 @@
 #include "framework/display.h"
 #include "framework/input.h"
 #include "graphics.h"
-#include "level.h"
+#include "lights.h"
 #include "player.h"
+#include "level.h"
+#include "items.h"
 
 
 void setup() {
@@ -15,6 +17,7 @@ void setup() {
 	startInput();
 	createDisplay();
 	actorSetup();
+	itemSetup();
 	levelSetup();
 
 	//Generate level just for demonstration purposes

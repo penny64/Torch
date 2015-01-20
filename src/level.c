@@ -54,6 +54,10 @@ int getRandomInt(int min, int max) {
 	return TCOD_random_get_int(RANDOM, min, max);
 }
 
+float getRandomFloat(float min, float max) {
+	return TCOD_random_get_float(RANDOM, min, max);
+}
+
 TCOD_console_t getLevelConsole() {
 	return LEVEL_CONSOLE;
 }
@@ -296,7 +300,7 @@ void generateLevel() {
 	//placeLights();
 	findRooms();
 	
-	//createLight(WINDOW_WIDTH/2, WINDOW_HEIGHT/2);
+	createLight(WINDOW_WIDTH/2, WINDOW_HEIGHT/2);
 	
 	drawLights();
 	

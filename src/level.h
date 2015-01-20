@@ -14,3 +14,4 @@ void levelSetup(void);
 void generateLevel(void);
 int isPositionWalkable(int, int);
 int getRandomInt(int, int);
+float getRandomFloat(float, float);

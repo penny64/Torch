@@ -3,9 +3,12 @@
 #include "libtcod.h"
 #include "framework/display.h"
 #include "framework/numbers.h"
+#include "framework/actors.h"
 #include "framework/draw.h"
+#include "player.h"
 #include "level.h"
 #include "lights.h"
+#include "items.h"
 
 
 TCOD_console_t DYNAMIC_LIGHT_CONSOLE;
@@ -97,7 +100,9 @@ void startLights() {
 void _drawLight(light *lght) {
 	int x, y;
 	int distMod;
-	//TCOD_console_t lightConsole = getLightConsole();
+	TCOD_console_t itemConsole = getItemConsole();
+
+	drawChar(itemConsole, lght->x, lght->y, (int)'i', TCOD_color_RGB(255, 255, 155), TCOD_color_RGB(0, 0, 0));
 	
 	for (y = lght->y - 64; y < lght->y + 64; y++) {
 		for (x = lght->x - 64; x < lght->x + 64; x++) {
@@ -115,8 +120,6 @@ void drawLights() {
 	light *ptr = LIGHTS;
 	TCOD_console_t lightConsole = getLightConsole();
 	lightMap = malloc(sizeof(double[255][255]));
-	
-	//TCOD_console_clear(lightConsole);
 	
 	for (y = 0; y <= WINDOW_HEIGHT; y++) {
 		for (x = 0; x <= WINDOW_WIDTH; x++) {
@@ -213,8 +216,9 @@ void lightLogic() {
 }
 
 void _drawDynamicLight(light *lght) {
-	int x, y;
-	int distMod, penalty;
+	int x, y, penalty;
+	float distMod;
+	character *player = getPlayer();
 	
 	TCOD_map_clear(lght->lightMap, 0, 0);
 	
@@ -224,7 +228,7 @@ void _drawDynamicLight(light *lght) {
 	
 	for (y = lght->y - 32; y < lght->y + 32; y++) {
 		for (x = lght->x - 32; x < lght->x + 32; x++) {
-			if (TCOD_map_is_in_fov(lght->fov, x, y)) {
+			if (TCOD_map_is_in_fov(lght->fov, x, y) && TCOD_map_is_in_fov(player->fov, x, y)) {
 				if (lght->fuel < lght->size) {
 					penalty = lght->size - lght->fuel;
 				} else {
@@ -232,15 +236,15 @@ void _drawDynamicLight(light *lght) {
 				}
 				
 				distMod = lght->size - (distanceFloat(lght->x, lght->y, x, y) + penalty);
+
+				if (isPositionWalkable(x, y)) {
+					distMod -= getRandomFloat(0, 1);
+				}
 				
 				if (distMod < 0) {
 					distMod = 0;
 				} else if (distMod > lght->size) {
 					distMod = lght->size;
-				}
-				
-				if (distMod > lght->size / 2) {
-					distMod -= getRandomInt(0, 1);
 				}
 				
 				drawCharBackEx(DYNAMIC_LIGHT_CONSOLE, x, y, TCOD_color_RGB(95, 35, 35), TCOD_BKGND_ALPHA(distMod / (float) lght->size));
