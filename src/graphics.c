@@ -10,6 +10,7 @@
 #include "player.h"
 #include "level.h"
 #include "items.h"
+#include "ui.h"
 
 
 void generateFov() {
@@ -103,9 +104,11 @@ void composeScene() {
 	TCOD_console_t seenConsole = getSeenConsole();
 	TCOD_console_t shadowConsole = getShadowConsole();
 	TCOD_console_t fogConsole = getFogConsole();
+	TCOD_console_t UiConsole = getUiConsole();
 	
 	drawDynamicLights();
 	applyFov();
+	drawUi();
 	
 	TCOD_console_blit(levelConsole, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, NULL, 0, 0, 1, 1);
 	TCOD_console_blit(lightConsole, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, NULL, 0, 0, 0, .9f);
@@ -115,5 +118,5 @@ void composeScene() {
 	TCOD_console_blit(fogConsole, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, NULL, 0, 0, 1, 0.3f);
 	TCOD_console_blit(seenConsole, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, NULL, 0, 0, 1, 1);
 	TCOD_console_blit(shadowConsole, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, NULL, 0, 0, 1, 0.55f);
-	
+	TCOD_console_blit(UiConsole, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, NULL, 0, 0, 1, 1);
 }

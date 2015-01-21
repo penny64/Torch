@@ -3,6 +3,8 @@
 #include "framework/actors.h"
 #include "items.h"
 #include "lights.h"
+#include "player.h"
+#include "ui.h"
 
 
 TCOD_console_t ITEM_CONSOLE;
@@ -65,8 +67,14 @@ void itemLogic() {
 }
 
 void itemHandleCharacterCollision(item *itm, character *actor) {
+	character *player = getPlayer();
+
 	if (itm->itemFlags & IS_FUEL_SOURCE) {
 		actor->itemLight->fuel = actor->itemLight->fuelMax;
+
+		if (player != NULL) {
+			showMessage("%cTorch rekindled. Bonfire has x fuel remaining.%c", 10);
+		}
 	}
 }
 

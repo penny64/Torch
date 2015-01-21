@@ -9,6 +9,7 @@
 #include "player.h"
 #include "level.h"
 #include "items.h"
+#include "ui.h"
 
 
 void setup() {
@@ -16,6 +17,7 @@ void setup() {
 	startLogging(LOGGING_DEBUG);
 	startInput();
 	createDisplay();
+	setupUi();
 	actorSetup();
 	itemSetup();
 	levelSetup();
@@ -35,7 +37,12 @@ int main() {
 		inputLogic();
 		playerInputLogic();
 		
+		//While loop?
 		if (getPlayerMoveCount()) {
+			if (getPlayerMoveCount() == 1) {
+				uiLogic();
+			}
+
 			actorLogic();
 			itemLogic();
 			lightLogic();
