@@ -6,6 +6,7 @@
 #include "level.h"
 #include "lights.h"
 #include "libtcod.h"
+#include "items.h"
 
 
 TCOD_console_t LEVEL_CONSOLE;
@@ -303,6 +304,8 @@ void generateLevel() {
 	createLight(WINDOW_WIDTH/2, WINDOW_HEIGHT/2);
 	
 	drawLights();
+
+	createBonfire((WINDOW_WIDTH/2) - 1, WINDOW_HEIGHT/2);
 	
 	for (y = 0; y < WINDOW_HEIGHT; y++) {
 		for (x = 0; x < WINDOW_WIDTH; x++) {

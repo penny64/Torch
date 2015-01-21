@@ -168,7 +168,7 @@ void drawLights() {
 				if (highest > 14) {
 					highest -= 14;
 					
-					if (highest <= 0) {
+					if (highest < 0) {
 						continue;
 					}
 					

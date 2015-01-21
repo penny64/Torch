@@ -20,7 +20,7 @@ void setup() {
 	itemSetup();
 	levelSetup();
 
-	//Generate level just for demonstration purposes
+	//Attract screen
 	generateLevel();
 	createPlayer();
 	createActor();
@@ -37,6 +37,7 @@ int main() {
 		
 		if (getPlayerMoveCount()) {
 			actorLogic();
+			itemLogic();
 			lightLogic();
 		}
 		

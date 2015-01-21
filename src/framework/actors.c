@@ -1,5 +1,6 @@
 #include "../level.h" //Will fix this later
 #include "../lights.h"
+#include "../items.h"
 #include "display.h"
 #include "logging.h"
 #include "actors.h"
@@ -39,6 +40,18 @@ character *createActor() {
 	return _c;
 }
 
+void _checkForCollisions(character *actor) {
+	item *ptr = getItems();
+
+	while (ptr != NULL) {
+		if (actor->x == ptr->x && actor->y == ptr->y) {
+			itemHandleCharacterCollision(ptr, actor);
+		}
+
+		ptr = ptr->next;
+	}
+}
+
 void _actorLogic(character *actor) {
 	int nx = actor->x + actor->vx;
 	int ny = actor->y + actor->vy;
@@ -49,6 +62,8 @@ void _actorLogic(character *actor) {
 		
 		TCOD_map_compute_fov(actor->fov, actor->x, actor->y, 16, 1, FOV_SHADOW);
 	}
+
+	_checkForCollisions(actor);
 	
 	actor->itemLight->x = actor->x;
 	actor->itemLight->y = actor->y;

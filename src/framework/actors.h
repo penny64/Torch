@@ -2,6 +2,8 @@
 
 #include "libtcod.h"
 
+#ifndef SOME_HEADER_GUARD_WITH_UNIQUE_NAME
+#define SOME_HEADER_GUARD_WITH_UNIQUE_NAME
 
 typedef struct character character;
 
@@ -11,6 +13,8 @@ struct character {
 	struct light *itemLight;
 	TCOD_console_t fov;
 };
+
+#endif
 
 character *createActor(void);
 character *getActors(void);
