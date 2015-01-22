@@ -254,8 +254,11 @@ void findRooms() {
 						continue;
 					}
 
-					openList[oLen][0] = x;
-					openList[oLen][1] = y;
+					if (!(y1 == 0 && x1 == 0)) {
+						openList[oLen][0] = x;
+						openList[oLen][1] = y;
+					}
+
 					CLOSED_MAP[x][y] = 1;
 					oLen ++;
 					added ++;
@@ -263,7 +266,7 @@ void findRooms() {
 			}
 		}
 
-		for (i = 0; i <= oLen; i++) {
+		for (i = 0; i < oLen; i++) {
 			x = openList[i][0];
 			y = openList[i][1];
 			
@@ -282,6 +285,7 @@ void placeTunnels() {
 			for (x = 0; x <= WINDOW_WIDTH; x++) {
 				if (ROOM_MAP[x][y] == ROOM_COUNT) {
 					//We need to pick a position here!
+					printf("Room @ %i, %i (%i)\n", x, y, ROOM_COUNT);
 				}
 
 				if (ROOM_MAP[x][y] > ROOM_COUNT) {
@@ -342,6 +346,7 @@ void placeTunnels() {
 		for (y = 2; y < WINDOW_HEIGHT - 1; y++) {
 			for (x = 2; x < WINDOW_WIDTH - 1; x++) {
 				printf("%-2i", DIJKSTRA_MAP[x][y]);
+				//printf("%i", ROOM_MAP[x][y]);
 			}
 
 			printf("\n");
