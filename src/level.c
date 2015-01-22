@@ -201,12 +201,9 @@ void findRooms() {
 	}
 	
 	while (added) {
-		printf("Found new room: %i\n", ROOM_COUNT + 1);
-		
 		cLen = 0;
 		oLen = 0;
 		added = 0;
-		ROOM_COUNT ++;
 
 		//Find starting position
 		for (y = 0; y < WINDOW_HEIGHT; y++) {
@@ -266,6 +263,12 @@ void findRooms() {
 			}
 		}
 
+		if (added) {
+			ROOM_COUNT ++;
+
+			printf("Found new room: %i\n", ROOM_COUNT);
+		}
+
 		for (i = 0; i < oLen; i++) {
 			x = openList[i][0];
 			y = openList[i][1];
@@ -280,12 +283,14 @@ void placeTunnels() {
 	DIJKSTRA_MAP = malloc(sizeof(double[255][255]));
 
 	while (ROOM_COUNT) {
+		printf("Generating tunnels for room %i\n", ROOM_COUNT);
+
 		//Find our first room
-		for (y = 0; y <= WINDOW_HEIGHT; y++) {
-			for (x = 0; x <= WINDOW_WIDTH; x++) {
+		for (y = 2; y < WINDOW_HEIGHT - 1; y++) {
+			for (x = 2; x < WINDOW_WIDTH - 1; x++) {
 				if (ROOM_MAP[x][y] == ROOM_COUNT) {
 					//We need to pick a position here!
-					printf("Room @ %i, %i (%i)\n", x, y, ROOM_COUNT);
+					printf("Room @ %i, %i (%i, array says %i)\n", x, y, ROOM_COUNT, ROOM_MAP[x][y]);
 				}
 
 				if (ROOM_MAP[x][y] > ROOM_COUNT) {
@@ -303,8 +308,8 @@ void placeTunnels() {
 		while (mapUpdates) {
 			mapUpdates = 0;
 
-			for (y = 0; y <= WINDOW_HEIGHT; y++) {
-				for (x = 0; x <= WINDOW_WIDTH; x++) {
+			for (y = 2; y < WINDOW_HEIGHT - 1; y++) {
+				for (x = 2; x < WINDOW_WIDTH - 1; x++) {
 					lowestValue = 1001;
 					currentValue = DIJKSTRA_MAP[x][y];
 
@@ -345,8 +350,8 @@ void placeTunnels() {
 
 		for (y = 2; y < WINDOW_HEIGHT - 1; y++) {
 			for (x = 2; x < WINDOW_WIDTH - 1; x++) {
-				printf("%-2i", DIJKSTRA_MAP[x][y]);
-				//printf("%i", ROOM_MAP[x][y]);
+				//printf("%-2i", DIJKSTRA_MAP[x][y]);
+				printf("%i", ROOM_MAP[x][y]);
 			}
 
 			printf("\n");
