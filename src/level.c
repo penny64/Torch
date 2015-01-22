@@ -301,8 +301,6 @@ void generateLevel() {
 	//placeLights();
 	findRooms();
 	
-	createLight(WINDOW_WIDTH/2, WINDOW_HEIGHT/2);
-	
 	drawLights();
 
 	createBonfire((WINDOW_WIDTH/2) - 1, WINDOW_HEIGHT/2);

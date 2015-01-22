@@ -24,8 +24,6 @@ light *createLight(int x, int y) {
 	_c = malloc(sizeof(light));
 	_c->x = x;
 	_c->y = y;
-	//_c->vx = 0;
-	//_c->vy = 0;
 	_c->prev = NULL;
 	_c->next = NULL;
 	_c->fov = copyLevelMap();
@@ -38,14 +36,18 @@ light *createLight(int x, int y) {
 	} else {
 		_p_c = LIGHTS;
 		
-		LIGHTS->next = _c;
+		while (_p_c->next) {
+			_p_c = _p_c->next;
+		}
+		
+		_p_c->next = _c;
 		_c->prev = _p_c;
 	}
 
 	return _c;
 }
 
-light *createDynamicLight(int x, int y) {
+light *createDynamicLight(int x, int y, character *actor) {
 	light *_c, *_p_c;
 	
 	_c = malloc(sizeof(light));
@@ -53,6 +55,7 @@ light *createDynamicLight(int x, int y) {
 	_c->y = y;
 	_c->fuelMax = 70;
 	_c->fuel = _c->fuelMax;
+	_c->owner = actor;
 	_c->size = 8;
 	_c->prev = NULL;
 	_c->next = NULL;
@@ -65,8 +68,12 @@ light *createDynamicLight(int x, int y) {
 		DYNAMIC_LIGHTS = _c;
 	} else {
 		_p_c = DYNAMIC_LIGHTS;
+
+		while (_p_c->next) {
+			_p_c = _p_c->next;
+		}
 		
-		DYNAMIC_LIGHTS->next = _c;
+		_p_c->next = _c;
 		_c->prev = _p_c;
 	}
 

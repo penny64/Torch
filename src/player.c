@@ -3,6 +3,7 @@
 #include "framework/input.h"
 #include "lights.h"
 #include "libtcod.h"
+#include "items.h"
 
 
 static struct character *PLAYER_ACTOR;
@@ -34,6 +35,6 @@ void playerInputLogic() {
 	}
 	
 	if (isCharPressed('c')) {
-		createDynamicLight(PLAYER_ACTOR->x, PLAYER_ACTOR->y);
+		createBonfire(PLAYER_ACTOR->x, PLAYER_ACTOR->y);
 	}
 }

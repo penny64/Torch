@@ -1,6 +1,7 @@
 #include "libtcod.h"
 #include "framework/display.h"
 #include "framework/actors.h"
+#include "framework/draw.h"
 #include "items.h"
 #include "lights.h"
 #include "player.h"
@@ -34,6 +35,7 @@ item *createItem(int x, int y, char chr, unsigned int flags) {
 	_c->y = y;
 	_c->chr = (int)chr;
 	_c->itemFlags = flags;
+	_c->owner = NULL;
 	_c->prev = NULL;
 	_c->next = NULL;
 	
@@ -42,7 +44,11 @@ item *createItem(int x, int y, char chr, unsigned int flags) {
 	} else {
 		_p_c = ITEMS;
 		
-		ITEMS->next = _c;
+		while (_p_c->next) {
+			_p_c = _p_c->next;
+		}
+		
+		_p_c->next = _c;
 		_c->prev = _p_c;
 	}
 
@@ -56,6 +62,16 @@ void assignFlag(item *itm, unsigned int flag) {
 void _itemLogic(item *itm) {
 }
 
+void _drawItem(item *itm) {
+	TCOD_console_t itemConsole = getItemConsole();
+
+	if (itm->owner) {
+		return;
+	}
+
+	drawChar(itemConsole, itm->x, itm->y, (int)'i', TCOD_color_RGB(255, 255, 155), TCOD_color_RGB(0, 0, 0));
+}
+
 void itemLogic() {
 	item *ptr = ITEMS;
 	
@@ -64,6 +80,19 @@ void itemLogic() {
 		
 		ptr = ptr->next;
 	}
+}
+
+void drawItems() {
+	item *ptr = ITEMS;
+	TCOD_console_t itemConsole = getItemConsole();
+
+	TCOD_console_clear(itemConsole);
+	
+	while (ptr != NULL) {
+		_drawItem(ptr);
+		
+		ptr = ptr->next;
+	}	
 }
 
 void itemHandleCharacterCollision(item *itm, character *actor) {
@@ -80,4 +109,8 @@ void itemHandleCharacterCollision(item *itm, character *actor) {
 
 void createBonfire(int x, int y) {
 	createItem(x, y, '!', IS_FUEL_SOURCE | IS_SOMETHING);
+
+	light *lght = createDynamicLight(x, y, NULL);
+	lght->fuel = 180;
+	lght->fuelMax = 100;
 }

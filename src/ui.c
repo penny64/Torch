@@ -11,7 +11,8 @@
 
 TCOD_console_t UI_CONSOLE;
 const char *DISPLAY_TEXT;
-int DISPLAY_TEXT_TIME, DISPLAY_TEXT_TIME_MAX;
+float DISPLAY_TEXT_TIME, DISPLAY_TEXT_TIME_MAX;
+int DISPLAY_TEXT_FADE = 0, FADE_DELAY = 0;
 
 
 void setupUi() {
@@ -28,21 +29,25 @@ TCOD_console_t getUiConsole() {
 }
 
 void _drawMessage() {
-	//char timeText[50];
 	float colorMod;
+	//char timeText[50];
 
 	if (DISPLAY_TEXT != NULL) {
 		colorMod = DISPLAY_TEXT_TIME / (float)DISPLAY_TEXT_TIME_MAX;
 
-		if (colorMod < .5) {
-			colorMod = .5;
+		if (colorMod < 0) {
+			colorMod = 0;
 		}
 
-		TCOD_console_set_color_control(TCOD_COLCTRL_1, TCOD_color_RGB(255 * colorMod, 250 * colorMod, 220 * colorMod), TCOD_color_RGB(25, 25, 25));
+		if (colorMod > 1) {
+			colorMod = 1;
+		}
+
+		TCOD_console_set_color_control(TCOD_COLCTRL_1, TCOD_color_RGB(255 * colorMod, 250 * colorMod, 220 * colorMod), TCOD_color_RGB(0, 0, 0));
 		//sprintf(timeText, "%c%i%c", DISPLAY_TEXT_TIME_MAX);
 
 		//drawString(UI_CONSOLE, 0, WINDOW_HEIGHT - 1, timeText);
-		drawString(UI_CONSOLE, 3, WINDOW_HEIGHT - 1, DISPLAY_TEXT);
+		drawString(UI_CONSOLE, (WINDOW_WIDTH / 2) - (strlen(DISPLAY_TEXT) / 2), WINDOW_HEIGHT - 1, DISPLAY_TEXT);
 	}
 }
 
@@ -61,8 +66,10 @@ void _drawTorchFuel() {
 
 void showMessage(const char *text, int timeInTurns) {
 	DISPLAY_TEXT = text;
-	DISPLAY_TEXT_TIME = timeInTurns;
-	DISPLAY_TEXT_TIME_MAX = timeInTurns;
+	DISPLAY_TEXT_TIME = 0;
+	DISPLAY_TEXT_TIME_MAX = (float)timeInTurns * 2;
+	DISPLAY_TEXT_FADE = 0;
+	FADE_DELAY = 0;
 }
 
 void drawUi() {
@@ -73,8 +80,22 @@ void drawUi() {
 }
 
 void uiLogic() {
-	if (DISPLAY_TEXT_TIME > 0) {
-		DISPLAY_TEXT_TIME --;
+	if (FADE_DELAY < 5) {
+		FADE_DELAY ++;
+
+		return;
+	}
+
+	FADE_DELAY = 0;
+
+	if (!DISPLAY_TEXT_FADE) {
+		DISPLAY_TEXT_TIME += 3;
+
+		if (DISPLAY_TEXT_TIME >= DISPLAY_TEXT_TIME_MAX + (FPS * .25)) {
+			DISPLAY_TEXT_FADE = 1;
+		}
+	} else if (DISPLAY_TEXT_FADE && DISPLAY_TEXT_TIME > 0) {
+		DISPLAY_TEXT_TIME -= 3;
 	} else if (DISPLAY_TEXT != NULL) {
 		DISPLAY_TEXT = NULL;
 	}

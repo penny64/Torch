@@ -39,14 +39,12 @@ int main() {
 		
 		//While loop?
 		if (getPlayerMoveCount()) {
-			if (getPlayerMoveCount() == 1) {
-				uiLogic();
-			}
-
 			actorLogic();
 			itemLogic();
 			lightLogic();
 		}
+
+		uiLogic();
 		
 		if (isTCODCharPressed(TCODK_ESCAPE)) {
 			break;

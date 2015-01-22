@@ -26,7 +26,7 @@ character *createActor() {
 	_c->prev = NULL;
 	_c->next = NULL;
 	_c->fov = copyLevelMap();
-	_c->itemLight = createDynamicLight(_c->x, _c->y);
+	_c->itemLight = createDynamicLight(_c->x, _c->y, _c);
 	
 	if (CHARACTERS == NULL) {
 		CHARACTERS = _c;

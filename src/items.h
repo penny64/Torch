@@ -16,6 +16,7 @@ struct item {
 	int x, y, vx, vy, chr;
 	unsigned int itemFlags;
 	struct item *next, *prev;
+	struct character *owner;
 };
 
 
@@ -26,6 +27,7 @@ void assignFlag(item*, unsigned int);
 void itemHandleCharacterCollision(item*, character*);
 TCOD_console_t getItemConsole(void);
 item *getItems(void);
+void drawItems(void);
 
 //Item list
 void createBonfire(int, int);
