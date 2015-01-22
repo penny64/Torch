@@ -17,8 +17,8 @@ TCOD_console_t SEEN_CONSOLE;
 TCOD_map_t LEVEL_MAP;
 TCOD_noise_t FOG_NOISE;
 TCOD_random_t RANDOM;
-//int **ROOM_MAP;
-//int **CLOSED_MAP;
+int (*ROOM_MAP)[255];
+int (*DIJKSTRA_MAP)[255];
 int ROOM_COUNT;
 
 
@@ -180,12 +180,7 @@ void placeLights() {
 			}
 			
 			if (count == 1 && !TCOD_random_get_int(RANDOM, 0, 5)) {
-				//for (y1 = -1; y1 <= 1; y1++) {
-				//	for (x1 = -1; x1 <= 1; x1++) {
-						//TODO: "Tree" lighting
 				createLight(x, y);
-				//	}
-				//}
 			}
 		}
 	}
@@ -194,19 +189,19 @@ void placeLights() {
 void findRooms() {
 	int i, x, y, x1, y1, w_x, w_y, oLen, cLen, added = 1;
 	int (*openList)[WINDOW_WIDTH * WINDOW_HEIGHT] = malloc(sizeof(double[WINDOW_WIDTH * WINDOW_HEIGHT][WINDOW_WIDTH * WINDOW_HEIGHT]));
-	int (*ROOM_MAP)[255] = malloc(sizeof(double[255][255]));
 	int (*CLOSED_MAP)[255] = malloc(sizeof(double[255][255]));
-
+	ROOM_MAP = malloc(sizeof(double[255][255]));
 	ROOM_COUNT = 0;
 
 	for (y = 0; y <= WINDOW_HEIGHT; y++) {
 		for (x = 0; x <= WINDOW_WIDTH; x++) {
 			CLOSED_MAP[x][y] = 0;
+			ROOM_MAP[x][y] = 0;
 		}
 	}
 	
 	while (added) {
-		printf("Found new room: %i\n", ROOM_COUNT);
+		printf("Found new room: %i\n", ROOM_COUNT + 1);
 		
 		cLen = 0;
 		oLen = 0;
@@ -273,9 +268,88 @@ void findRooms() {
 			y = openList[i][1];
 			
 			ROOM_MAP[x][y] = ROOM_COUNT;
-
-			//setChar(LEVEL_CONSOLE, x, y, 64+ROOM_COUNT);
 		}
+	}
+}
+
+void placeTunnels() {
+	int x, y, x1, y1, w_x, w_y, mapUpdates, currentValue, neighborValue, lowestValue;;
+	DIJKSTRA_MAP = malloc(sizeof(double[255][255]));
+
+	while (ROOM_COUNT) {
+		//Find our first room
+		for (y = 0; y <= WINDOW_HEIGHT; y++) {
+			for (x = 0; x <= WINDOW_WIDTH; x++) {
+				if (ROOM_MAP[x][y] == ROOM_COUNT) {
+					//We need to pick a position here!
+				}
+
+				if (ROOM_MAP[x][y] > ROOM_COUNT) {
+					DIJKSTRA_MAP[x][y] = -1;
+				} else if (ROOM_MAP[x][y] > 0 && ROOM_MAP[x][y] < ROOM_COUNT) {
+					DIJKSTRA_MAP[x][y] = 0;
+				} else if (!ROOM_MAP[x][y]) {
+					DIJKSTRA_MAP[x][y] = 1000;
+				}
+			}
+		}
+
+		mapUpdates = 1;
+
+		while (mapUpdates) {
+			mapUpdates = 0;
+
+			for (y = 0; y <= WINDOW_HEIGHT; y++) {
+				for (x = 0; x <= WINDOW_WIDTH; x++) {
+					lowestValue = 1001;
+					currentValue = DIJKSTRA_MAP[x][y];
+
+					if (currentValue <= 0) {
+						continue;
+					}
+
+					for (y1 = -1; y1 <= 1; y1++) {
+						for (x1 = -1; x1 <= 1; x1++) {
+							if ((x1 == 0 && y1 == 0) | (x + x1 <= 2 || x + x1 >= WINDOW_WIDTH - 2 || y + y1 <= 2 || y + y1 >= WINDOW_HEIGHT - 2)) {
+								continue;
+							}
+
+							neighborValue = DIJKSTRA_MAP[x + x1][y + y1];
+
+							if (neighborValue == -1) {
+								continue;
+							}
+
+							if (neighborValue >= currentValue) {
+								continue;
+							} else if (neighborValue - 1 < lowestValue) {
+								lowestValue = neighborValue + 1;
+							}
+						}
+					}
+
+					if (lowestValue < currentValue) {
+						DIJKSTRA_MAP[x][y] = lowestValue;
+
+						mapUpdates ++;
+					}
+				}
+			}
+		}
+
+		printf("FORCING A BREAK!!!!!!!!!!!!!\n");
+
+		for (y = 2; y < WINDOW_HEIGHT - 1; y++) {
+			for (x = 2; x < WINDOW_WIDTH - 1; x++) {
+				printf("%-2i", DIJKSTRA_MAP[x][y]);
+			}
+
+			printf("\n");
+		}
+
+		break;
+
+		ROOM_COUNT --;
 	}
 }
 
@@ -300,6 +374,7 @@ void generateLevel() {
 	smooth();
 	//placeLights();
 	findRooms();
+	placeTunnels();
 	
 	drawLights();
 

@@ -33,7 +33,11 @@ character *createActor() {
 	} else {
 		_p_c = CHARACTERS;
 		
-		CHARACTERS->next = _c;
+		while (_p_c->next) {
+			_p_c = _p_c->next;
+		}
+		
+		_p_c->next = _c;
 		_c->prev = _p_c;
 	}
 
