@@ -17,6 +17,7 @@ struct item {
 	unsigned int itemFlags;
 	struct item *next, *prev;
 	struct character *owner;
+	struct light *itemLight;
 };
 
 
@@ -31,3 +32,4 @@ void drawItems(void);
 
 //Item list
 void createBonfire(int, int);
+void createUnkindledBonfire(int, int);

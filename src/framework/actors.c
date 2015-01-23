@@ -124,7 +124,7 @@ void killActor(character *actor) {
 	actor->hp = 0;
 	
 	if (actor == getPlayer()) {
-		showMessage("%cYou die.%c", 30);
+		showMessage("%cYou die.%c", 15);
 	}
 }
 

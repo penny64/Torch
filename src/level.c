@@ -315,6 +315,8 @@ void placeTunnels() {
 		index = TCOD_random_get_int(RANDOM, 0, startCount - 1);
 		w_x = START_POSITIONS[index][0];
 		w_y = START_POSITIONS[index][1];
+		
+		//createUnkindledBonfire(w_x, w_y);
 
 		mapUpdates = 1;
 

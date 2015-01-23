@@ -101,8 +101,14 @@ void itemHandleCharacterCollision(item *itm, character *actor) {
 	if (itm->itemFlags & IS_FUEL_SOURCE) {
 		actor->itemLight->fuel = actor->itemLight->fuelMax;
 
-		if (player != NULL) {
-			showMessage("%cTorch rekindled. Bonfire has x fuel remaining.%c", 10);
+		if (actor == player) {
+			if (itm->itemLight && !itm->itemLight->fuel) {
+				itm->itemLight->fuel = itm->itemLight->fuelMax;
+				
+				showMessage("%cBonfire rekindled. Torch has x fuel remaining.%c", 10);
+			} else {
+				showMessage("%cTorch rekindled. Bonfire has x fuel remaining.%c", 10);
+			}
 		}
 	}
 }
@@ -112,5 +118,14 @@ void createBonfire(int x, int y) {
 
 	light *lght = createDynamicLight(x, y, NULL);
 	lght->fuel = 180;
-	lght->fuelMax = 100;
+	lght->fuelMax = 180;
+}
+
+void createUnkindledBonfire(int x, int y) {
+	item *itm = createItem(x, y, '!', IS_FUEL_SOURCE | IS_SOMETHING);
+
+	light *lght = createDynamicLight(x, y, NULL);
+	//itm->itemLight = lght;
+	//lght->fuel = 0;
+	//lght->fuelMax = 180;
 }

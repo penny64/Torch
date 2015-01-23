@@ -261,7 +261,7 @@ void _drawDynamicLight(light *lght) {
 				}
 				
 				if (TCOD_map_is_in_fov(player->fov, x, y)) {
-					drawCharBackEx(DYNAMIC_LIGHT_CONSOLE, x, y, TCOD_color_RGB(95, 35, 35), TCOD_BKGND_ALPHA(distMod / (float) lght->size));
+					drawCharBackEx(DYNAMIC_LIGHT_CONSOLE, x, y, TCOD_color_RGB(95, 35, 35), TCOD_BKGND_ADDALPHA(distMod / (float) lght->size));
 				}
 			}
 		}
