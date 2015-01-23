@@ -1,6 +1,7 @@
 #include "../level.h" //Will fix this later
 #include "../lights.h"
 #include "../items.h"
+#include "../ui.h"
 #include "display.h"
 #include "logging.h"
 #include "actors.h"
@@ -56,7 +57,17 @@ void _checkForCollisions(character *actor) {
 	}
 }
 
+void _checkIfPositionLit(character *actor) {
+	if (!isPositionLit(actor->x, actor->y)) {
+		killActor(actor);
+	}
+}
+
 void _actorLogic(character *actor) {
+	if (!actor->hp) {
+		return;
+	}
+	
 	int nx = actor->x + actor->vx;
 	int ny = actor->y + actor->vy;
 
@@ -68,6 +79,7 @@ void _actorLogic(character *actor) {
 	}
 
 	_checkForCollisions(actor);
+	_checkIfPositionLit(actor);
 	
 	actor->itemLight->x = actor->x;
 	actor->itemLight->y = actor->y;
@@ -89,7 +101,13 @@ void actorLogic() {
 }
 
 void _drawActor(character *actor) {
-	drawChar(ACTOR_CONSOLE, actor->x, actor->y, (int)'@', TCOD_color_RGB(255, 255, 255), TCOD_color_RGB(0, 0, 0));
+	int colorMod = 0;
+	
+	if (actor->hp <= 0) {
+		colorMod = 155;
+	}
+	
+	drawChar(ACTOR_CONSOLE, actor->x, actor->y, (int)'@', TCOD_color_RGB(255 - colorMod, 255 - colorMod, 255 - colorMod), TCOD_color_RGB(0, 0, 0));
 }
 
 void drawActors() {
@@ -99,6 +117,14 @@ void drawActors() {
 		_drawActor(ptr);
 
 		ptr = ptr->next;
+	}
+}
+
+void killActor(character *actor) {
+	actor->hp = 0;
+	
+	if (actor == getPlayer()) {
+		showMessage("%cYou die.%c", 30);
 	}
 }
 

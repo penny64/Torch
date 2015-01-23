@@ -22,6 +22,10 @@ int getPlayerMoveCount() {
 }
 
 void playerInputLogic() {
+	if (!PLAYER_ACTOR || PLAYER_ACTOR->hp <= 0) {
+		return;
+	}
+	
 	if (isTCODCharPressed(TCODK_LEFT)) {
 		PLAYER_ACTOR->vx = -1;
 	} else if (isTCODCharPressed(TCODK_RIGHT)) {

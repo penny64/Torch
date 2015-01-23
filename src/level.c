@@ -238,6 +238,10 @@ void findRooms() {
 					if (!TCOD_map_is_walkable(LEVEL_MAP, x, y)) {
 						continue;
 					}
+					
+					if ((y1 == -1 && x1 == 1) || (y1 == -1 && x1 == -1) || (y1 == 1 && x1 == 1) || (y1 == 1 && x1 == -1)) {
+						continue;
+					}
 
 					if (x <= 1 || x >= WINDOW_WIDTH - 2 || y <= 1 || y >= WINDOW_HEIGHT - 2) {
 						continue;
@@ -279,29 +283,38 @@ void findRooms() {
 }
 
 void placeTunnels() {
-	int x, y, x1, y1, w_x, w_y, mapUpdates, currentValue, neighborValue, lowestValue;;
+	int x, y, x1, y1, w_x, w_y, mapUpdates, currentValue, neighborValue, lowestValue, startCount, index, lowestX, lowestY;
 	DIJKSTRA_MAP = malloc(sizeof(double[255][255]));
+	int (*START_POSITIONS)[WINDOW_WIDTH * WINDOW_HEIGHT] = malloc(sizeof(double[WINDOW_WIDTH * WINDOW_HEIGHT][WINDOW_WIDTH * WINDOW_HEIGHT]));
 
 	while (ROOM_COUNT) {
 		printf("Generating tunnels for room %i\n", ROOM_COUNT);
+		
+		startCount = 0;
 
 		//Find our first room
 		for (y = 2; y < WINDOW_HEIGHT - 1; y++) {
 			for (x = 2; x < WINDOW_WIDTH - 1; x++) {
 				if (ROOM_MAP[x][y] == ROOM_COUNT) {
-					//We need to pick a position here!
-					printf("Room @ %i, %i (%i, array says %i)\n", x, y, ROOM_COUNT, ROOM_MAP[x][y]);
+					START_POSITIONS[startCount][0] = x;
+					START_POSITIONS[startCount][1] = y;
+					
+					startCount ++;
 				}
 
 				if (ROOM_MAP[x][y] > ROOM_COUNT) {
 					DIJKSTRA_MAP[x][y] = -1;
 				} else if (ROOM_MAP[x][y] > 0 && ROOM_MAP[x][y] < ROOM_COUNT) {
 					DIJKSTRA_MAP[x][y] = 0;
-				} else if (!ROOM_MAP[x][y]) {
+				} else if (!ROOM_MAP[x][y] || ROOM_MAP[x][y] == ROOM_COUNT) {
 					DIJKSTRA_MAP[x][y] = 1000;
 				}
 			}
 		}
+		
+		index = TCOD_random_get_int(RANDOM, 0, startCount - 1);
+		w_x = START_POSITIONS[index][0];
+		w_y = START_POSITIONS[index][1];
 
 		mapUpdates = 1;
 
@@ -345,19 +358,45 @@ void placeTunnels() {
 				}
 			}
 		}
+		
+		while (DIJKSTRA_MAP[w_x][w_y]) {
+			lowestValue = DIJKSTRA_MAP[w_x][w_y];
+			lowestX = 0;
+			lowestY = 0;
+			
+			for (y1 = -1; y1 <= 1; y1++) {
+				for (x1 = -1; x1 <= 1; x1++) {
+					if ((x1 == 0 && y1 == 0) | (w_x + x1 <= 2 || w_x + x1 >= WINDOW_WIDTH - 2 || w_y + y1 <= 2 || w_y + y1 >= WINDOW_HEIGHT - 2)) {
+						continue;
+					}
+					
+					if ((y1 == -1 && x1 == 1) || (y1 == -1 && x1 == -1) || (y1 == 1 && x1 == 1) || (y1 == 1 && x1 == -1)) {
+						continue;
+					}
+					
+					if (DIJKSTRA_MAP[w_x + x1][w_y + y1] < lowestValue) {
+						lowestValue = DIJKSTRA_MAP[w_x + x1][w_y + y1];
+						lowestX = w_x + x1;
+						lowestY = w_y + y1;
+					}
+				}
+			}
+			
+			w_x = lowestX;
+			w_y = lowestY;
+			
+			TCOD_map_set_properties(LEVEL_MAP, w_x, w_y, 1, 1);
+			
+			printf("Walking: %i, %i\n", w_x, w_y);
+		}
 
-		printf("FORCING A BREAK!!!!!!!!!!!!!\n");
-
-		for (y = 2; y < WINDOW_HEIGHT - 1; y++) {
+		/*for (y = 2; y < WINDOW_HEIGHT - 1; y++) {
 			for (x = 2; x < WINDOW_WIDTH - 1; x++) {
-				//printf("%-2i", DIJKSTRA_MAP[x][y]);
-				printf("%i", ROOM_MAP[x][y]);
+				printf("%-2i", DIJKSTRA_MAP[x][y]);
 			}
 
 			printf("\n");
-		}
-
-		break;
+		}*/
 
 		ROOM_COUNT --;
 	}

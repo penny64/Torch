@@ -235,7 +235,7 @@ void _drawDynamicLight(light *lght) {
 	
 	for (y = lght->y - 32; y < lght->y + 32; y++) {
 		for (x = lght->x - 32; x < lght->x + 32; x++) {
-			if (TCOD_map_is_in_fov(lght->fov, x, y) && TCOD_map_is_in_fov(player->fov, x, y)) {
+			if (TCOD_map_is_in_fov(lght->fov, x, y)) {
 				if (lght->fuel < lght->size) {
 					penalty = lght->size - lght->fuel;
 				} else {
@@ -243,6 +243,12 @@ void _drawDynamicLight(light *lght) {
 				}
 				
 				distMod = lght->size - (distanceFloat(lght->x, lght->y, x, y) + penalty);
+				
+				if (distMod <= 0) {
+					TCOD_map_set_properties(lght->lightMap, x, y, 0, 0);
+				} else {
+					TCOD_map_set_properties(lght->lightMap, x, y, 1, 1);
+				}
 
 				if (isPositionWalkable(x, y)) {
 					distMod -= getRandomFloat(0, 1);
@@ -254,8 +260,9 @@ void _drawDynamicLight(light *lght) {
 					distMod = lght->size;
 				}
 				
-				drawCharBackEx(DYNAMIC_LIGHT_CONSOLE, x, y, TCOD_color_RGB(95, 35, 35), TCOD_BKGND_ALPHA(distMod / (float) lght->size));
-				TCOD_map_set_properties(lght->lightMap, x, y, 1, 1);
+				if (TCOD_map_is_in_fov(player->fov, x, y)) {
+					drawCharBackEx(DYNAMIC_LIGHT_CONSOLE, x, y, TCOD_color_RGB(95, 35, 35), TCOD_BKGND_ALPHA(distMod / (float) lght->size));
+				}
 			}
 		}
 	}
@@ -271,4 +278,22 @@ void drawDynamicLights() {
 
 		ptr = ptr->next;
 	}
+}
+
+int isPositionLit(int x, int y) {
+	light *lght = DYNAMIC_LIGHTS;
+			
+	if (TCOD_map_is_walkable(LIGHT_MAP, x, y)) {
+		return 1;
+	}
+	
+	while (lght != NULL) {
+		if (TCOD_map_is_walkable(lght->lightMap, x, y)) {
+			return 1;
+		}
+		
+		lght = lght->next;
+	}
+	
+	return 0;
 }
