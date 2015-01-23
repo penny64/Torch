@@ -30,7 +30,7 @@ item *getItems() {
 item *createItem(int x, int y, char chr, unsigned int flags) {
 	item *_c, *_p_c;
 	
-	_c = malloc(sizeof(item));
+	_c = calloc(1, sizeof(item));
 	_c->x = x;
 	_c->y = y;
 	_c->chr = (int)chr;

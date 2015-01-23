@@ -1,6 +1,7 @@
 #include "../level.h" //Will fix this later
 #include "../lights.h"
 #include "../items.h"
+#include "../player.h"
 #include "../ui.h"
 #include "display.h"
 #include "logging.h"
@@ -19,13 +20,14 @@ void actorSetup() {
 character *createActor() {
 	character *_c, *_p_c;
 	
-	_c = malloc(sizeof(character));
+	_c = calloc(1, sizeof(character));
 	_c->x = WINDOW_WIDTH / 2;
 	_c->y = WINDOW_HEIGHT / 2;
 	_c->vx = 1;
 	_c->vy = 0;
 	_c->prev = NULL;
 	_c->next = NULL;
+	_c->hp = 100;
 	_c->fov = copyLevelMap();
 	_c->itemLight = createDynamicLight(_c->x, _c->y, _c);
 	
@@ -122,6 +124,8 @@ void drawActors() {
 
 void killActor(character *actor) {
 	actor->hp = 0;
+
+	printf("Killed actor.\n");
 	
 	if (actor == getPlayer()) {
 		showMessage("%cYou die.%c", 15);

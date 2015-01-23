@@ -2,8 +2,8 @@
 
 #include "libtcod.h"
 
-#ifndef SOME_HEADER_GUARD_WITH_UNIQUE_NAME
-#define SOME_HEADER_GUARD_WITH_UNIQUE_NAME
+#ifndef ACTORS_H
+#define ACTORS_H
 
 typedef struct character character;
 
@@ -23,3 +23,4 @@ void actorLogic(void);
 void drawActors(void);
 void actorSetup(void);
 void actorCleanup(void);
+void killActor(character*);

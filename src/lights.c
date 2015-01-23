@@ -21,7 +21,7 @@ TCOD_map_t LIGHT_MAP;
 light *createLight(int x, int y) {
 	light *_c, *_p_c;
 	
-	_c = malloc(sizeof(light));
+	_c = calloc(1, sizeof(light));
 	_c->x = x;
 	_c->y = y;
 	_c->prev = NULL;
@@ -50,7 +50,7 @@ light *createLight(int x, int y) {
 light *createDynamicLight(int x, int y, character *actor) {
 	light *_c, *_p_c;
 	
-	_c = malloc(sizeof(light));
+	_c = calloc(1, sizeof(light));
 	_c->x = x;
 	_c->y = y;
 	_c->fuelMax = 70;

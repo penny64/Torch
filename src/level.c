@@ -388,8 +388,6 @@ void placeTunnels() {
 			w_y = lowestY;
 			
 			TCOD_map_set_properties(LEVEL_MAP, w_x, w_y, 1, 1);
-			
-			printf("Walking: %i, %i\n", w_x, w_y);
 		}
 
 		/*for (y = 2; y < WINDOW_HEIGHT - 1; y++) {
