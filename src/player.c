@@ -38,6 +38,28 @@ void playerInputLogic() {
 		PLAYER_ACTOR->vy = 1;
 	}
 	
+	if (isCharPressed('1')) {
+		PLAYER_ACTOR->vx = -1;
+		PLAYER_ACTOR->vy = 1;
+	} else if (isCharPressed('2')) {
+		PLAYER_ACTOR->vy = 1;
+	} else if (isCharPressed('3')) {
+		PLAYER_ACTOR->vx = 1;
+		PLAYER_ACTOR->vy = 1;
+	} else if (isCharPressed('4')) {
+		PLAYER_ACTOR->vx = -1;
+	} else if (isCharPressed('6')) {
+		PLAYER_ACTOR->vx = 1;
+	} else if (isCharPressed('7')) {
+		PLAYER_ACTOR->vx = -1;
+		PLAYER_ACTOR->vy = -1;
+	} else if (isCharPressed('8')) {
+		PLAYER_ACTOR->vy = -1;
+	} else if (isCharPressed('9')) {
+		PLAYER_ACTOR->vx = 1;
+		PLAYER_ACTOR->vy = -1;
+	}
+	
 	if (isCharPressed('c')) {
 		createBonfire(PLAYER_ACTOR->x, PLAYER_ACTOR->y);
 	}

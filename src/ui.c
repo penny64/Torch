@@ -58,9 +58,17 @@ void _drawTorchFuel() {
 
 	fuelMod = player->itemLight->fuel / (float)player->itemLight->fuelMax;
 	barWidth *= fuelMod;
+	
+	//setChar(UI_CONSOLE, 1, 0, '[');
+	drawChar(UI_CONSOLE, 1, 0, '[', TCOD_color_RGB(200, 200, 200), TCOD_color_RGB(65, 65, 65));
+	drawChar(UI_CONSOLE, WINDOW_WIDTH - 2, 0, ']', TCOD_color_RGB(200, 200, 200), TCOD_color_RGB(65, 65, 65));
 
-	for (x = 0; x <= barWidth; x++) {
+	for (x = 2; x < barWidth; x++) {
 		drawCharBackEx(UI_CONSOLE, x, 0, TCOD_color_RGB(255 - x, (255 * fuelMod), 150 * fuelMod), TCOD_BKGND_SET);
+	}
+	
+	for (x = barWidth; x < WINDOW_WIDTH - 2; x++) {
+		drawCharBackEx(UI_CONSOLE, x, 0, TCOD_color_RGB(35, 35, 35), TCOD_BKGND_SET);
 	}
 }
 
