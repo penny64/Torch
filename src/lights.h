@@ -22,4 +22,5 @@ void lightLogic(void);
 void drawLights(void);
 void drawDynamicLights(void);
 void startLights(void);
+void refreshAllLights(void);
 int isPositionLit(int, int);

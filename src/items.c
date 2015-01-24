@@ -72,6 +72,9 @@ void _drawItem(item *itm) {
 	drawChar(itemConsole, itm->x, itm->y, (int)'i', TCOD_color_RGB(255, 255, 155), TCOD_color_RGB(0, 0, 0));
 }
 
+void resetItemForNewLevel(item *itm) {
+}
+
 void itemLogic() {
 	item *ptr = ITEMS;
 	

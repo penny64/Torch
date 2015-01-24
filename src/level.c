@@ -284,7 +284,7 @@ void findRooms() {
 }
 
 void placeTunnels() {
-	int x, y, x1, y1, w_x, w_y, mapUpdates, currentValue, neighborValue, lowestValue, startCount, index, lowestX, lowestY, invalid, placedPlayer = 0;
+	int x, y, x1, y1, w_x, w_y, mapUpdates, currentValue, neighborValue, lowestValue, startCount, index, lowestX, lowestY, invalid, roomSize, placedPlayer = 0;
 	int (*START_POSITIONS)[WINDOW_WIDTH * WINDOW_HEIGHT] = malloc(sizeof(double[WINDOW_WIDTH * WINDOW_HEIGHT][WINDOW_WIDTH * WINDOW_HEIGHT]));
 	character *player = getPlayer();
 	DIJKSTRA_MAP = malloc(sizeof(double[255][255]));
@@ -374,9 +374,11 @@ void placeTunnels() {
 								continue;
 							}
 							
-							if ((y1 == -1 && x1 == 1) || (y1 == -1 && x1 == -1) || (y1 == 1 && x1 == 1) || (y1 == 1 && x1 == -1)) {
-								continue;
-							}
+							//if (TCOD_random_get_int(RANDOM, 0, 1)) {
+								if ((y1 == -1 && x1 == 1) || (y1 == -1 && x1 == -1) || (y1 == 1 && x1 == 1) || (y1 == 1 && x1 == -1)) {
+									continue;
+								}
+							//}
 
 							neighborValue = DIJKSTRA_MAP[x + x1][y + y1];
 
@@ -412,9 +414,9 @@ void placeTunnels() {
 						continue;
 					}
 					
-					if ((y1 == -1 && x1 == 1) || (y1 == -1 && x1 == -1) || (y1 == 1 && x1 == 1) || (y1 == 1 && x1 == -1)) {
-						continue;
-					}
+					//if ((y1 == -1 && x1 == 1) || (y1 == -1 && x1 == -1) || (y1 == 1 && x1 == 1) || (y1 == 1 && x1 == -1)) {
+					//	continue;
+					//}
 					
 					if (DIJKSTRA_MAP[w_x + x1][w_y + y1] < lowestValue) {
 						lowestValue = DIJKSTRA_MAP[w_x + x1][w_y + y1];
@@ -428,12 +430,25 @@ void placeTunnels() {
 			w_x = lowestX;
 			w_y = lowestY;
 			
-			printf("Walking to %i, %i\n", w_x, w_y);
+			//printf("Walking to %i, %i\n", w_x, w_y);
+			if (!TCOD_random_get_int(RANDOM, 0, 15)) {
+				roomSize = 6;
+			} else {
+				roomSize = 3;
+			}
 			
-			TCOD_map_set_properties(LEVEL_MAP, w_x, w_y, 1, 1);
+			for (y1 = -16; y1 <= 16; y1++) {
+				for (x1 = -16; x1 <= 16; x1++) {
+					if (distance(w_x, w_y, w_x + x1, w_y + y1) >= TCOD_random_get_int(RANDOM, roomSize - 1, roomSize)) {
+						continue;
+					}
+					
+					TCOD_map_set_properties(LEVEL_MAP, w_x + x1, w_y + y1, 1, 1);
+				}
+			}
 		}
 
-		for (y = 2; y < WINDOW_HEIGHT - 1; y++) {
+		/*for (y = 2; y < WINDOW_HEIGHT - 1; y++) {
 			for (x = 2; x < WINDOW_WIDTH - 1; x++) {
 				if (x == START_POSITIONS[index][0] && y == START_POSITIONS[index][1]) {
 					printf("X ");
@@ -443,7 +458,7 @@ void placeTunnels() {
 			}
 
 			printf("\n");
-		}
+		}*/
 
 		ROOM_COUNT --;
 	}
@@ -457,25 +472,22 @@ void generateLevel() {
 	character *player = getPlayer();
 	
 	for (i = 0; i < 6; i++) {
-		if (!i) {
-			x = WINDOW_WIDTH / 2;
-			y = WINDOW_HEIGHT / 2;
-		} else {
-			x = TCOD_random_get_int(RANDOM, 16, WINDOW_WIDTH - 16);
-			y = TCOD_random_get_int(RANDOM, 16, WINDOW_HEIGHT - 16);
-		}
+		x = TCOD_random_get_int(RANDOM, 4, WINDOW_WIDTH - 4);
+		y = TCOD_random_get_int(RANDOM, 4, WINDOW_HEIGHT - 4);
 
 		carve(x, y);
 	}
 
-	smooth();
+	//smooth();
 	//placeLights();
 	findRooms();
 	placeTunnels();
+	smooth();
 	
 	drawLights();
 	
 	createBonfire(player->x, player->y);
+	refreshAllLights();
 	
 	for (y = 0; y < WINDOW_HEIGHT; y++) {
 		for (x = 0; x < WINDOW_WIDTH; x++) {

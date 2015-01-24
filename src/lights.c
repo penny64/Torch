@@ -96,6 +96,23 @@ TCOD_map_t getLightMap() {
 	return LIGHT_MAP;
 }
 
+void _initDynamicLight(light *lght) {
+	lght->fov = copyLevelMap();
+	lght->lightMap = copyLevelMap();
+	
+	TCOD_map_compute_fov(lght->fov, lght->x, lght->y, lght->size, 1, FOV_SHADOW);
+}
+
+void refreshAllLights() {
+	light *ptr = DYNAMIC_LIGHTS;
+	
+	while (ptr != NULL) {
+		 _initDynamicLight(ptr);
+		
+		ptr = ptr->next;
+	}
+}
+
 void startLights() {
 	LIGHT_MAP = TCOD_map_new(WINDOW_WIDTH, WINDOW_HEIGHT);
 	DYNAMIC_LIGHT_CONSOLE = TCOD_console_new(WINDOW_WIDTH, WINDOW_HEIGHT);
