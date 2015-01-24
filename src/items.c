@@ -125,7 +125,7 @@ void createUnkindledBonfire(int x, int y) {
 	item *itm = createItem(x, y, '!', IS_FUEL_SOURCE | IS_SOMETHING);
 
 	light *lght = createDynamicLight(x, y, NULL);
-	//itm->itemLight = lght;
-	//lght->fuel = 0;
-	//lght->fuelMax = 180;
+	itm->itemLight = lght;
+	lght->fuel = 0;
+	lght->fuelMax = 120;
 }

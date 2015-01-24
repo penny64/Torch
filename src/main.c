@@ -20,11 +20,12 @@ void setup() {
 	setupUi();
 	actorSetup();
 	itemSetup();
+	createPlayer();
 	levelSetup();
 
 	//Attract screen
 	generateLevel();
-	createPlayer();
+	resetActorForNewLevel(getPlayer());
 	createActor();
 
 	logString(LOGGING_DEBUG, WINDOW_TITLE);

@@ -7,6 +7,7 @@
 #include "lights.h"
 #include "libtcod.h"
 #include "items.h"
+#include "player.h"
 
 
 TCOD_console_t LEVEL_CONSOLE;
@@ -283,11 +284,18 @@ void findRooms() {
 }
 
 void placeTunnels() {
-	int x, y, x1, y1, w_x, w_y, mapUpdates, currentValue, neighborValue, lowestValue, startCount, index, lowestX, lowestY;
-	DIJKSTRA_MAP = malloc(sizeof(double[255][255]));
+	int x, y, x1, y1, w_x, w_y, mapUpdates, currentValue, neighborValue, lowestValue, startCount, index, lowestX, lowestY, invalid, placedPlayer = 0;
 	int (*START_POSITIONS)[WINDOW_WIDTH * WINDOW_HEIGHT] = malloc(sizeof(double[WINDOW_WIDTH * WINDOW_HEIGHT][WINDOW_WIDTH * WINDOW_HEIGHT]));
+	character *player = getPlayer();
+	DIJKSTRA_MAP = malloc(sizeof(double[255][255]));
+	
+	for (y = 2; y < WINDOW_HEIGHT - 1; y++) {
+		for (x = 2; x < WINDOW_WIDTH - 1; x++) {
+			DIJKSTRA_MAP[x][y] = 0;
+		}
+	}
 
-	while (ROOM_COUNT) {
+	while (ROOM_COUNT > 1) {
 		printf("Generating tunnels for room %i\n", ROOM_COUNT);
 		
 		startCount = 0;
@@ -295,11 +303,29 @@ void placeTunnels() {
 		//Find our first room
 		for (y = 2; y < WINDOW_HEIGHT - 1; y++) {
 			for (x = 2; x < WINDOW_WIDTH - 1; x++) {
-				if (ROOM_MAP[x][y] == ROOM_COUNT) {
-					START_POSITIONS[startCount][0] = x;
-					START_POSITIONS[startCount][1] = y;
+				invalid = 0;
+				
+				for (y1 = -1; y1 <= 1; y1++) {
+					for (x1 = -1; x1 <= 1; x1++) {
+						if (!ROOM_MAP[x + x1][y + y1]) {
+							invalid = 1;
+							
+							break;
+						}
+					}
 					
-					startCount ++;
+					if (invalid) {
+						break;
+					}
+				}
+				
+				if (!invalid) {
+					if (ROOM_MAP[x][y] == ROOM_COUNT) {
+						START_POSITIONS[startCount][0] = x;
+						START_POSITIONS[startCount][1] = y;
+						
+						startCount ++;
+					}
 				}
 
 				if (ROOM_MAP[x][y] > ROOM_COUNT) {
@@ -307,7 +333,7 @@ void placeTunnels() {
 				} else if (ROOM_MAP[x][y] > 0 && ROOM_MAP[x][y] < ROOM_COUNT) {
 					DIJKSTRA_MAP[x][y] = 0;
 				} else if (!ROOM_MAP[x][y] || ROOM_MAP[x][y] == ROOM_COUNT) {
-					DIJKSTRA_MAP[x][y] = 1000;
+					DIJKSTRA_MAP[x][y] = 99;
 				}
 			}
 		}
@@ -316,7 +342,17 @@ void placeTunnels() {
 		w_x = START_POSITIONS[index][0];
 		w_y = START_POSITIONS[index][1];
 		
-		//createUnkindledBonfire(w_x, w_y);
+		printf("Starting at %i, %i\n", w_x, w_y);
+		
+		if (!placedPlayer) {
+			player->x = w_x;
+			player->y = w_y;
+			player->vx ++;
+			
+			placedPlayer = 1;
+		} else {
+			createUnkindledBonfire(w_x, w_y);
+		}
 
 		mapUpdates = 1;
 
@@ -325,7 +361,7 @@ void placeTunnels() {
 
 			for (y = 2; y < WINDOW_HEIGHT - 1; y++) {
 				for (x = 2; x < WINDOW_WIDTH - 1; x++) {
-					lowestValue = 1001;
+					lowestValue = 99;
 					currentValue = DIJKSTRA_MAP[x][y];
 
 					if (currentValue <= 0) {
@@ -337,6 +373,10 @@ void placeTunnels() {
 							if ((x1 == 0 && y1 == 0) | (x + x1 <= 2 || x + x1 >= WINDOW_WIDTH - 2 || y + y1 <= 2 || y + y1 >= WINDOW_HEIGHT - 2)) {
 								continue;
 							}
+							
+							if ((y1 == -1 && x1 == 1) || (y1 == -1 && x1 == -1) || (y1 == 1 && x1 == 1) || (y1 == 1 && x1 == -1)) {
+								continue;
+							}
 
 							neighborValue = DIJKSTRA_MAP[x + x1][y + y1];
 
@@ -346,7 +386,7 @@ void placeTunnels() {
 
 							if (neighborValue >= currentValue) {
 								continue;
-							} else if (neighborValue - 1 < lowestValue) {
+							} else if (neighborValue - 1 <= lowestValue) {
 								lowestValue = neighborValue + 1;
 							}
 						}
@@ -384,19 +424,26 @@ void placeTunnels() {
 				}
 			}
 			
+			
 			w_x = lowestX;
 			w_y = lowestY;
+			
+			printf("Walking to %i, %i\n", w_x, w_y);
 			
 			TCOD_map_set_properties(LEVEL_MAP, w_x, w_y, 1, 1);
 		}
 
-		/*for (y = 2; y < WINDOW_HEIGHT - 1; y++) {
+		for (y = 2; y < WINDOW_HEIGHT - 1; y++) {
 			for (x = 2; x < WINDOW_WIDTH - 1; x++) {
-				printf("%-2i", DIJKSTRA_MAP[x][y]);
+				if (x == START_POSITIONS[index][0] && y == START_POSITIONS[index][1]) {
+					printf("X ");
+				} else {
+					printf("%-2i", DIJKSTRA_MAP[x][y]);
+				}
 			}
 
 			printf("\n");
-		}*/
+		}
 
 		ROOM_COUNT --;
 	}
@@ -407,6 +454,7 @@ void generateLevel() {
 	float fogValue, colorMod;
 	float p[2];
 	TCOD_noise_t fog = getFogNoise();
+	character *player = getPlayer();
 	
 	for (i = 0; i < 6; i++) {
 		if (!i) {
@@ -426,8 +474,8 @@ void generateLevel() {
 	placeTunnels();
 	
 	drawLights();
-
-	createBonfire((WINDOW_WIDTH/2) - 1, WINDOW_HEIGHT/2);
+	
+	createBonfire(player->x, player->y);
 	
 	for (y = 0; y < WINDOW_HEIGHT; y++) {
 		for (x = 0; x < WINDOW_WIDTH; x++) {

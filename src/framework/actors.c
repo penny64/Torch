@@ -23,7 +23,7 @@ character *createActor() {
 	_c = calloc(1, sizeof(character));
 	_c->x = WINDOW_WIDTH / 2;
 	_c->y = WINDOW_HEIGHT / 2;
-	_c->vx = 1;
+	_c->vx = 0;
 	_c->vy = 0;
 	_c->prev = NULL;
 	_c->next = NULL;
@@ -45,6 +45,13 @@ character *createActor() {
 	}
 
 	return _c;
+}
+
+void resetActorForNewLevel(character *actor) {
+	actor->fov = copyLevelMap();
+	
+	//TODO: Delete old torch
+	actor->itemLight = createDynamicLight(actor->x, actor->y, actor);
 }
 
 void _checkForCollisions(character *actor) {

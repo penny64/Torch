@@ -19,6 +19,7 @@ struct character {
 character *createActor(void);
 character *getActors(void);
 TCOD_console_t getActorConsole(void);
+void resetActorForNewLevel(character*);
 void actorLogic(void);
 void drawActors(void);
 void actorSetup(void);
