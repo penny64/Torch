@@ -1,3 +1,5 @@
+#include <stdio.h>
+
 #include "../level.h" //Will fix this later
 #include "../lights.h"
 #include "../items.h"

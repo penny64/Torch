@@ -2,6 +2,7 @@
 #include <stdio.h>
 
 #include "framework/display.h"
+#include "framework/numbers.h"
 #include "framework/draw.h"
 #include "level.h"
 #include "lights.h"

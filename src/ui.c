@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 
 #include "framework/actors.h"
 #include "framework/display.h"

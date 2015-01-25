@@ -101,7 +101,7 @@ void composeScene() {
 	generateFov();
 	
 	TCOD_console_t levelConsole = getLevelConsole();
-	TCOD_console_t lightConsole = getLightConsole();
+	//TCOD_console_t lightConsole = getLightConsole();
 	TCOD_console_t dynamicLightConsole = getDynamicLightConsole();
 	TCOD_console_t actorConsole = getActorConsole();
 	TCOD_console_t itemConsole = getItemConsole();
