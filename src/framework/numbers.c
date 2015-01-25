@@ -17,3 +17,14 @@ float distanceFloat(float x1, float y1, float x2, float y2) {
 		return (float) (x_dist + (y_dist - x_dist));
 	}
 }
+
+int clip(int i, int min, int max) {
+	const int t = i < min ? min : i;
+	return t > max ? max : t;
+}
+
+float clipFloat(float f, float min, float max) {
+  const float t = f < min ? min : f;
+  return t > max ? max : t;
+}
+

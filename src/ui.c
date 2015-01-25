@@ -3,6 +3,7 @@
 #include "framework/actors.h"
 #include "framework/display.h"
 #include "framework/draw.h"
+#include "framework/numbers.h"
 #include "libtcod.h"
 #include "lights.h"
 #include "player.h"
@@ -57,9 +58,10 @@ void _drawTorchFuel() {
 	character *player = getPlayer();
 
 	fuelMod = player->itemLight->fuel / (float)player->itemLight->fuelMax;
+	fuelMod = clipFloat(fuelMod, 0, WINDOW_WIDTH - 2);
+
 	barWidth *= fuelMod;
 	
-	//setChar(UI_CONSOLE, 1, 0, '[');
 	drawChar(UI_CONSOLE, 1, 0, '[', TCOD_color_RGB(200, 200, 200), TCOD_color_RGB(65, 65, 65));
 	drawChar(UI_CONSOLE, WINDOW_WIDTH - 2, 0, ']', TCOD_color_RGB(200, 200, 200), TCOD_color_RGB(65, 65, 65));
 

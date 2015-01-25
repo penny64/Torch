@@ -117,11 +117,24 @@ void itemHandleCharacterCollision(item *itm, character *actor) {
 }
 
 void createBonfire(int x, int y) {
-	createItem(x, y, '!', IS_FUEL_SOURCE | IS_SOMETHING);
+	item *itm = createItem(x, y, '!', IS_FUEL_SOURCE | IS_SOMETHING);
 
 	light *lght = createDynamicLight(x, y, NULL);
+	itm->itemLight = lght;
 	lght->fuel = 180;
 	lght->fuelMax = 180;
+}
+
+void createBonfireKeystone(int x, int y) {
+	item *itm = createItem(x, y, '!', IS_FUEL_SOURCE | IS_SOMETHING | IS_KEY);
+
+	light *lght = createDynamicLight(x, y, NULL);
+	itm->itemLight = lght;
+	lght->r_tint = 15;
+	lght->g_tint = 80;
+	lght->b_tint = 5;
+	lght->fuel = 0;
+	lght->fuelMax = 280;
 }
 
 void createUnkindledBonfire(int x, int y) {

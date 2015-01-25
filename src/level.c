@@ -353,7 +353,7 @@ void placeTunnels() {
 			
 			placedPlayer = 1;
 		} else {
-			createUnkindledBonfire(w_x, w_y);
+			createBonfireKeystone(w_x, w_y);
 		}
 
 		mapUpdates = 1;
@@ -516,12 +516,13 @@ void generateLevel() {
 
 			if (!TCOD_map_is_walkable(LEVEL_MAP, x, y)) {
 				if (TCOD_map_is_walkable(TUNNEL_WALLS, x, y)) {
-					drawCharBackEx(LEVEL_CONSOLE, x, y, TCOD_color_RGB(65, 65, 65), TCOD_BKGND_SET);
+					drawCharBackEx(LEVEL_CONSOLE, x, y, TCOD_color_RGB(85, 85, 85), TCOD_BKGND_SET);
 				} else {
 					drawCharBackEx(LEVEL_CONSOLE, x, y, TCOD_color_RGB(95, 8, 8), TCOD_BKGND_SET);
 				}
 			} else {
 				colorMod = (int)(fogValue * 150);
+				
 				drawCharBackEx(FOG_CONSOLE, x, y, TCOD_color_RGB(135 - colorMod, 120 - colorMod, 120 - colorMod), TCOD_BKGND_ALPHA(1));
 			}
 		}

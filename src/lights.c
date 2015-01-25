@@ -53,6 +53,9 @@ light *createDynamicLight(int x, int y, character *actor) {
 	_c = calloc(1, sizeof(light));
 	_c->x = x;
 	_c->y = y;
+	_c->r_tint = 55;
+	_c->g_tint = 50;
+	_c->b_tint = 35;
 	_c->fuelMax = 70;
 	_c->fuel = _c->fuelMax;
 	_c->owner = actor;
@@ -285,13 +288,14 @@ void _drawDynamicLight(light *lght) {
 					g_tint = 55;
 					b_tint = 55;
 					
-					if (alpha > .25) {
-						alpha = .25;
+					if (alpha > .45) {
+						alpha = .45;
 					}
 				} else {
-					r_tint = 95;
-					b_tint = 35;
-					g_tint = 35;
+					r_tint = lght->r_tint;
+					g_tint = lght->g_tint;
+					b_tint = lght->b_tint;
+
 					if (alpha > .75) {
 						alpha = .75;
 					}

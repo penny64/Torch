@@ -30,6 +30,9 @@ character *createActor() {
 	_c->hp = 100;
 	_c->fov = copyLevelMap();
 	_c->itemLight = createDynamicLight(_c->x, _c->y, _c);
+	_c->itemLight->r_tint = 95;
+	_c->itemLight->g_tint = 35;
+	_c->itemLight->b_tint = 35;
 	
 	if (CHARACTERS == NULL) {
 		CHARACTERS = _c;
