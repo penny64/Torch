@@ -79,12 +79,16 @@ void applyFov() {
 				
 				fadeValue = 1.f - ((float) distMod / 32.f);
 				
+				if (fadeValue > .75f) {
+					fadeValue = .75f;
+				}
+				
 				setChar(actorConsole, x, y, (int)' ');
 				
 				if (fadeValue < .03126) {
 					drawCharBackEx(shadowConsole, x, y, TCOD_color_RGB(1, 0, 0), TCOD_BKGND_SET);
 				} else {
-					drawCharBackEx(shadowConsole, x, y, TCOD_color_RGB(55, 15, 15), TCOD_BKGND_ALPHA(fadeValue));
+					drawCharBackEx(shadowConsole, x, y, TCOD_color_RGB(25, 25, 25), TCOD_BKGND_ALPHA(fadeValue));
 				}
 			} else {
 				drawCharBack(seenConsole, x, y, TCOD_color_RGB(255, 0, 255));
@@ -112,12 +116,12 @@ void composeScene() {
 	drawItems();
 	
 	TCOD_console_blit(levelConsole, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, NULL, 0, 0, 1, 1);
-	TCOD_console_blit(lightConsole, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, NULL, 0, 0, 0, .9f);
+	//TCOD_console_blit(lightConsole, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, NULL, 0, 0, 0, .9f);
 	TCOD_console_blit(dynamicLightConsole, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, NULL, 0, 0, 0, .9f);
 	TCOD_console_blit(itemConsole, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, NULL, 0, 0, 1, 0);
 	TCOD_console_blit(actorConsole, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, NULL, 0, 0, 1, 0);
 	TCOD_console_blit(fogConsole, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, NULL, 0, 0, 1, 0.3f);
-	//TCOD_console_blit(seenConsole, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, NULL, 0, 0, 1, 1);
+	TCOD_console_blit(seenConsole, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, NULL, 0, 0, 1, 1);
 	TCOD_console_blit(shadowConsole, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, NULL, 0, 0, 1, 0.55f);
 	TCOD_console_blit(UiConsole, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, NULL, 0, 0, 1, 1);
 }

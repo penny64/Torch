@@ -240,9 +240,10 @@ void lightLogic() {
 }
 
 void _drawDynamicLight(light *lght) {
-	int x, y, penalty;
-	float distMod;
+	int x, y, penalty, r_tint, g_tint, b_tint;
+	float distMod, alpha;
 	character *player = getPlayer();
+	TCOD_map_t levelMap = getLevelMap();
 	
 	TCOD_map_clear(lght->lightMap, 0, 0);
 	
@@ -273,12 +274,31 @@ void _drawDynamicLight(light *lght) {
 				
 				if (distMod < 0) {
 					distMod = 0;
-				} else if (distMod > lght->size) {
-					distMod = lght->size;
+				} else if (distMod > lght->size / 2) {
+					distMod = lght->size / 2;
+				}
+				
+				alpha = distMod / (float) lght->size;
+				
+				if (!TCOD_map_is_walkable(levelMap, x, y)) {
+					r_tint = 55;
+					g_tint = 55;
+					b_tint = 55;
+					
+					if (alpha > .25) {
+						alpha = .25;
+					}
+				} else {
+					r_tint = 95;
+					b_tint = 35;
+					g_tint = 35;
+					if (alpha > .75) {
+						alpha = .75;
+					}
 				}
 				
 				if (TCOD_map_is_in_fov(player->fov, x, y)) {
-					drawCharBackEx(DYNAMIC_LIGHT_CONSOLE, x, y, TCOD_color_RGB(95, 35, 35), TCOD_BKGND_ADDALPHA(distMod / (float) lght->size));
+					drawCharBackEx(DYNAMIC_LIGHT_CONSOLE, x, y, TCOD_color_RGB(r_tint, g_tint, b_tint), TCOD_BKGND_ADDALPHA(alpha));
 				}
 			}
 		}

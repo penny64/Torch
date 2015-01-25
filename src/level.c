@@ -16,6 +16,7 @@ TCOD_console_t SHADOW_CONSOLE;
 TCOD_console_t FOG_CONSOLE;
 TCOD_console_t SEEN_CONSOLE;
 TCOD_map_t LEVEL_MAP;
+TCOD_map_t TUNNEL_WALLS;
 TCOD_noise_t FOG_NOISE;
 TCOD_random_t RANDOM;
 int (*ROOM_MAP)[255];
@@ -31,6 +32,7 @@ void levelSetup() {
 	SEEN_CONSOLE = TCOD_console_new(WINDOW_WIDTH, WINDOW_HEIGHT);
 	LIGHT_CONSOLE = TCOD_console_new(WINDOW_WIDTH, WINDOW_HEIGHT);
 	LEVEL_MAP = TCOD_map_new(WINDOW_WIDTH, WINDOW_HEIGHT);
+	TUNNEL_WALLS = TCOD_map_new(WINDOW_WIDTH, WINDOW_HEIGHT);
 	FOG_NOISE = TCOD_noise_new(2, TCOD_NOISE_DEFAULT_HURST, TCOD_NOISE_DEFAULT_LACUNARITY, NULL);
 	RANDOM = TCOD_random_get_instance();
 
@@ -103,7 +105,7 @@ void carve(int x, int y) {
 	int x1, y1;
 	int i, ii;
 	
-	for (i = 0; i < TCOD_random_get_int(RANDOM, 24, 32); i++) {
+	for (i = 0; i < TCOD_random_get_int(RANDOM, 18, 24); i++) {
 		for (ii = 0; ii < TCOD_random_get_int(RANDOM, 0, 1); ii++) {
 			for (y1 = -1 - ii; y1 <= 1 + ii; y1++) {
 				for (x1 = -1; x1 <= 1; x1++) {
@@ -284,7 +286,7 @@ void findRooms() {
 }
 
 void placeTunnels() {
-	int x, y, x1, y1, w_x, w_y, mapUpdates, currentValue, neighborValue, lowestValue, startCount, index, lowestX, lowestY, invalid, roomSize, placedPlayer = 0;
+	int x, y, x1, y1, w_x, w_y, mapUpdates, currentValue, neighborValue, lowestValue, startCount, index, lowestX, lowestY, invalid, roomSize, randomRoomSize, dist, placedPlayer = 0;
 	int (*START_POSITIONS)[WINDOW_WIDTH * WINDOW_HEIGHT] = malloc(sizeof(double[WINDOW_WIDTH * WINDOW_HEIGHT][WINDOW_WIDTH * WINDOW_HEIGHT]));
 	character *player = getPlayer();
 	DIJKSTRA_MAP = malloc(sizeof(double[255][255]));
@@ -437,9 +439,17 @@ void placeTunnels() {
 				roomSize = 3;
 			}
 			
+			randomRoomSize = TCOD_random_get_int(RANDOM, roomSize - 1, roomSize);
+			
 			for (y1 = -16; y1 <= 16; y1++) {
 				for (x1 = -16; x1 <= 16; x1++) {
-					if (distance(w_x, w_y, w_x + x1, w_y + y1) >= TCOD_random_get_int(RANDOM, roomSize - 1, roomSize)) {
+					dist = distance(w_x, w_y, w_x + x1, w_y + y1);
+					
+					if (dist >= randomRoomSize) {
+						if (dist - randomRoomSize <= 1) {
+							TCOD_map_set_properties(TUNNEL_WALLS, w_x + x1, w_y + y1, 1, 1);
+						}
+						
 						continue;
 					}
 					
@@ -496,8 +506,8 @@ void generateLevel() {
 
 			fogValue = TCOD_noise_get_fbm_ex(fog, p, 32.0f, TCOD_NOISE_PERLIN) + .2f;
 
-			if (fogValue < 0) {
-				fogValue = 0;
+			if (fogValue < .3) {
+				fogValue = .3;
 			}
 
 			if (fogValue > .6) {
@@ -505,10 +515,14 @@ void generateLevel() {
 			}
 
 			if (!TCOD_map_is_walkable(LEVEL_MAP, x, y)) {
-				drawCharBackEx(LEVEL_CONSOLE, x, y, TCOD_color_RGB(44, 8, 8), TCOD_BKGND_SET);
+				if (TCOD_map_is_walkable(TUNNEL_WALLS, x, y)) {
+					drawCharBackEx(LEVEL_CONSOLE, x, y, TCOD_color_RGB(65, 65, 65), TCOD_BKGND_SET);
+				} else {
+					drawCharBackEx(LEVEL_CONSOLE, x, y, TCOD_color_RGB(95, 8, 8), TCOD_BKGND_SET);
+				}
 			} else {
 				colorMod = (int)(fogValue * 150);
-				drawCharBackEx(FOG_CONSOLE, x, y, TCOD_color_RGB(135 - colorMod, 100 - colorMod, 100 - colorMod), TCOD_BKGND_ALPHA(1));
+				drawCharBackEx(FOG_CONSOLE, x, y, TCOD_color_RGB(135 - colorMod, 120 - colorMod, 120 - colorMod), TCOD_BKGND_ALPHA(1));
 			}
 		}
 	}
