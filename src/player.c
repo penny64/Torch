@@ -21,6 +21,14 @@ int getPlayerMoveCount() {
 	return abs(PLAYER_ACTOR->vx) + abs(PLAYER_ACTOR->vy);
 }
 
+void _handlePlantTorch() {
+	//PLAYER_ACTOR->itemLight->x = PLAYER_ACTOR->x;
+	//PLAYER_ACTOR->itemLight->y = PLAYER_ACTOR->yy;
+	createPlantedTorch(PLAYER_ACTOR->itemLight->x, PLAYER_ACTOR->itemLight->y, PLAYER_ACTOR->itemLight);
+
+	PLAYER_ACTOR->itemLight = NULL;
+}
+
 void playerInputLogic() {
 	if (!PLAYER_ACTOR || PLAYER_ACTOR->hp <= 0) {
 		return;
@@ -82,7 +90,7 @@ void playerInputLogic() {
 		PLAYER_ACTOR->vy = -1;
 	}
 	
-	if (isCharPressed('c')) {
-		createBonfire(PLAYER_ACTOR->x, PLAYER_ACTOR->y);
+	if (isCharPressed(' ')) {
+		_handlePlantTorch();
 	}
 }

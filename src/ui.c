@@ -56,10 +56,13 @@ void _drawTorchFuel() {
 	float fuelMod;
 	character *player = getPlayer();
 
-	fuelMod = player->itemLight->fuel / (float)player->itemLight->fuelMax;
-	fuelMod = clipFloat(fuelMod, 0, WINDOW_WIDTH - 2);
+	if (player->itemLight) {
+		fuelMod = player->itemLight->fuel / (float)player->itemLight->fuelMax;
 
-	barWidth *= fuelMod;
+		barWidth = clip(barWidth * fuelMod, 1, WINDOW_WIDTH - 2);
+	} else {
+		barWidth = 1;
+	}
 	
 	drawChar(UI_CONSOLE, 1, 0, '[', TCOD_color_RGB(200, 200, 200), TCOD_color_RGB(65, 65, 65));
 	drawChar(UI_CONSOLE, WINDOW_WIDTH - 2, 0, ']', TCOD_color_RGB(200, 200, 200), TCOD_color_RGB(65, 65, 65));

@@ -55,6 +55,21 @@ item *createItem(int x, int y, char chr, unsigned int flags) {
 	return _c;
 }
 
+void deleteItem(item *itm) {
+	item *prevItem = NULL;
+
+	if (itm == ITEMS) {
+		ITEMS = NULL;
+	} else {
+		prevItem = itm->prev;
+		prevItem->next = itm->next;
+	}
+
+	printf("Item deleted.\n");
+
+	free(itm);
+}
+
 void assignFlag(item *itm, unsigned int flag) {
 	itm->itemFlags |= flag;
 }
@@ -101,7 +116,7 @@ void drawItems() {
 void itemHandleCharacterCollision(item *itm, character *actor) {
 	character *player = getPlayer();
 
-	if (itm->itemFlags & IS_FUEL_SOURCE) {
+	if (itm->itemFlags & IS_FUEL_SOURCE && actor->itemLight) {
 		actor->itemLight->fuel = actor->itemLight->fuelMax;
 
 		if (actor == player) {
@@ -114,10 +129,21 @@ void itemHandleCharacterCollision(item *itm, character *actor) {
 			}
 		}
 	}
+
+	if (actor == player) {
+		if (itm->itemFlags & IS_TORCH && !player->itemLight) {
+			player->itemLight = itm->itemLight;
+			itm->itemLight->owner = player;
+
+			deleteItem(itm);
+
+			showMessage("%cYou pick up the torch.%c", 10);
+		}
+	}
 }
 
 void createBonfire(int x, int y) {
-	item *itm = createItem(x, y, '!', IS_FUEL_SOURCE | IS_SOMETHING);
+	item *itm = createItem(x, y, '!', IS_FUEL_SOURCE);
 
 	light *lght = createDynamicLight(x, y, NULL);
 	itm->itemLight = lght;
@@ -126,7 +152,7 @@ void createBonfire(int x, int y) {
 }
 
 void createBonfireKeystone(int x, int y) {
-	item *itm = createItem(x, y, '!', IS_FUEL_SOURCE | IS_SOMETHING | IS_KEY);
+	item *itm = createItem(x, y, '!', IS_FUEL_SOURCE | IS_KEY);
 
 	light *lght = createDynamicLight(x, y, NULL);
 	itm->itemLight = lght;
@@ -138,10 +164,19 @@ void createBonfireKeystone(int x, int y) {
 }
 
 void createUnkindledBonfire(int x, int y) {
-	item *itm = createItem(x, y, '!', IS_FUEL_SOURCE | IS_SOMETHING);
+	item *itm = createItem(x, y, '!', IS_FUEL_SOURCE);
 
 	light *lght = createDynamicLight(x, y, NULL);
 	itm->itemLight = lght;
 	lght->fuel = 0;
 	lght->fuelMax = 120;
+}
+
+void createPlantedTorch(int x, int y, light *lght) {
+	lght->owner = NULL;
+	lght->x = x;
+	lght->y = y;
+
+	item *itm = createItem(x, y, 'i', IS_TORCH);
+	itm->itemLight = lght;
 }

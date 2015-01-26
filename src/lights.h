@@ -1,5 +1,7 @@
 #include "framework/actors.h"
 
+#ifndef LIGHTS_H
+#define LIGHTS_H
 
 typedef struct light light;
 
@@ -11,6 +13,7 @@ struct light {
 	TCOD_map_t lightMap;
 };
 
+#endif
 
 TCOD_map_t getLightMap(void);
 TCOD_console_t getDynamicLightConsole(void);

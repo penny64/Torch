@@ -29,12 +29,9 @@ character *createActor() {
 	_c->vy = 0;
 	_c->prev = NULL;
 	_c->next = NULL;
+	_c->itemLight = NULL
 	_c->hp = 100;
 	_c->fov = copyLevelMap();
-	_c->itemLight = createDynamicLight(_c->x, _c->y, _c);
-	_c->itemLight->r_tint = 95;
-	_c->itemLight->g_tint = 35;
-	_c->itemLight->b_tint = 35;
 	
 	if (CHARACTERS == NULL) {
 		CHARACTERS = _c;
@@ -57,6 +54,11 @@ void resetActorForNewLevel(character *actor) {
 	
 	//TODO: Delete old torch
 	actor->itemLight = createDynamicLight(actor->x, actor->y, actor);
+	actor->itemLight->r_tint = 95;
+	actor->itemLight->g_tint = 95;
+	actor->itemLight->b_tint = 35;
+	actor->itemLight->fuelMax = 280;
+	actor->itemLight->fuel = actor->itemLight->fuelMax;
 }
 
 void _checkForCollisions(character *actor) {
@@ -85,9 +87,13 @@ void _actorLogic(character *actor) {
 	int nx = actor->x + actor->vx;
 	int ny = actor->y + actor->vy;
 
-	if (isPositionWalkable(nx, ny)) {
+	if (nx && ny && isPositionWalkable(nx, ny)) {
 		actor->x = nx;
 		actor->y = ny;
+
+		if (actor->itemLight) {
+			actor->itemLight->fuel --;
+		}
 		
 		TCOD_map_compute_fov(actor->fov, actor->x, actor->y, 16, 1, FOV_SHADOW);
 	}
@@ -95,8 +101,10 @@ void _actorLogic(character *actor) {
 	_checkForCollisions(actor);
 	_checkIfPositionLit(actor);
 	
-	actor->itemLight->x = actor->x;
-	actor->itemLight->y = actor->y;
+	if (actor->itemLight) {
+		actor->itemLight->x = actor->x;
+		actor->itemLight->y = actor->y;
+	}
 
 	actor->vx = 0;
 	actor->vy = 0;
@@ -106,8 +114,6 @@ void actorLogic() {
 	character *ptr = CHARACTERS;
 
 	while (ptr != NULL) {
-		//if (ptr->charType)
-
 		_actorLogic(ptr);
 
 		ptr = ptr->next;
