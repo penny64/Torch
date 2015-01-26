@@ -8,6 +8,11 @@ void setChar(TCOD_console_t console, int x, int y, int chr) {
 	TCOD_console_set_char(console, x, y, chr);
 }
 
+void setCharEx(TCOD_console_t console, int x, int y, int chr, TCOD_color_t col) {
+	TCOD_console_set_char(console, x, y, chr);
+	TCOD_console_set_char_foreground(console, x, y, col);
+}
+
 void drawChar(TCOD_console_t console, int x, int y, int chr, TCOD_color_t foreColor, TCOD_color_t backColor) {
 	TCOD_console_put_char_ex(console, x, y, chr, foreColor, backColor);
 }

@@ -46,9 +46,7 @@ void _drawMessage() {
 		}
 
 		TCOD_console_set_color_control(TCOD_COLCTRL_1, TCOD_color_RGB(255 * colorMod, 250 * colorMod, 220 * colorMod), TCOD_color_RGB(0, 0, 0));
-		//sprintf(timeText, "%c%i%c", DISPLAY_TEXT_TIME_MAX);
-
-		//drawString(UI_CONSOLE, 0, WINDOW_HEIGHT - 1, timeText);
+		
 		drawString(UI_CONSOLE, (WINDOW_WIDTH / 2) - (strlen(DISPLAY_TEXT) / 2), WINDOW_HEIGHT - 1, DISPLAY_TEXT);
 	}
 }

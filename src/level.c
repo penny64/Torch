@@ -447,7 +447,7 @@ void placeTunnels() {
 					dist = distance(w_x, w_y, w_x + x1, w_y + y1);
 					
 					if (dist >= randomRoomSize) {
-						if (dist - randomRoomSize <= 1) {
+						if (dist - randomRoomSize <= 3) {
 							TCOD_map_set_properties(TUNNEL_WALLS, w_x + x1, w_y + y1, 1, 1);
 						}
 						
@@ -523,6 +523,10 @@ void generateLevel() {
 				}
 			} else {
 				colorMod = (int)(fogValue * 150);
+				
+				if (!TCOD_random_get_int(RANDOM, 0, 4)) {
+					setCharEx(LEVEL_CONSOLE, x, y, ',' + TCOD_random_get_int(RANDOM, 0, 4), TCOD_color_RGB(155 - colorMod, 140 - colorMod, 140 - colorMod));
+				}
 				
 				drawCharBackEx(FOG_CONSOLE, x, y, TCOD_color_RGB(135 - colorMod, 120 - colorMod, 120 - colorMod), TCOD_BKGND_ALPHA(1));
 			}
