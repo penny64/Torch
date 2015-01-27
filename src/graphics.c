@@ -71,7 +71,8 @@ void applyFov() {
 			
 			if (!visible) {
 				distMod = distanceFloat(player->x, player->y, x, y);
-				distMod -= getRandomInt(0, 3);
+
+				distMod -= getRandomFloat(0, 2);
 				
 				if (distMod < 0) {
 					distMod = 0;

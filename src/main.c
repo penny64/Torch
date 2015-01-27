@@ -45,6 +45,7 @@ int main() {
 			lightLogic();
 		}
 
+		//effectsLogic();
 		uiLogic();
 		
 		if (isTCODCharPressed(TCODK_ESCAPE)) {

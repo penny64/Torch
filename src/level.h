@@ -1,4 +1,5 @@
 #include "libtcod.h"
+#define MAX_ROOMS 6
 
 
 TCOD_console_t getLevelConsole(void);

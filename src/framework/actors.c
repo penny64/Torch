@@ -29,7 +29,7 @@ character *createActor() {
 	_c->vy = 0;
 	_c->prev = NULL;
 	_c->next = NULL;
-	_c->itemLight = NULL
+	_c->itemLight = NULL;
 	_c->hp = 100;
 	_c->fov = copyLevelMap();
 	
@@ -57,7 +57,7 @@ void resetActorForNewLevel(character *actor) {
 	actor->itemLight->r_tint = 95;
 	actor->itemLight->g_tint = 95;
 	actor->itemLight->b_tint = 35;
-	actor->itemLight->fuelMax = 280;
+	actor->itemLight->fuelMax = 180;
 	actor->itemLight->fuel = actor->itemLight->fuelMax;
 }
 

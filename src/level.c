@@ -287,9 +287,8 @@ void findRooms() {
 }
 
 void placeTunnels() {
-	int x, y, x1, y1, w_x, w_y, mapUpdates, currentValue, neighborValue, lowestValue, startCount, index, lowestX, lowestY, invalid, roomSize, randomRoomSize, dist, placedPlayer = 0;
+	int x, y, x1, y1, w_x, w_y, mapUpdates, currentValue, neighborValue, lowestValue, startCount, index, lowestX, lowestY, invalid, roomSize, randomRoomSize, dist;
 	int (*START_POSITIONS)[WINDOW_WIDTH * WINDOW_HEIGHT] = malloc(sizeof(double[WINDOW_WIDTH * WINDOW_HEIGHT][WINDOW_WIDTH * WINDOW_HEIGHT]));
-	character *player = getPlayer();
 	DIJKSTRA_MAP = malloc(sizeof(double[255][255]));
 	
 	for (y = 2; y < WINDOW_HEIGHT - 1; y++) {
@@ -299,7 +298,7 @@ void placeTunnels() {
 	}
 
 	while (ROOM_COUNT > 1) {
-		printf("Generating tunnels for room %i\n", ROOM_COUNT);
+		//printf("Generating tunnels for room %i\n", ROOM_COUNT);
 		
 		startCount = 0;
 
@@ -345,17 +344,7 @@ void placeTunnels() {
 		w_x = START_POSITIONS[index][0];
 		w_y = START_POSITIONS[index][1];
 		
-		printf("Starting at %i, %i\n", w_x, w_y);
-		
-		if (!placedPlayer) {
-			player->x = w_x;
-			player->y = w_y;
-			player->vx ++;
-			
-			placedPlayer = 1;
-		} else {
-			createBonfireKeystone(w_x, w_y);
-		}
+		createBonfireKeystone(w_x, w_y);
 
 		mapUpdates = 1;
 
@@ -444,6 +433,10 @@ void placeTunnels() {
 			
 			for (y1 = -16; y1 <= 16; y1++) {
 				for (x1 = -16; x1 <= 16; x1++) {
+					if ((w_x + x1 <= 2 || w_x + x1 >= WINDOW_WIDTH - 2 || w_y + y1 <= 2 || w_y + y1 >= WINDOW_HEIGHT - 2)) {
+						continue;
+					}
+
 					dist = distance(w_x, w_y, w_x + x1, w_y + y1);
 					
 					if (dist >= randomRoomSize) {
@@ -476,15 +469,34 @@ void placeTunnels() {
 }
 
 void generateLevel() {
-	int x, y, i;
+	int x, y, i, ii, foundPlot, plotDist, plotPoints[MAX_ROOMS][2];
 	float fogValue, colorMod;
 	float p[2];
 	TCOD_noise_t fog = getFogNoise();
 	character *player = getPlayer();
 	
-	for (i = 0; i < 6; i++) {
-		x = TCOD_random_get_int(RANDOM, 4, WINDOW_WIDTH - 4);
-		y = TCOD_random_get_int(RANDOM, 4, WINDOW_HEIGHT - 4);
+	for (i = 0; i < MAX_ROOMS; i++) {
+		foundPlot = 0;
+
+		while (!foundPlot) {
+			foundPlot = 1;
+
+			x = TCOD_random_get_int(RANDOM, 4, WINDOW_WIDTH - 4);
+			y = TCOD_random_get_int(RANDOM, 4, WINDOW_HEIGHT - 4);
+
+			for (ii = 0; ii < i; ii++) {
+				plotDist = distance(x, y, plotPoints[ii - 1][0], plotPoints[ii - 1][1]);
+
+				if (plotDist <= 12) {
+					foundPlot = 0;
+					
+					break;
+				}
+			}
+		}
+
+		plotPoints[i - 1][0] = x;
+		plotPoints[i - 1][1] = y;
 
 		carve(x, y);
 	}
@@ -497,7 +509,10 @@ void generateLevel() {
 	
 	drawLights();
 	
-	createBonfire(player->x, player->y);
+	player->x = plotPoints[0][0];
+	player->y = plotPoints[0][1];
+	player->vx = 1;
+
 	refreshAllLights();
 	
 	for (y = 0; y < WINDOW_HEIGHT; y++) {
