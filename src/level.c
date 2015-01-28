@@ -22,6 +22,7 @@ TCOD_noise_t FOG_NOISE;
 TCOD_random_t RANDOM;
 int (*ROOM_MAP)[255];
 int (*DIJKSTRA_MAP)[255];
+float (*EFFECTS_MAP)[255];
 int ROOM_COUNT;
 
 
@@ -40,7 +41,7 @@ void levelSetup() {
 	TCOD_console_set_default_background(LEVEL_CONSOLE, TCOD_color_RGB(40, 30, 30));
 	TCOD_console_set_default_background(LIGHT_CONSOLE, TCOD_color_RGB(0, 0, 0));
 	TCOD_console_set_default_background(SHADOW_CONSOLE, TCOD_color_RGB(0, 0, 0));
-	TCOD_console_set_default_background(SEEN_CONSOLE, TCOD_color_RGB(0, 0, 0));
+	TCOD_console_set_default_background(SEEN_CONSOLE, TCOD_color_RGB(15, 15, 15));
 	TCOD_console_set_key_color(LIGHT_CONSOLE, TCOD_color_RGB(255, 0, 255));
 	TCOD_console_set_key_color(SHADOW_CONSOLE, TCOD_color_RGB(0, 0, 0));
 	TCOD_console_set_key_color(SEEN_CONSOLE, TCOD_color_RGB(255, 0, 255));
@@ -96,6 +97,10 @@ TCOD_map_t copyLevelMap() {
 	TCOD_map_copy(LEVEL_MAP, newMap);
 	
 	return newMap;
+}
+
+float *getEffectsMap() {
+	return *EFFECTS_MAP;
 }
 
 int isPositionWalkable(int x, int y) {
@@ -196,11 +201,13 @@ void findRooms() {
 	int (*CLOSED_MAP)[255] = malloc(sizeof(double[255][255]));
 	ROOM_MAP = malloc(sizeof(double[255][255]));
 	ROOM_COUNT = 0;
+	EFFECTS_MAP = malloc(sizeof(float[255][255]));
 
 	for (y = 0; y <= WINDOW_HEIGHT; y++) {
 		for (x = 0; x <= WINDOW_WIDTH; x++) {
 			CLOSED_MAP[x][y] = 0;
 			ROOM_MAP[x][y] = 0;
+			EFFECTS_MAP[x][y] = 0.1f;
 		}
 	}
 	
@@ -529,6 +536,8 @@ void generateLevel() {
 			if (fogValue > .6) {
 				fogValue = .6;
 			}
+
+			EFFECTS_MAP[x][y] = TCOD_random_get_float(RANDOM, .75, 1);
 
 			if (!TCOD_map_is_walkable(LEVEL_MAP, x, y)) {
 				if (TCOD_map_is_walkable(TUNNEL_WALLS, x, y)) {

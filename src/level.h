@@ -15,4 +15,5 @@ void levelSetup(void);
 void generateLevel(void);
 int isPositionWalkable(int, int);
 int getRandomInt(int, int);
+float *getEffectsMap(void);
 float getRandomFloat(float, float);

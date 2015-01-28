@@ -24,6 +24,7 @@ void applyFov() {
 	int x, y;
 	int visible, visibleToPlayer, isLit;
 	float distMod, fadeValue;
+	float (*effectsMap)[255] = getEffectsMap();;
 	TCOD_map_t map = getLevelMap();
 	TCOD_map_t lightMap = getLightMap();
 	TCOD_console_t actorConsole = getActorConsole();
@@ -83,6 +84,8 @@ void applyFov() {
 				if (fadeValue > .75f) {
 					fadeValue = .75f;
 				}
+
+				fadeValue *= effectsMap[x][y];
 				
 				setChar(actorConsole, x, y, (int)' ');
 				
