@@ -9,6 +9,7 @@
 #include "libtcod.h"
 #include "items.h"
 #include "player.h"
+#include "ui.h"
 
 
 TCOD_console_t LEVEL_CONSOLE;
@@ -23,7 +24,9 @@ TCOD_random_t RANDOM;
 int (*ROOM_MAP)[255];
 int (*DIJKSTRA_MAP)[255];
 float (*EFFECTS_MAP)[255];
+float EXIT_WAVE_DIST;
 int ROOM_COUNT;
+int EXIT_OPEN;
 
 
 void levelSetup() {
@@ -103,15 +106,35 @@ float *getEffectsMap() {
 	return *EFFECTS_MAP;
 }
 
+float getExitWaveDistance() {
+	return EXIT_WAVE_DIST;
+}
+
 int isPositionWalkable(int x, int y) {
 	return TCOD_map_is_walkable(LEVEL_MAP, x, y);
 }
 
+void completeLevel() {
+	EXIT_OPEN = 1;
+
+	showMessage("%cYou hear a low rumble.%c", 20);
+}
+
+int isLevelComplete() {
+	return EXIT_OPEN;
+}
+
+void levelLogic() {
+	if (isLevelComplete()) {
+		EXIT_WAVE_DIST = clipFloat(EXIT_WAVE_DIST + .5f, 0, 255);
+	}
+}
+
 void carve(int x, int y) {
-	int x1, y1;
+	int x1, y1, xMod, yMod, lastXMod = -3, lastYMod = -3;
 	int i, ii;
 	
-	for (i = 0; i < TCOD_random_get_int(RANDOM, 18, 24); i++) {
+	for (i = 0; i < TCOD_random_get_int(RANDOM, 8, 16); i++) {
 		for (ii = 0; ii < TCOD_random_get_int(RANDOM, 0, 1); ii++) {
 			for (y1 = -1 - ii; y1 <= 1 + ii; y1++) {
 				for (x1 = -1; x1 <= 1; x1++) {
@@ -126,9 +149,23 @@ void carve(int x, int y) {
 		
 		while (TCOD_map_is_walkable(LEVEL_MAP, x, y)) {
 			if (TCOD_random_get_int(RANDOM, 0, 1)) {
-				x += TCOD_random_get_int(RANDOM, -1, 1);
+				xMod = TCOD_random_get_int(RANDOM, -2, 2);
+
+				while (xMod == lastXMod) {
+					xMod = TCOD_random_get_int(RANDOM, -2, 2);
+				}
+
+				x += xMod;
+				lastXMod = xMod;
 			} else {
-				y += TCOD_random_get_int(RANDOM, -1, 1);
+				yMod = TCOD_random_get_int(RANDOM, -2, 2);
+
+				while (yMod == lastYMod) {
+					yMod = TCOD_random_get_int(RANDOM, -2, 2);
+				}
+
+				y += yMod;
+				lastYMod = yMod;
 			}
 		}
 	}
@@ -481,6 +518,9 @@ void generateLevel() {
 	float p[2];
 	TCOD_noise_t fog = getFogNoise();
 	character *player = getPlayer();
+
+	EXIT_OPEN = 0;
+	EXIT_WAVE_DIST = 0;
 	
 	for (i = 0; i < MAX_ROOMS; i++) {
 		foundPlot = 0;
@@ -494,7 +534,7 @@ void generateLevel() {
 			for (ii = 0; ii < i; ii++) {
 				plotDist = distance(x, y, plotPoints[ii - 1][0], plotPoints[ii - 1][1]);
 
-				if (plotDist <= 12) {
+				if (plotDist <= 18) {
 					foundPlot = 0;
 					
 					break;
@@ -537,7 +577,7 @@ void generateLevel() {
 				fogValue = .6;
 			}
 
-			EFFECTS_MAP[x][y] = TCOD_random_get_float(RANDOM, .75, 1);
+			EFFECTS_MAP[x][y] = TCOD_random_get_float(RANDOM, .65, .8);
 
 			if (!TCOD_map_is_walkable(LEVEL_MAP, x, y)) {
 				if (TCOD_map_is_walkable(TUNNEL_WALLS, x, y)) {

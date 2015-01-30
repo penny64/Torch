@@ -4,6 +4,7 @@
 #include "lights.h"
 #include "libtcod.h"
 #include "items.h"
+#include "level.h"
 
 
 static struct character *PLAYER_ACTOR;
@@ -92,5 +93,7 @@ void playerInputLogic() {
 	
 	if (isCharPressed(' ')) {
 		_handlePlantTorch();
+	} else if (isCharPressed('c')) {
+		completeLevel();
 	}
 }

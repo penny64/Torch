@@ -6,6 +6,7 @@
 #include "lights.h"
 #include "player.h"
 #include "ui.h"
+#include "level.h"
 
 
 TCOD_console_t ITEM_CONSOLE;
@@ -98,6 +99,10 @@ void itemLogic() {
 		
 		ptr = ptr->next;
 	}
+
+	if (!isLevelComplete() && getNumberOfLitKeytorches() == getTotalNumberOfKeytorches()) {
+		completeLevel();
+	}
 }
 
 void drawItems() {
@@ -111,6 +116,36 @@ void drawItems() {
 		
 		ptr = ptr->next;
 	}	
+}
+
+int getTotalNumberOfKeytorches() {
+	int count = 0;
+	item *ptr = ITEMS;
+	
+	while (ptr != NULL) {
+		if (ptr->itemFlags & IS_KEY) {
+			count ++;
+		}
+		
+		ptr = ptr->next;
+	}
+
+	return count;
+}
+
+int getNumberOfLitKeytorches() {
+	int count = 0;
+	item *ptr = ITEMS;
+	
+	while (ptr != NULL) {
+		if (ptr->itemFlags & IS_KEY && ptr->itemLight->fuel) {
+			count ++;
+		}
+		
+		ptr = ptr->next;
+	}
+
+	return count;
 }
 
 void itemHandleCharacterCollision(item *itm, character *actor) {

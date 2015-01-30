@@ -23,8 +23,9 @@ void generateFov() {
 void applyFov() {
 	int x, y;
 	int visible, visibleToPlayer, isLit;
-	float distMod, fadeValue;
-	float (*effectsMap)[255] = getEffectsMap();;
+	float exitWaveDistance = getExitWaveDistance();
+	float distMod, distToExitWave, fadeValue;
+	float (*effectsMap)[255] = getEffectsMap();
 	TCOD_map_t map = getLevelMap();
 	TCOD_map_t lightMap = getLightMap();
 	TCOD_console_t actorConsole = getActorConsole();
@@ -72,8 +73,6 @@ void applyFov() {
 			
 			if (!visible) {
 				distMod = distanceFloat(player->x, player->y, x, y);
-
-				distMod -= getRandomFloat(0, 2);
 				
 				if (distMod < 0) {
 					distMod = 0;
@@ -83,6 +82,15 @@ void applyFov() {
 				
 				if (fadeValue > .75f) {
 					fadeValue = .75f;
+				}
+
+				if (isLevelComplete()) {
+					distToExitWave = 25.f - clipFloat(25.f * labs(distanceFloat(x, y, player->x, player->y) - exitWaveDistance), 0.f, 25.f);
+					distToExitWave = distToExitWave / 25.f;
+
+					effectsMap[x][y] = clipFloat((effectsMap[x][y] + getRandomFloat(-.03, .03) + distToExitWave), .65, 1.25);
+				} else {
+					effectsMap[x][y] = clipFloat(effectsMap[x][y] + getRandomFloat(-.01, .01), .65, .8);
 				}
 
 				fadeValue *= effectsMap[x][y];

@@ -30,6 +30,8 @@ void itemHandleCharacterCollision(item*, character*);
 TCOD_console_t getItemConsole(void);
 item *getItems(void);
 void drawItems(void);
+int getTotalNumberOfKeytorches(void);
+int getNumberOfLitKeytorches(void);
 
 //Item list
 void createBonfire(int, int);

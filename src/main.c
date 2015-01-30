@@ -26,7 +26,6 @@ void setup() {
 	//Attract screen
 	generateLevel();
 	resetActorForNewLevel(getPlayer());
-	createActor();
 
 	logString(LOGGING_DEBUG, WINDOW_TITLE);
 }
@@ -47,6 +46,7 @@ int main() {
 
 		//effectsLogic();
 		uiLogic();
+		levelLogic();
 		
 		if (isTCODCharPressed(TCODK_ESCAPE)) {
 			break;
