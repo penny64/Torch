@@ -63,9 +63,11 @@ light *createDynamicLight(int x, int y, character *actor) {
 	_c->prev = NULL;
 	_c->next = NULL;
 	_c->fov = copyLevelMap();
-	_c->lightMap = copyLevelMap();
 	
-	TCOD_map_compute_fov(_c->fov, x, y, _c->size, 1, FOV_SHADOW);
+	//resetLight(_c);
+	//_c->lightMap = copyLevelMap();
+	
+	//TCOD_map_compute_fov(_c->fov, x, y, _c->size, 1, FOV_SHADOW);
 	
 	if (DYNAMIC_LIGHTS == NULL) {
 		DYNAMIC_LIGHTS = _c;
@@ -81,6 +83,21 @@ light *createDynamicLight(int x, int y, character *actor) {
 	}
 
 	return _c;
+}
+
+void deleteDynamicLight(light *lght) {
+	light *prevLight = NULL;
+
+	if (lght == DYNAMIC_LIGHTS) {
+		DYNAMIC_LIGHTS = NULL;
+	} else {
+		prevLight = lght->prev;
+		prevLight->next = lght->next;
+	}
+
+	printf("Light deleted.\n");
+
+	free(lght);
 }
 
 light *getLights() {
@@ -100,6 +117,13 @@ TCOD_map_t getLightMap() {
 }
 
 void _initDynamicLight(light *lght) {
+	lght->fov = copyLevelMap();
+	lght->lightMap = copyLevelMap();
+	
+	TCOD_map_compute_fov(lght->fov, lght->x, lght->y, lght->size, 1, FOV_SHADOW);
+}
+
+void resetLight(light *lght) {
 	lght->fov = copyLevelMap();
 	lght->lightMap = copyLevelMap();
 	

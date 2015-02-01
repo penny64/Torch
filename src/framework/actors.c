@@ -29,9 +29,12 @@ character *createActor() {
 	_c->vy = 0;
 	_c->prev = NULL;
 	_c->next = NULL;
-	_c->itemLight = NULL;
+	_c->itemLight = createDynamicLight(_c->x, _c->y, _c);
 	_c->hp = 100;
 	_c->fov = copyLevelMap();
+	_c->chr = (int)'@';
+	_c->foreColor = TCOD_color_RGB(255, 255, 255);
+	_c->backColor = TCOD_color_RGB(255, 0, 0);
 	
 	if (CHARACTERS == NULL) {
 		CHARACTERS = _c;
@@ -49,19 +52,30 @@ character *createActor() {
 	return _c;
 }
 
-void resetActorForNewLevel(character *actor) {
+void _resetActorForNewLevel(character *actor) {
 	actor->fov = copyLevelMap();
 	
 	//TODO: Delete old torch
-	actor->itemLight = createDynamicLight(actor->x, actor->y, actor);
-	actor->itemLight->r_tint = 95;
+	//actor->itemLight = createDynamicLight(actor->x, actor->y, actor);
+	resetLight(actor->itemLight);
+	/*actor->itemLight->r_tint = 95;
 	actor->itemLight->g_tint = 95;
 	actor->itemLight->b_tint = 35;
 	actor->itemLight->fuelMax = 180;
-	actor->itemLight->fuel = actor->itemLight->fuelMax;
+	actor->itemLight->fuel = actor->itemLight->fuelMax;*/
 }
 
-void _checkForCollisions(character *actor) {
+void resetAllActorsForNewLevel() {
+	character *ptr = CHARACTERS;
+	
+	while (ptr != NULL) {
+		_resetActorForNewLevel(ptr);
+		
+		ptr = ptr->next;
+	}
+}
+
+void _checkForItemCollisions(character *actor) {
 	item *ptr = getItems();
 
 	while (ptr != NULL) {
@@ -79,15 +93,42 @@ void _checkIfPositionLit(character *actor) {
 	}
 }
 
+void _actorAi(character *actor) {
+	if (actor->aiFlags & RANDOM_WALK) {
+		actor->vx += getRandomInt(-1, 1);
+		actor->vy += getRandomInt(-1, 1);
+	}
+}
+
 void _actorLogic(character *actor) {
 	if (!actor->hp) {
 		return;
 	}
 	
+	character *ptr = CHARACTERS;
+	int hitActor = 0;
 	int nx = actor->x + actor->vx;
 	int ny = actor->y + actor->vy;
+	
+	while (ptr != NULL) {
+		if (ptr == actor || ptr->hp <= 0) {
+			ptr = ptr->next;
+			
+			continue;
+		}
+		
+		if (ptr->x == nx && ptr->y == ny) {
+			hitActor = 1;
+			
+			break;
+		}
 
-	if (nx && ny && isPositionWalkable(nx, ny)) {
+		ptr = ptr->next;
+	}
+
+	if (hitActor) {
+		meleeAttack(actor, ptr);
+	} else if ((actor->vx || actor->vy) && isPositionWalkable(nx, ny)) {
 		actor->x = nx;
 		actor->y = ny;
 
@@ -98,7 +139,7 @@ void _actorLogic(character *actor) {
 		TCOD_map_compute_fov(actor->fov, actor->x, actor->y, 16, 1, FOV_SHADOW);
 	}
 
-	_checkForCollisions(actor);
+	_checkForItemCollisions(actor);
 	_checkIfPositionLit(actor);
 	
 	if (actor->itemLight) {
@@ -114,6 +155,7 @@ void actorLogic() {
 	character *ptr = CHARACTERS;
 
 	while (ptr != NULL) {
+		_actorAi(ptr);
 		_actorLogic(ptr);
 
 		ptr = ptr->next;
@@ -121,13 +163,13 @@ void actorLogic() {
 }
 
 void _drawActor(character *actor) {
-	int colorMod = 0;
+	//int colorMod = 0;
 	
 	if (actor->hp <= 0) {
-		colorMod = 155;
+		return;
 	}
 	
-	drawChar(ACTOR_CONSOLE, actor->x, actor->y, (int)'@', TCOD_color_RGB(255 - colorMod, 255 - colorMod, 255 - colorMod), TCOD_color_RGB(0, 0, 0));
+	drawChar(ACTOR_CONSOLE, actor->x, actor->y, actor->chr, actor->foreColor, actor->backColor);
 }
 
 void drawActors() {
@@ -141,7 +183,13 @@ void drawActors() {
 }
 
 void killActor(character *actor) {
+	TCOD_console_t levelConsole = getLevelConsole();
+	
 	actor->hp = 0;
+	if (actor->itemLight) {
+		deleteDynamicLight(actor->itemLight);
+	}
+	drawChar(levelConsole, actor->x, actor->y, actor->chr, TCOD_color_RGB(actor->foreColor.r * .55f, actor->foreColor.g * .55f, actor->foreColor.b * .55f), actor->backColor);
 
 	printf("Killed actor.\n");
 	

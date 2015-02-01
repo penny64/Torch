@@ -12,6 +12,11 @@ static struct character *PLAYER_ACTOR;
 
 void createPlayer() {
 	PLAYER_ACTOR = createActor();
+	
+	PLAYER_ACTOR->itemLight->g_tint = 95;
+	PLAYER_ACTOR->itemLight->b_tint = 35;
+	PLAYER_ACTOR->itemLight->fuelMax = 180;
+	PLAYER_ACTOR->itemLight->fuel = PLAYER_ACTOR->itemLight->fuelMax;
 }
 
 character *getPlayer() {

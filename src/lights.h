@@ -21,6 +21,8 @@ light *createLight(int, int);
 light *createDynamicLight(int, int, character*);
 light *getLights(void);
 light *getDynamicLights(void);
+void deleteDynamicLight(light*);
+void resetLight(light*);
 void lightLogic(void);
 void drawLights(void);
 void drawDynamicLights(void);

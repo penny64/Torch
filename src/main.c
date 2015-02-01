@@ -25,7 +25,8 @@ void setup() {
 
 	//Attract screen
 	generateLevel();
-	resetActorForNewLevel(getPlayer());
+	//resetActorForNewLevel(getPlayer());
+	resetAllActorsForNewLevel();
 
 	logString(LOGGING_DEBUG, WINDOW_TITLE);
 }

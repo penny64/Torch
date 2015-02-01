@@ -134,7 +134,7 @@ void carve(int x, int y) {
 	int x1, y1, xMod, yMod, lastXMod = -3, lastYMod = -3;
 	int i, ii;
 	
-	for (i = 0; i < TCOD_random_get_int(RANDOM, 8, 16); i++) {
+	for (i = 0; i < TCOD_random_get_int(RANDOM, 4, 8); i++) {
 		for (ii = 0; ii < TCOD_random_get_int(RANDOM, 0, 1); ii++) {
 			for (y1 = -1 - ii; y1 <= 1 + ii; y1++) {
 				for (x1 = -1; x1 <= 1; x1++) {
@@ -416,6 +416,7 @@ void placeTunnels() {
 			
 			if (!i) {
 				createBonfireKeystone(w_x, w_y);
+				createBat(w_x, w_y);
 			}
 
 			mapUpdates = 1;

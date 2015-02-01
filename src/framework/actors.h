@@ -16,10 +16,11 @@ enum {
 typedef struct character character;
 
 struct character {
-	int x, y, vx, vy, hp;
+	int x, y, vx, vy, hp, chr;
 	struct character *next, *prev;
 	struct light *itemLight;
 	unsigned int aiFlags;
+	TCOD_color_t foreColor, backColor;
 	TCOD_console_t fov;
 };
 
@@ -28,7 +29,7 @@ struct character {
 character *createActor(void);
 character *getActors(void);
 TCOD_console_t getActorConsole(void);
-void resetActorForNewLevel(character*);
+void resetAllActorsForNewLevel();
 void actorLogic(void);
 void drawActors(void);
 void actorSetup(void);
