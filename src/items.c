@@ -166,6 +166,7 @@ void itemHandleCharacterCollision(item *itm, character *actor) {
 			}
 			
 			itm->foreColor = TCOD_color_RGB(255, 255, 155);
+			itm->backColor = TCOD_color_RGB(155, 155, 155);
 		}
 	}
 
@@ -182,7 +183,7 @@ void itemHandleCharacterCollision(item *itm, character *actor) {
 }
 
 void createBonfire(int x, int y) {
-	item *itm = createItem(x, y, '!', TCOD_color_RGB(255, 255, 155), TCOD_color_RGB(0, 0, 0), IS_FUEL_SOURCE);
+	item *itm = createItem(x, y, '!', TCOD_color_RGB(255, 255, 155), TCOD_color_RGB(255, 0, 255), IS_FUEL_SOURCE);
 
 	light *lght = createDynamicLight(x, y, NULL);
 	itm->itemLight = lght;
@@ -191,7 +192,7 @@ void createBonfire(int x, int y) {
 }
 
 void createBonfireKeystone(int x, int y) {
-	item *itm = createItem(x, y, '!', TCOD_color_RGB(15, 15, 15), TCOD_color_RGB(5, 5, 5), IS_FUEL_SOURCE | IS_KEY);
+	item *itm = createItem(x, y, '!', TCOD_color_RGB(15, 15, 15), TCOD_color_RGB(55, 55, 55), IS_FUEL_SOURCE | IS_KEY);
 
 	light *lght = createDynamicLight(x, y, NULL);
 	itm->itemLight = lght;
@@ -203,7 +204,7 @@ void createBonfireKeystone(int x, int y) {
 }
 
 void createUnkindledBonfire(int x, int y) {
-	item *itm = createItem(x, y, '!', TCOD_color_RGB(55, 55, 15), TCOD_color_RGB(0, 0, 0), IS_FUEL_SOURCE);
+	item *itm = createItem(x, y, '!', TCOD_color_RGB(55, 55, 15), TCOD_color_RGB(255, 0, 255), IS_FUEL_SOURCE);
 
 	light *lght = createDynamicLight(x, y, NULL);
 	itm->itemLight = lght;
@@ -216,12 +217,12 @@ void createPlantedTorch(int x, int y, light *lght) {
 	lght->x = x;
 	lght->y = y;
 
-	item *itm = createItem(x, y, 'i', TCOD_color_RGB(255, 255, 155), TCOD_color_RGB(0, 0, 0), IS_TORCH);
+	item *itm = createItem(x, y, 'i', TCOD_color_RGB(255, 255, 155), TCOD_color_RGB(255, 0, 255), IS_TORCH);
 	itm->itemLight = lght;
 }
 
 void createTreasure(int x, int y) {
-	item *itm = createItem(x, y, '*', TCOD_color_RGB(255, 255, 0), TCOD_color_RGB(0, 0, 0), IS_FUEL_SOURCE);
+	item *itm = createItem(x, y, '*', TCOD_color_RGB(255, 255, 0), TCOD_color_RGB(255, 0, 255), IS_FUEL_SOURCE);
 	
 	printf("Treasure\n");
 
