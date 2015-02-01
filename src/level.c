@@ -347,7 +347,8 @@ void placeTunnels() {
 		}
 	}
 	
-	for (i = 0; i <= 1; i++) {
+	//TODO: Adjust max for more "connected" levels
+	for (i = 0; i <= 2; i++) {
 		ROOM_COUNT = ROOM_COUNT_MAX;
 		
 		while (ROOM_COUNT > 1) {
@@ -387,14 +388,24 @@ void placeTunnels() {
 						}
 					}
 
-					if (ROOM_MAP[x][y] > ROOM_COUNT) {
-						DIJKSTRA_MAP[x][y] = -1;
-					} else if (!i && ROOM_MAP[x][y] > 0 && ROOM_MAP[x][y] < ROOM_COUNT) {
-						DIJKSTRA_MAP[x][y] = 0;
-					} else if (i && !TCOD_random_get_int(RANDOM, 0, 3)) {
-						DIJKSTRA_MAP[x][y] = 0;
-					} else if (!ROOM_MAP[x][y] || ROOM_MAP[x][y] == ROOM_COUNT) {
-						DIJKSTRA_MAP[x][y] = 99;
+					if (!i) {
+						if (ROOM_MAP[x][y] > ROOM_COUNT) {
+							DIJKSTRA_MAP[x][y] = -1;
+						} else if (ROOM_MAP[x][y] > 0 && ROOM_MAP[x][y] < ROOM_COUNT) {
+							DIJKSTRA_MAP[x][y] = 0;
+						//} else if (i && !TCOD_random_get_int(RANDOM, 0, 3)) {
+						//	DIJKSTRA_MAP[x][y] = 0;
+						} else if (!ROOM_MAP[x][y] || ROOM_MAP[x][y] == ROOM_COUNT) {
+							DIJKSTRA_MAP[x][y] = 99;
+						}
+					} else {
+						if (ROOM_MAP[x][y] > 0 && ROOM_MAP[x][y] != ROOM_COUNT && !TCOD_random_get_int(RANDOM, 0, 3)) {
+							DIJKSTRA_MAP[x][y] = 0;
+						} else if (!ROOM_MAP[x][y] || ROOM_MAP[x][y] == ROOM_COUNT) {
+							DIJKSTRA_MAP[x][y] = 99;
+						} else {
+							DIJKSTRA_MAP[x][y] = -1;
+						}
 					}
 				}
 			}
