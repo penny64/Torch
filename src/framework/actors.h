@@ -5,12 +5,21 @@
 #ifndef ACTORS_H
 #define ACTORS_H
 
+
+enum {
+  RANDOM_WALK = 0x01,
+  IS_LIT = 0x02,
+  CHASE = 0x04,
+  EXPLODE = 0x08,
+} aiFlag_t;
+
 typedef struct character character;
 
 struct character {
 	int x, y, vx, vy, hp;
 	struct character *next, *prev;
 	struct light *itemLight;
+	unsigned int aiFlags;
 	TCOD_console_t fov;
 };
 

@@ -19,12 +19,13 @@ struct item {
 	struct item *next, *prev;
 	struct character *owner;
 	struct light *itemLight;
+	TCOD_color_t foreColor, backColor;
 };
 
 
 void itemSetup(void);
 void itemLogic(void);
-item *createItem(int, int, char, unsigned int);
+item *createItem(int, int, char, TCOD_color_t, TCOD_color_t, unsigned int);
 void assignFlag(item*, unsigned int);
 void itemHandleCharacterCollision(item*, character*);
 TCOD_console_t getItemConsole(void);
@@ -37,4 +38,5 @@ int getNumberOfLitKeytorches(void);
 void createBonfire(int, int);
 void createBonfireKeystone(int, int);
 void createUnkindledBonfire(int, int);
+void createTreasure(int, int);
 void createPlantedTorch(int, int, light*);
