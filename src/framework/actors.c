@@ -20,7 +20,7 @@ void actorSetup() {
 	ACTOR_CONSOLE = TCOD_console_new(WINDOW_WIDTH, WINDOW_HEIGHT);
 }
 
-void actorShutdown() {
+void actorsShutdown() {
 	character *next, *ptr = CHARACTERS;
 	
 	printf("Cleaning up actors...\n");
@@ -67,21 +67,38 @@ character *createActor() {
 	return _c;
 }
 
+void deleteActor(character *chr) {
+	if (chr == NULL) {
+		printf("*** CRASH INCOMING ***\n");
+	}
+
+	if (chr == CHARACTERS) {
+		CHARACTERS = NULL;
+	} else {
+		chr->prev->next = chr->next;
+
+		if (chr->next) {
+			chr->next->prev = chr->prev;
+
+			printf("Clearing ahead of time\n");
+		}
+	}
+
+	if (chr == NULL) {
+		printf("*** CRASH INCOMING (2) ***\n");
+	}
+
+	free(chr);
+}
+
 void _resetActorForNewLevel(character *actor) {
 	if (actor->fov) {
 		TCOD_map_delete(actor->fov);
 	}
 	
 	actor->fov = copyLevelMap();
-	
-	//TODO: Delete old torch
-	//actor->itemLight = createDynamicLight(actor->x, actor->y, actor);
+
 	resetLight(actor->itemLight);
-	/*actor->itemLight->r_tint = 95;
-	actor->itemLight->g_tint = 95;
-	actor->itemLight->b_tint = 35;
-	actor->itemLight->fuelMax = 180;
-	actor->itemLight->fuel = actor->itemLight->fuelMax;*/
 }
 
 void resetAllActorsForNewLevel() {
@@ -206,10 +223,19 @@ void killActor(character *actor) {
 	
 	actor->hp = 0;
 	if (actor->itemLight) {
-		deleteDynamicLight(actor->itemLight);
+		if (actor->aiFlags & DROP_LIGHT_ON_DEATH) {
+			actor->itemLight->owner = NULL;
+
+			if (actor->itemLight->fuel > (int)(actor->itemLight->fuelMax * .25f)) {
+				actor->itemLight->fuel = (int)(actor->itemLight->fuelMax * .25f);
+			}
+		} else {
+			deleteDynamicLight(actor->itemLight);
+		}
 		
 		actor->itemLight = NULL;
 	}
+	
 	drawChar(levelConsole, actor->x, actor->y, actor->chr, TCOD_color_RGB(actor->foreColor.r * .55f, actor->foreColor.g * .55f, actor->foreColor.b * .55f), actor->backColor);
 
 	printf("Killed actor.\n");
@@ -220,6 +246,25 @@ void killActor(character *actor) {
 }
 
 void actorCleanup() {
+	character *nextChar, *ptr = CHARACTERS;
+	int freedActors = 0;
+
+	while (ptr != NULL) {
+		nextChar = ptr->next;
+		
+		if (ptr->hp <= 0) {
+			deleteActor(ptr);
+
+			freedActors ++;
+		}
+
+		ptr = nextChar;
+	}
+
+	if (freedActors) {
+		printf("%i actor(s) freed.\n", freedActors);
+	}
+
 	TCOD_console_clear(ACTOR_CONSOLE);
 }
 

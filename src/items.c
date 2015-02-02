@@ -75,16 +75,15 @@ void itemsShutdown() {
 }
 
 void deleteItem(item *itm) {
-	item *prevItem = NULL;
-
 	if (itm == ITEMS) {
 		ITEMS = NULL;
 	} else {
-		prevItem = itm->prev;
-		prevItem->next = itm->next;
-	}
+		itm->prev->next = itm->next;
 
-	printf("Item deleted.\n");
+		if (itm->next) {
+			itm->next->prev = itm->prev;
+		}
+	}
 
 	free(itm);
 }

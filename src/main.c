@@ -15,6 +15,8 @@
 void setup() {
 	//Setup systems
 	startLogging(LOGGING_DEBUG);
+	logString(LOGGING_DEBUG, WINDOW_TITLE);
+
 	startInput();
 	createDisplay();
 	setupUi();
@@ -25,10 +27,7 @@ void setup() {
 
 	//Attract screen
 	generateLevel();
-	//resetActorForNewLevel(getPlayer());
 	resetAllActorsForNewLevel();
-
-	logString(LOGGING_DEBUG, WINDOW_TITLE);
 }
 
 int main() {
@@ -62,10 +61,10 @@ int main() {
 		actorCleanup();
 	}
 	
-	actorShutdown();
+	actorsShutdown();
 	lightsShutdown();
-	levelShutdown();
 	itemsShutdown();
+	levelShutdown();
 	
 	return 0;
 }

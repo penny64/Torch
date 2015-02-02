@@ -8,8 +8,8 @@
 
 enum {
   RANDOM_WALK = 0x01,
-  IS_LIT = 0x02,
-  CHASE = 0x04,
+  CHASE = 0x02,
+  DROP_LIGHT_ON_DEATH = 0x04,
   EXPLODE = 0x08,
 } aiFlag_t;
 
@@ -33,6 +33,6 @@ void resetAllActorsForNewLevel();
 void actorLogic(void);
 void drawActors(void);
 void actorSetup(void);
-void actorShutdown(void);
+void actorsShutdown(void);
 void actorCleanup(void);
 void killActor(character*);

@@ -13,7 +13,7 @@ void createBat(int x, int y) {
 	actor->x = x;
 	actor->y = y;
 	actor->hp = 25;
-	actor->aiFlags = RANDOM_WALK;
+	actor->aiFlags = RANDOM_WALK | DROP_LIGHT_ON_DEATH;
 	actor->chr = (int)'^';
 	actor->foreColor = TCOD_color_RGB(205, 25, 25);
 	actor->itemLight->r_tint = 125;
