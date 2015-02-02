@@ -188,6 +188,8 @@ void killActor(character *actor) {
 	actor->hp = 0;
 	if (actor->itemLight) {
 		deleteDynamicLight(actor->itemLight);
+		
+		actor->itemLight = NULL;
 	}
 	drawChar(levelConsole, actor->x, actor->y, actor->chr, TCOD_color_RGB(actor->foreColor.r * .55f, actor->foreColor.g * .55f, actor->foreColor.b * .55f), actor->backColor);
 

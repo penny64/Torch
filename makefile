@@ -11,7 +11,7 @@ cgame: $(OFILES)
 		$(CC) $(LDFLAGS) -o torch $^
 
 cgame-debug: $(OFILES)
-		$(CC) -g -O0 $(LDFLAGS) -o cgame $^
+		$(CC) -g -O0 $(LDFLAGS) -o torch $^
 
 clean:
 	rm torch src/*.o src/framework/*.o
