@@ -74,7 +74,6 @@ void levelShutdown() {
 	TCOD_map_delete(LEVEL_MAP);
 	TCOD_map_delete(TUNNEL_WALLS);
 	TCOD_noise_delete(FOG_NOISE);
-	
 }
 
 int getRandomInt(int min, int max) {

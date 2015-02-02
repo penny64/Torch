@@ -104,16 +104,15 @@ void lightsShutdown() {
 }
 
 void deleteDynamicLight(light *lght) {
-	light *prevLight = NULL;
-
 	if (lght == DYNAMIC_LIGHTS) {
 		DYNAMIC_LIGHTS = NULL;
 	} else {
-		prevLight = lght->prev;
-		prevLight->next = lght->next;
-	}
+		lght->prev->next = lght->next;
 
-	printf("Light deleted.\n");
+		if (lght->next) {
+			lght->next->prev = lght->prev;
+		}
+	}
 
 	free(lght);
 }
