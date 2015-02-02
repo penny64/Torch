@@ -1,3 +1,5 @@
+#include <stdio.h>
+
 #include "libtcod.h"
 #include "framework/display.h"
 #include "framework/actors.h"
@@ -236,7 +238,7 @@ void createPlantedTorch(int x, int y, light *lght) {
 }
 
 void createTreasure(int x, int y) {
-	item *itm = createItem(x, y, '*', TCOD_color_RGB(255, 255, 0), TCOD_color_RGB(255, 0, 255), IS_FUEL_SOURCE);
+	createItem(x, y, '*', TCOD_color_RGB(255, 255, 0), TCOD_color_RGB(255, 0, 255), IS_FUEL_SOURCE);
 	
 	printf("Treasure\n");
 

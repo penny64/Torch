@@ -4,6 +4,7 @@
 #include "../lights.h"
 #include "../items.h"
 #include "../player.h"
+#include "../combat.h"
 #include "../ui.h"
 #include "display.h"
 #include "logging.h"

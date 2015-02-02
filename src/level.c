@@ -9,6 +9,7 @@
 #include "libtcod.h"
 #include "items.h"
 #include "player.h"
+#include "enemies.h"
 #include "ui.h"
 
 
