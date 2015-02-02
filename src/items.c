@@ -58,6 +58,20 @@ item *createItem(int x, int y, char chr, TCOD_color_t foreColor, TCOD_color_t ba
 	return _c;
 }
 
+void itemsShutdown() {
+	item *next, *ptr = ITEMS;
+	
+	printf("Cleaning up items...\n");
+	
+	while (ptr != NULL) {
+		next = ptr->next;
+		
+		free(ptr);
+		
+		ptr = next;
+	}
+}
+
 void deleteItem(item *itm) {
 	item *prevItem = NULL;
 

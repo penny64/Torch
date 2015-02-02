@@ -62,5 +62,10 @@ int main() {
 		actorCleanup();
 	}
 	
+	actorShutdown();
+	lightsShutdown();
+	levelShutdown();
+	itemsShutdown();
+	
 	return 0;
 }

@@ -33,5 +33,6 @@ void resetAllActorsForNewLevel();
 void actorLogic(void);
 void drawActors(void);
 void actorSetup(void);
+void actorShutdown(void);
 void actorCleanup(void);
 void killActor(character*);

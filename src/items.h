@@ -24,6 +24,7 @@ struct item {
 
 
 void itemSetup(void);
+void itemsShutdown(void);
 void itemLogic(void);
 item *createItem(int, int, char, TCOD_color_t, TCOD_color_t, unsigned int);
 void assignFlag(item*, unsigned int);

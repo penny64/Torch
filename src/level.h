@@ -12,6 +12,7 @@ TCOD_map_t copyLevelMap(void);
 TCOD_map_t copyLevelMap(void);
 TCOD_noise_t getFogNoise(void);
 void levelSetup(void);
+void levelShutdown(void);
 void generateLevel(void);
 void completeLevel(void);
 void levelLogic(void);

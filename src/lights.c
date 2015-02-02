@@ -85,6 +85,23 @@ light *createDynamicLight(int x, int y, character *actor) {
 	return _c;
 }
 
+void lightsShutdown() {
+	light *next, *ptr = DYNAMIC_LIGHTS;
+	
+	printf("Cleaning up lights...\n");
+	
+	while (ptr != NULL) {
+		next = ptr->next;
+		
+		TCOD_map_delete(ptr->fov);
+		TCOD_map_delete(ptr->lightMap);
+		
+		free(ptr);
+		
+		ptr = next;
+	}
+}
+
 void deleteDynamicLight(light *lght) {
 	light *prevLight = NULL;
 
@@ -117,6 +134,18 @@ TCOD_map_t getLightMap() {
 }
 
 void _initDynamicLight(light *lght) {
+	if (lght->fov) {
+		TCOD_map_delete(lght->fov);
+	} else {
+		printf("Trying to init a light with no existing fov.\n");
+	}
+	
+	if (lght->lightMap) {
+		TCOD_map_delete(lght->lightMap);
+	} else {
+		printf("Trying to init a light with no existing light map.\n");
+	}
+	
 	lght->fov = copyLevelMap();
 	lght->lightMap = copyLevelMap();
 	

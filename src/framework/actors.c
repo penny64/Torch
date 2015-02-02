@@ -19,6 +19,20 @@ void actorSetup() {
 	ACTOR_CONSOLE = TCOD_console_new(WINDOW_WIDTH, WINDOW_HEIGHT);
 }
 
+void actorShutdown() {
+	character *next, *ptr = CHARACTERS;
+	
+	printf("Cleaning up actors...\n");
+	
+	while (ptr != NULL) {
+		next = ptr->next;
+		
+		free(ptr);
+		
+		ptr = next;
+	}
+}
+
 character *createActor() {
 	character *_c, *_p_c;
 	
@@ -53,6 +67,10 @@ character *createActor() {
 }
 
 void _resetActorForNewLevel(character *actor) {
+	if (actor->fov) {
+		TCOD_map_delete(actor->fov);
+	}
+	
 	actor->fov = copyLevelMap();
 	
 	//TODO: Delete old torch

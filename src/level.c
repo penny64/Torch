@@ -23,6 +23,7 @@ TCOD_noise_t FOG_NOISE;
 TCOD_random_t RANDOM;
 int (*ROOM_MAP)[255];
 int (*DIJKSTRA_MAP)[255];
+int (*CLOSED_MAP)[255];
 float (*EFFECTS_MAP)[255];
 float EXIT_WAVE_DIST;
 int ROOM_COUNT, ROOM_COUNT_MAX;
@@ -31,7 +32,6 @@ int EXIT_OPEN;
 
 void levelSetup() {
 	LEVEL_CONSOLE = TCOD_console_new(WINDOW_WIDTH, WINDOW_HEIGHT);
-	LIGHT_CONSOLE = TCOD_console_new(WINDOW_WIDTH, WINDOW_HEIGHT);
 	SHADOW_CONSOLE = TCOD_console_new(WINDOW_WIDTH, WINDOW_HEIGHT);
 	FOG_CONSOLE = TCOD_console_new(WINDOW_WIDTH, WINDOW_HEIGHT);
 	SEEN_CONSOLE = TCOD_console_new(WINDOW_WIDTH, WINDOW_HEIGHT);
@@ -57,6 +57,23 @@ void levelSetup() {
 	TCOD_noise_set_type(FOG_NOISE, TCOD_NOISE_PERLIN);
 	
 	startLights();
+}
+
+void levelShutdown() {
+	printf("Shutting down level...\n");
+	
+	free(ROOM_MAP);
+	free(EFFECTS_MAP);
+	free(CLOSED_MAP);
+	TCOD_console_delete(LEVEL_CONSOLE);
+	TCOD_console_delete(LIGHT_CONSOLE);
+	TCOD_console_delete(SHADOW_CONSOLE);
+	TCOD_console_delete(FOG_CONSOLE);
+	TCOD_console_delete(SEEN_CONSOLE);
+	TCOD_map_delete(LEVEL_MAP);
+	TCOD_map_delete(TUNNEL_WALLS);
+	TCOD_noise_delete(FOG_NOISE);
+	
 }
 
 int getRandomInt(int min, int max) {
@@ -206,6 +223,8 @@ void smooth() {
 				}
 			}
 		}
+		
+		TCOD_map_delete(mapCopy);
 	}
 }
 
@@ -239,7 +258,7 @@ void placeLights() {
 void findRooms() {
 	int i, x, y, x1, y1, w_x, w_y, oLen, cLen, added = 1;
 	int (*openList)[WINDOW_WIDTH * WINDOW_HEIGHT] = malloc(sizeof(double[WINDOW_WIDTH * WINDOW_HEIGHT][WINDOW_WIDTH * WINDOW_HEIGHT]));
-	int (*CLOSED_MAP)[255] = malloc(sizeof(double[255][255]));
+	CLOSED_MAP = malloc(sizeof(double[255][255]));
 	ROOM_MAP = malloc(sizeof(double[255][255]));
 	ROOM_COUNT = 0;
 	EFFECTS_MAP = malloc(sizeof(float[255][255]));
@@ -334,6 +353,9 @@ void findRooms() {
 	}
 	
 	ROOM_COUNT_MAX = ROOM_COUNT;
+	
+	free(openList);
+	//free(CLOSED_MAP);
 }
 
 void placeTunnels() {
@@ -540,6 +562,9 @@ void placeTunnels() {
 			ROOM_COUNT --;
 		}
 	}
+	
+	free(START_POSITIONS);
+	free(DIJKSTRA_MAP);
 }
 
 void generateLevel() {
