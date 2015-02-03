@@ -283,6 +283,12 @@ void _lightLogic(light *lght) {
 	if (lght->fuel > 0) {
 		lght->fuel --;
 	}
+
+	if (lght->fuel < 0) {
+		printf("Warning: Light has less than 0 fuel.\n");
+
+		lght->fuel = 0;
+	}
 }
 
 void lightLogic() {

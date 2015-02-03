@@ -171,7 +171,7 @@ void itemHandleCharacterCollision(item *itm, character *actor) {
 	if (itm->itemFlags & IS_FUEL_SOURCE && actor->itemLight) {
 		actor->itemLight->fuel = actor->itemLight->fuelMax;
 
-		if (actor == player) {
+		if (actor == player && actor->itemLight && actor->itemLight->fuel) {
 			if (itm->itemLight && !itm->itemLight->fuel) {
 				itm->itemLight->fuel = itm->itemLight->fuelMax;
 				
@@ -198,7 +198,7 @@ void itemHandleCharacterCollision(item *itm, character *actor) {
 }
 
 void createBonfire(int x, int y) {
-	item *itm = createItem(x, y, '!', TCOD_color_RGB(255, 255, 155), TCOD_color_RGB(255, 0, 255), IS_FUEL_SOURCE);
+	item *itm = createItem(x, y, '!', TCOD_color_RGB(255, 255, 155), TCOD_color_RGB(55, 0, 55), IS_FUEL_SOURCE);
 
 	light *lght = createDynamicLight(x, y, NULL);
 	itm->itemLight = lght;
@@ -219,7 +219,7 @@ void createBonfireKeystone(int x, int y) {
 }
 
 void createUnkindledBonfire(int x, int y) {
-	item *itm = createItem(x, y, '!', TCOD_color_RGB(55, 55, 15), TCOD_color_RGB(255, 0, 255), IS_FUEL_SOURCE);
+	item *itm = createItem(x, y, '!', TCOD_color_RGB(55, 55, 15), TCOD_color_RGB(55, 0, 55), IS_FUEL_SOURCE);
 
 	light *lght = createDynamicLight(x, y, NULL);
 	itm->itemLight = lght;
@@ -232,12 +232,12 @@ void createPlantedTorch(int x, int y, light *lght) {
 	lght->x = x;
 	lght->y = y;
 
-	item *itm = createItem(x, y, 'i', TCOD_color_RGB(255, 255, 155), TCOD_color_RGB(255, 0, 255), IS_TORCH);
+	item *itm = createItem(x, y, 'i', TCOD_color_RGB(255, 255, 155), TCOD_color_RGB(55, 0, 55), IS_TORCH);
 	itm->itemLight = lght;
 }
 
 void createTreasure(int x, int y) {
-	createItem(x, y, '*', TCOD_color_RGB(255, 255, 0), TCOD_color_RGB(255, 0, 255), IS_FUEL_SOURCE);
+	createItem(x, y, '*', TCOD_color_RGB(255, 255, 0), TCOD_color_RGB(55, 0, 55), IS_FUEL_SOURCE);
 	
 	printf("Treasure\n");
 

@@ -29,8 +29,6 @@ int getPlayerMoveCount() {
 }
 
 void _handlePlantTorch() {
-	//PLAYER_ACTOR->itemLight->x = PLAYER_ACTOR->x;
-	//PLAYER_ACTOR->itemLight->y = PLAYER_ACTOR->yy;
 	createPlantedTorch(PLAYER_ACTOR->itemLight->x, PLAYER_ACTOR->itemLight->y, PLAYER_ACTOR->itemLight);
 
 	PLAYER_ACTOR->itemLight = NULL;

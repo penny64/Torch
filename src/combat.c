@@ -10,11 +10,7 @@ void meleeAttack(character *attacker, character *target) {
 	if ((attacker->traitFlags & TORCH_ATTACK_PENALTY && attacker->itemLight)) {
 		damage /= 2;
 
-		attacker->itemLight->fuel -= 50;
-	}
-
-	if (attacker->traitFlags & TORCH_ATTACK_PENALTY) {
-		printf("Shit!\n");
+		attacker->itemLight->fuel -= 25;
 	}
 
 	target->hp -= damage;
