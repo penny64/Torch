@@ -29,6 +29,7 @@ float (*EFFECTS_MAP)[255];
 float EXIT_WAVE_DIST;
 int ROOM_COUNT, ROOM_COUNT_MAX;
 int EXIT_OPEN;
+int EXIT_IN_PROGRESS;
 
 
 void levelSetup() {
@@ -133,12 +134,17 @@ int isPositionWalkable(int x, int y) {
 
 void completeLevel() {
 	EXIT_OPEN = 1;
+	EXIT_IN_PROGRESS = 1;
 
 	showMessage("%cYou hear a low rumble.%c", 20);
 }
 
 int isLevelComplete() {
 	return EXIT_OPEN;
+}
+
+int isTransitionInProgress() {
+	return EXIT_IN_PROGRESS;
 }
 
 void levelLogic() {
