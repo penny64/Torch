@@ -7,6 +7,9 @@
 #include "level.h"
 
 
+const int SIZEMOD_TIME_MAX = 10;
+int SIZEMOD_TIME = SIZEMOD_TIME_MAX;
+
 static struct character *PLAYER_ACTOR;
 
 
@@ -34,8 +37,23 @@ void _handlePlantTorch() {
 	PLAYER_ACTOR->itemLight = NULL;
 }
 
+void playerLogic() {
+	if (isTransitionInProgress()) {
+		if (SIZEMOD_TIME > 0) {
+			SIZEMOD_TIME --;
+		} else {
+			SIZEMOD_TIME = SIZEMOD_TIME_MAX;
+			PLAYER_ACTOR->itemLight->sizeMod -= .3f;//clipFloat(PLAYER_ACTOR->itemLight->sizeMod - .1f, 0.f, 1.f);
+
+			if (PLAYER_ACTOR->itemLight->sizeMod < 0) {
+				PLAYER_ACTOR->itemLight->sizeMod = 0.f;
+			}
+		}
+	}
+}
+
 void playerInputLogic() {
-	if (!PLAYER_ACTOR || PLAYER_ACTOR->hp <= 0) {
+	if (!PLAYER_ACTOR || PLAYER_ACTOR->hp <= 0 || isTransitionInProgress()) {
 		return;
 	}
 	

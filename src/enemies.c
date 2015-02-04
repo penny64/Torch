@@ -18,6 +18,7 @@ void createBat(int x, int y) {
 	actor->foreColor = TCOD_color_RGB(205, 25, 25);
 	actor->itemLight->r_tint = 125;
 	actor->itemLight->size = 4;
-	actor->itemLight->fuel = 99999;
+	actor->itemLight->fuelMax = 99999;
+	actor->itemLight->fuel = actor->itemLight->fuelMax;
 }
 

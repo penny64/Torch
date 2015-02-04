@@ -45,6 +45,7 @@ int main() {
 		}
 
 		//effectsLogic();
+		playerLogic();
 		uiLogic();
 		levelLogic();
 		graphicsLogic();

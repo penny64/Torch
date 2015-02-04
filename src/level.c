@@ -30,6 +30,7 @@ float EXIT_WAVE_DIST;
 int ROOM_COUNT, ROOM_COUNT_MAX;
 int EXIT_OPEN;
 int EXIT_IN_PROGRESS;
+int EXIT_LOCATION[2];
 
 
 void levelSetup() {
@@ -128,15 +129,26 @@ float getExitWaveDistance() {
 	return EXIT_WAVE_DIST;
 }
 
+int *getExitLocation() {
+	return EXIT_LOCATION;
+}
+
 int isPositionWalkable(int x, int y) {
 	return TCOD_map_is_walkable(LEVEL_MAP, x, y);
 }
 
 void completeLevel() {
 	EXIT_OPEN = 1;
-	EXIT_IN_PROGRESS = 1;
+
+	createExit(EXIT_LOCATION[0], EXIT_LOCATION[1]);
 
 	showMessage("%cYou hear a low rumble.%c", 20);
+}
+
+void exitLevel() {
+	EXIT_IN_PROGRESS = 1;
+
+	showMessage("%cYou step down...%c", 20);
 }
 
 int isLevelComplete() {
@@ -443,8 +455,14 @@ void placeTunnels() {
 			w_y = START_POSITIONS[index][1];
 			
 			if (!i) {
-				createBonfireKeystone(w_x, w_y);
 				createBat(w_x, w_y);
+
+				if (ROOM_COUNT == 2) {
+					EXIT_LOCATION[0] = w_x;
+					EXIT_LOCATION[1] = w_y;
+				} else {
+					createBonfireKeystone(w_x, w_y);
+				}
 			}
 
 			mapUpdates = 1;

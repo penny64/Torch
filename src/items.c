@@ -171,17 +171,18 @@ void itemHandleCharacterCollision(item *itm, character *actor) {
 	if (itm->itemFlags & IS_FUEL_SOURCE && actor->itemLight) {
 		actor->itemLight->fuel = actor->itemLight->fuelMax;
 
-		if (actor == player && actor->itemLight && actor->itemLight->fuel) {
-			if (itm->itemLight && !itm->itemLight->fuel) {
+		if (actor == player) {
+			if (itm->itemLight && actor->itemLight && actor->itemLight->fuel) {
+				if (!itm->itemLight->fuel) {
+					showMessage("%cBonfire rekindled. Torch has x fuel remaining.%c", 10);
+				} else {
+					showMessage("%cTorch rekindled. Bonfire has x fuel remaining.%c", 10);
+				}
+
 				itm->itemLight->fuel = itm->itemLight->fuelMax;
-				
-				showMessage("%cBonfire rekindled. Torch has x fuel remaining.%c", 10);
-			} else {
-				showMessage("%cTorch rekindled. Bonfire has x fuel remaining.%c", 10);
+				itm->foreColor = TCOD_color_RGB(255, 255, 155);
+				itm->backColor = TCOD_color_RGB(155, 155, 155);
 			}
-			
-			itm->foreColor = TCOD_color_RGB(255, 255, 155);
-			itm->backColor = TCOD_color_RGB(155, 155, 155);
 		}
 	}
 
@@ -193,6 +194,14 @@ void itemHandleCharacterCollision(item *itm, character *actor) {
 			deleteItem(itm);
 
 			showMessage("%cYou pick up the torch.%c", 10);
+		}
+
+		if (itm->itemFlags & IS_EXIT && isLevelComplete()) {
+			if (!player->itemLight) {
+				showMessage("%cYou forgot your torch!%c", 10);
+			} else {
+				exitLevel();
+			}
 		}
 	}
 }
@@ -238,14 +247,8 @@ void createPlantedTorch(int x, int y, light *lght) {
 
 void createTreasure(int x, int y) {
 	createItem(x, y, '*', TCOD_color_RGB(255, 255, 0), TCOD_color_RGB(55, 0, 55), IS_FUEL_SOURCE);
-	
-	printf("Treasure\n");
+}
 
-	/*light *lght = createDynamicLight(x, y, NULL);
-	itm->itemLight = lght;
-	lght->r_tint = 0;
-	lght->g_tint = 0;
-	lght->b_tint = 80;
-	lght->fuel = 0;
-	lght->fuelMax = 120;*/
+void createExit(int x, int y) {
+	createItem(x, y, '>', TCOD_color_RGB(200, 200, 150), TCOD_color_RGB(50, 50, 25), IS_EXIT);
 }

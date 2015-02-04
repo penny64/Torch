@@ -201,7 +201,7 @@ void actorLogic() {
 void _drawActor(character *actor) {
 	//int colorMod = 0;
 	
-	if (actor->hp <= 0) {
+	if (actor->hp <= 0 || (isTransitionInProgress() && actor->itemLight && actor->itemLight->sizeMod == 0)) {
 		return;
 	}
 	

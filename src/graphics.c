@@ -13,7 +13,7 @@
 #include "ui.h"
 
 const int FADE_TIME_MAX = 10;
-int FADE_TIME = FADE_TIME_MAX;
+int FADE_TIME = 60;
 int FADE_VALUE = 255;
 
 
@@ -25,7 +25,9 @@ void generateFov() {
 }
 
 void graphicsLogic() {
-	if (!isTransitionInProgress()) {
+	character *player = getPlayer();
+
+	if (!isTransitionInProgress() || player->itemLight->sizeMod > 0) {
 		return;
 	}
 
@@ -130,8 +132,8 @@ void postProcess() {
 	if (!isTransitionInProgress()) {
 		return;
 	}
-	
-    TCOD_console_set_fade(FADE_VALUE, TCOD_black);
+
+    TCOD_console_set_fade(FADE_VALUE, TCOD_color_RGB(20, 15, 10));
 }
 
 void composeScene() {

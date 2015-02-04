@@ -7,6 +7,7 @@ typedef struct light light;
 
 struct light {
 	int x, y, fuel, fuelMax, size, r_tint, g_tint, b_tint;
+	float sizeMod;
 	struct light *next, *prev;
 	struct character *owner;
 	TCOD_map_t fov;

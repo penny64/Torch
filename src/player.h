@@ -4,6 +4,7 @@
 
 
 void createPlayer(void);
+void playerLogic(void);
 void playerInputLogic(void);
 int getPlayerMoveCount(void);
 struct character *getPlayer(void);

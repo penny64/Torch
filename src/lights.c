@@ -61,14 +61,10 @@ light *createDynamicLight(int x, int y, character *actor) {
 	_c->fuel = _c->fuelMax;
 	_c->owner = actor;
 	_c->size = 8;
+	_c->sizeMod = 1.f;
 	_c->prev = NULL;
 	_c->next = NULL;
 	_c->fov = copyLevelMap();
-	
-	//resetLight(_c);
-	//_c->lightMap = copyLevelMap();
-	
-	//TCOD_map_compute_fov(_c->fov, x, y, _c->size, 1, FOV_SHADOW);
 	
 	if (DYNAMIC_LIGHTS == NULL) {
 		DYNAMIC_LIGHTS = _c;
@@ -340,7 +336,8 @@ void _drawDynamicLight(light *lght) {
 					distMod = lght->size / 2;
 				}
 				
-				alpha = distMod / (float) lght->size;
+				alpha = (distMod / (float) lght->size);
+				alpha *= lght->sizeMod;
 				
 				if (!TCOD_map_is_walkable(levelMap, x, y)) {
 					r_tint = 55;

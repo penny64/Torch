@@ -7,7 +7,7 @@ enum {
 	IS_FUEL_SOURCE = 0x01,
 	IS_TORCH = 0x02,
 	IS_KEY = 0x04,
-	IS_SOMETHING_SOMETHING_ELSE = 0x08,
+	IS_EXIT = 0x08,
 } itemFlag_t;
 
 
@@ -41,3 +41,4 @@ void createBonfireKeystone(int, int);
 void createUnkindledBonfire(int, int);
 void createTreasure(int, int);
 void createPlantedTorch(int, int, light*);
+void createExit(int, int);
