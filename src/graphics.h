@@ -2,3 +2,4 @@
 
 
 void composeScene(void);
+void graphicsLogic(void);

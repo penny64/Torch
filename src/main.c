@@ -47,6 +47,7 @@ int main() {
 		//effectsLogic();
 		uiLogic();
 		levelLogic();
+		graphicsLogic();
 		
 		if (isTCODCharPressed(TCODK_ESCAPE)) {
 			break;

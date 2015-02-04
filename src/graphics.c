@@ -12,12 +12,29 @@
 #include "items.h"
 #include "ui.h"
 
+const int FADE_TIME_MAX = 10;
+int FADE_TIME = FADE_TIME_MAX;
+int FADE_VALUE = 255;
+
 
 void generateFov() {
 	TCOD_map_t map = getLevelMap();
 	character *player = getPlayer();
 	
 	TCOD_map_compute_fov(map, player->x, player->y, 24, 1, FOV_SHADOW);
+}
+
+void graphicsLogic() {
+	if (!isTransitionInProgress()) {
+		return;
+	}
+
+	if (FADE_TIME) {
+		FADE_TIME --;
+	} else {
+		FADE_TIME = FADE_TIME_MAX;
+		FADE_VALUE = clip(FADE_VALUE - 55, 0, 255);
+	}
 }
 
 void applyFov() {
@@ -109,6 +126,14 @@ void applyFov() {
 	}
 }
 
+void postProcess() {
+	if (!isTransitionInProgress()) {
+		return;
+	}
+	
+    TCOD_console_set_fade(FADE_VALUE, TCOD_black);
+}
+
 void composeScene() {
 	generateFov();
 	
@@ -136,4 +161,6 @@ void composeScene() {
 	TCOD_console_blit(seenConsole, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, NULL, 0, 0, 1, 1);
 	TCOD_console_blit(shadowConsole, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, NULL, 0, 0, 1, 0.55f);
 	TCOD_console_blit(UiConsole, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, NULL, 0, 0, 1, 1);
+
+	postProcess();
 }
