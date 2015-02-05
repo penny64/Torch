@@ -27,7 +27,6 @@ void setup() {
 
 	//Attract screen
 	generateLevel();
-	resetAllActorsForNewLevel();
 }
 
 int main() {

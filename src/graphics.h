@@ -3,3 +3,5 @@
 
 void composeScene(void);
 void graphicsLogic(void);
+void fadeBackIn(void);
+int isScreenFadedOut(void);

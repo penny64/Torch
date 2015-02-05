@@ -5,8 +5,13 @@ LDFLAGS = -Wl,-rpath,. -Llib -L. -ltcod
 
 all: cgame
 
+debug: cgame-debug
+
 cgame: $(OFILES)
 		$(CC) $(LDFLAGS) -o torch $^
+
+cgame-debug: $(OFILES)
+		$(CC) -g -O0 $(LDFLAGS) -o torch $^
 
 clean:
 	rm torch src/*.o src/framework/*.o

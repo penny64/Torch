@@ -166,7 +166,7 @@ void refreshAllLights() {
 }
 
 void startLights() {
-	LIGHT_MAP = TCOD_map_new(WINDOW_WIDTH, WINDOW_HEIGHT);
+	//LIGHT_MAP = TCOD_map_new(WINDOW_WIDTH, WINDOW_HEIGHT);
 	DYNAMIC_LIGHT_CONSOLE = TCOD_console_new(WINDOW_WIDTH, WINDOW_HEIGHT);
 	
 	TCOD_console_set_default_background(DYNAMIC_LIGHT_CONSOLE, TCOD_color_RGB(0, 0, 0));

@@ -4,6 +4,7 @@
 #include "framework/display.h"
 #include "framework/numbers.h"
 #include "framework/draw.h"
+#include "graphics.h"
 #include "level.h"
 #include "lights.h"
 #include "libtcod.h"
@@ -155,13 +156,23 @@ int isLevelComplete() {
 	return EXIT_OPEN;
 }
 
+void transitionIsComplete() {
+	EXIT_IN_PROGRESS = 0;
+}
+
 int isTransitionInProgress() {
 	return EXIT_IN_PROGRESS;
 }
 
 void levelLogic() {
+	character *player = getPlayer();
+
 	if (isLevelComplete()) {
 		EXIT_WAVE_DIST = clipFloat(EXIT_WAVE_DIST + .5f, 0, 255);
+
+		if (!player->itemLight->sizeMod && isScreenFadedOut()) {
+			generateLevel();
+		}
 	}
 }
 
@@ -629,7 +640,9 @@ void generateLevel() {
 
 	//smooth();
 	//placeLights();
+	printf("Finding rooms\n");
 	findRooms();
+	printf("Placing tuns\n");
 	placeTunnels();
 	smooth();
 	
@@ -640,6 +653,8 @@ void generateLevel() {
 	player->vx = 1;
 
 	refreshAllLights();
+	resetAllActorsForNewLevel();
+	fadeBackIn();
 	
 	for (y = 0; y < WINDOW_HEIGHT; y++) {
 		for (x = 0; x < WINDOW_WIDTH; x++) {

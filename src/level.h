@@ -17,6 +17,7 @@ void generateLevel(void);
 void completeLevel(void);
 void exitLevel(void);
 void levelLogic(void);
+void transitionIsComplete(void);
 int isPositionWalkable(int, int);
 int isLevelComplete(void);
 int isTransitionInProgress(void);

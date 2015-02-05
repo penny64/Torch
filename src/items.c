@@ -246,7 +246,7 @@ void createPlantedTorch(int x, int y, light *lght) {
 }
 
 void createTreasure(int x, int y) {
-	createItem(x, y, '*', TCOD_color_RGB(255, 255, 0), TCOD_color_RGB(55, 0, 55), IS_FUEL_SOURCE);
+	createItem(x, y, '*', TCOD_color_RGB(255, 255, 0), TCOD_color_RGB(55, 0, 55), 0x0);
 }
 
 void createExit(int x, int y) {

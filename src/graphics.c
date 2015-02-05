@@ -15,6 +15,7 @@
 const int FADE_TIME_MAX = 10;
 int FADE_TIME = 60;
 int FADE_VALUE = 255;
+int FADE_BACK_IN = 0;
 
 
 void generateFov() {
@@ -24,19 +25,49 @@ void generateFov() {
 	TCOD_map_compute_fov(map, player->x, player->y, 24, 1, FOV_SHADOW);
 }
 
+int isScreenFadedOut() {
+	return !FADE_VALUE;
+}
+
+void fadeBackIn() {
+	FADE_BACK_IN = 1;
+}
+
 void graphicsLogic() {
 	character *player = getPlayer();
 
-	if (!isTransitionInProgress() || player->itemLight->sizeMod > 0) {
+	if (FADE_BACK_IN) {
+		if (FADE_TIME < FADE_TIME_MAX) {
+			FADE_TIME ++;
+		} else {
+			FADE_TIME = 0;
+			FADE_VALUE = clip(FADE_VALUE + 55, 0, 255);
+
+			if (FADE_VALUE == 255) {
+				FADE_BACK_IN = 0;
+				transitionIsComplete();
+			}
+		}
+	} else {
+		if (!isTransitionInProgress() || player->itemLight->sizeMod > 0) {
+			return;
+		}
+
+		if (FADE_TIME) {
+			FADE_TIME --;
+		} else {
+			FADE_TIME = FADE_TIME_MAX;
+			FADE_VALUE = clip(FADE_VALUE - 55, 0, 255);
+		}
+	}
+}
+
+void postProcess() {
+	if (!isTransitionInProgress()) {
 		return;
 	}
 
-	if (FADE_TIME) {
-		FADE_TIME --;
-	} else {
-		FADE_TIME = FADE_TIME_MAX;
-		FADE_VALUE = clip(FADE_VALUE - 55, 0, 255);
-	}
+    TCOD_console_set_fade(FADE_VALUE, TCOD_color_RGB(00, 00, 0));
 }
 
 void applyFov() {
@@ -126,14 +157,6 @@ void applyFov() {
 			}
 		}
 	}
-}
-
-void postProcess() {
-	if (!isTransitionInProgress()) {
-		return;
-	}
-
-    TCOD_console_set_fade(FADE_VALUE, TCOD_color_RGB(20, 15, 10));
 }
 
 void composeScene() {
