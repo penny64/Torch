@@ -32,6 +32,7 @@ int ROOM_COUNT, ROOM_COUNT_MAX;
 int EXIT_OPEN;
 int EXIT_IN_PROGRESS;
 int EXIT_LOCATION[2];
+int (*openList)[WINDOW_WIDTH * WINDOW_HEIGHT];
 
 
 void levelSetup() {
@@ -59,6 +60,11 @@ void levelSetup() {
 	TCOD_console_clear(SEEN_CONSOLE);
 	
 	TCOD_noise_set_type(FOG_NOISE, TCOD_NOISE_PERLIN);
+
+    CLOSED_MAP = calloc(1, sizeof(double[255][255]));
+    ROOM_MAP = calloc(1, sizeof(double[255][255]));
+    EFFECTS_MAP = calloc(1, sizeof(float[255][255]));
+    openList = calloc(1, sizeof(double[WINDOW_WIDTH * WINDOW_HEIGHT][WINDOW_WIDTH * WINDOW_HEIGHT]));
 	
 	startLights();
 }
@@ -286,17 +292,14 @@ void placeLights() {
 
 void findRooms() {
 	int i, x, y, x1, y1, w_x, w_y, oLen, cLen, added = 1;
-	int (*openList)[WINDOW_WIDTH * WINDOW_HEIGHT] = malloc(sizeof(double[WINDOW_WIDTH * WINDOW_HEIGHT][WINDOW_WIDTH * WINDOW_HEIGHT]));
-	CLOSED_MAP = malloc(sizeof(double[255][255]));
-	ROOM_MAP = malloc(sizeof(double[255][255]));
 	ROOM_COUNT = 0;
-	EFFECTS_MAP = malloc(sizeof(float[255][255]));
 
 	for (y = 0; y <= WINDOW_HEIGHT; y++) {
 		for (x = 0; x <= WINDOW_WIDTH; x++) {
 			CLOSED_MAP[x][y] = 0;
 			ROOM_MAP[x][y] = 0;
 			EFFECTS_MAP[x][y] = 0.1f;
+            openList[x][y] = 0;
 		}
 	}
 	

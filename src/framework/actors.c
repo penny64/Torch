@@ -72,6 +72,10 @@ void deleteActor(character *chr) {
 		printf("*** CRASH INCOMING ***\n");
 	}
 
+    if (chr == getPlayer()) {
+        printf("We're deleting the player for some fucking reason\n");
+    }
+
 	if (chr == CHARACTERS) {
 		CHARACTERS = NULL;
 	} else {
@@ -79,8 +83,6 @@ void deleteActor(character *chr) {
 
 		if (chr->next) {
 			chr->next->prev = chr->prev;
-
-			printf("Clearing ahead of time\n");
 		}
 	}
 
@@ -125,6 +127,7 @@ void _checkForItemCollisions(character *actor) {
 
 void _checkIfPositionLit(character *actor) {
 	if (!isPositionLit(actor->x, actor->y)) {
+        printf("Actor is in unlit position\n");
 		killActor(actor);
 	}
 }
