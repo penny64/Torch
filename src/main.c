@@ -35,6 +35,10 @@ int main() {
 	while (!TCOD_console_is_window_closed()) {
 		inputLogic();
 		playerInputLogic();
+
+        if (isTCODCharPressed(TCODK_ESCAPE)) {
+            break;
+        }
 		
 		//While loop?
 		if (getPlayerMoveCount()) {
@@ -46,12 +50,12 @@ int main() {
 		//effectsLogic();
 		playerLogic();
 		uiLogic();
-		levelLogic();
+
+        if (levelLogic()) {
+            continue;
+        }
+
 		graphicsLogic();
-		
-		if (isTCODCharPressed(TCODK_ESCAPE)) {
-			break;
-		}
 	
 		drawActors();
 

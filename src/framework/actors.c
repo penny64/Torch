@@ -100,7 +100,9 @@ void _resetActorForNewLevel(character *actor) {
 	
 	actor->fov = copyLevelMap();
 
-	resetLight(actor->itemLight);
+    if (actor->itemLight) {
+        resetLight(actor->itemLight);
+    }
 }
 
 void resetAllActorsForNewLevel() {

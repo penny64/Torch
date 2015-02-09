@@ -74,6 +74,22 @@ void itemsShutdown() {
 	}
 }
 
+void deleteAllOwnerlessItems() {
+    item *next, *ptr = ITEMS;
+
+    printf("Cleaning up items...\n");
+
+    while (ptr != NULL) {
+        next = ptr->next;
+
+        if (!ptr->owner) {
+            deleteItem(ptr);
+        }
+
+        ptr = next;
+    }
+}
+
 void deleteItem(item *itm) {
 	if (itm == ITEMS) {
 		ITEMS = NULL;

@@ -27,6 +27,7 @@ void itemSetup(void);
 void itemsShutdown(void);
 void itemLogic(void);
 item *createItem(int, int, char, TCOD_color_t, TCOD_color_t, unsigned int);
+void deleteItem(item*);
 void assignFlag(item*, unsigned int);
 void itemHandleCharacterCollision(item*, character*);
 TCOD_console_t getItemConsole(void);
@@ -34,6 +35,7 @@ item *getItems(void);
 void drawItems(void);
 int getTotalNumberOfKeytorches(void);
 int getNumberOfLitKeytorches(void);
+void deleteAllOwnerlessItems(void);
 
 //Item list
 void createBonfire(int, int);

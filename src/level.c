@@ -33,6 +33,7 @@ int EXIT_OPEN;
 int EXIT_IN_PROGRESS;
 int EXIT_LOCATION[2];
 int (*openList)[WINDOW_WIDTH * WINDOW_HEIGHT];
+int (*START_POSITIONS)[WINDOW_WIDTH * WINDOW_HEIGHT];
 
 
 void levelSetup() {
@@ -65,6 +66,8 @@ void levelSetup() {
     ROOM_MAP = calloc(1, sizeof(double[255][255]));
     EFFECTS_MAP = calloc(1, sizeof(float[255][255]));
     openList = calloc(1, sizeof(double[WINDOW_WIDTH * WINDOW_HEIGHT][WINDOW_WIDTH * WINDOW_HEIGHT]));
+    DIJKSTRA_MAP = malloc(sizeof(double[255][255]));
+    START_POSITIONS = malloc(sizeof(double[WINDOW_WIDTH * WINDOW_HEIGHT][WINDOW_WIDTH * WINDOW_HEIGHT]));
 	
 	startLights();
 }
@@ -75,6 +78,9 @@ void levelShutdown() {
 	free(ROOM_MAP);
 	free(EFFECTS_MAP);
 	free(CLOSED_MAP);
+    free(START_POSITIONS);
+    free(DIJKSTRA_MAP);
+    free(openList);
 	TCOD_console_delete(LEVEL_CONSOLE);
 	TCOD_console_delete(LIGHT_CONSOLE);
 	TCOD_console_delete(SHADOW_CONSOLE);
@@ -170,7 +176,7 @@ int isTransitionInProgress() {
 	return EXIT_IN_PROGRESS;
 }
 
-void levelLogic() {
+int levelLogic() {
 	character *player = getPlayer();
 
 	if (isLevelComplete()) {
@@ -178,8 +184,12 @@ void levelLogic() {
 
 		if (!player->itemLight->sizeMod && isScreenFadedOut()) {
 			generateLevel();
+
+            return 1;
 		}
 	}
+
+    return 0;
 }
 
 void carve(int x, int y) {
@@ -385,15 +395,11 @@ void findRooms() {
 	}
 	
 	ROOM_COUNT_MAX = ROOM_COUNT;
-	
-	free(openList);
-	//free(CLOSED_MAP);
 }
 
 void placeTunnels() {
-	int i, x, y, x1, y1, w_x, w_y, mapUpdates, currentValue, neighborValue, lowestValue, startCount, index, lowestX, lowestY, invalid, roomSize, randomRoomSize, dist;
-	int (*START_POSITIONS)[WINDOW_WIDTH * WINDOW_HEIGHT] = malloc(sizeof(double[WINDOW_WIDTH * WINDOW_HEIGHT][WINDOW_WIDTH * WINDOW_HEIGHT]));
-	DIJKSTRA_MAP = malloc(sizeof(double[255][255]));
+	int i, x, y, x1, y1, w_x, w_y, mapUpdates, currentValue, neighborValue, lowestValue, index, lowestX, lowestY, invalid, roomSize, randomRoomSize, dist;
+    int startCount = 0;
 	
 	for (y = 2; y < WINDOW_HEIGHT - 1; y++) {
 		for (x = 2; x < WINDOW_WIDTH - 1; x++) {
@@ -600,9 +606,6 @@ void placeTunnels() {
 			ROOM_COUNT --;
 		}
 	}
-	
-	free(START_POSITIONS);
-	free(DIJKSTRA_MAP);
 }
 
 void generateLevel() {
@@ -614,6 +617,15 @@ void generateLevel() {
 
 	EXIT_OPEN = 0;
 	EXIT_WAVE_DIST = 0;
+
+    TCOD_map_clear(LEVEL_MAP, 0, 0);
+    TCOD_map_clear(TUNNEL_WALLS, 0, 0);
+    TCOD_console_clear(LEVEL_CONSOLE);
+    TCOD_console_clear(LIGHT_CONSOLE);
+    TCOD_console_clear(SHADOW_CONSOLE);
+    TCOD_console_clear(SEEN_CONSOLE);
+    TCOD_console_clear(FOG_CONSOLE);
+    deleteAllOwnerlessItems();
 	
 	for (i = 0; i < MAX_ROOMS; i++) {
 		foundPlot = 0;

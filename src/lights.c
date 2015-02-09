@@ -171,6 +171,7 @@ void startLights() {
 	
 	TCOD_console_set_default_background(DYNAMIC_LIGHT_CONSOLE, TCOD_color_RGB(0, 0, 0));
 	TCOD_console_set_key_color(DYNAMIC_LIGHT_CONSOLE, TCOD_color_RGB(255, 0, 255));
+    TCOD_console_clear(DYNAMIC_LIGHT_CONSOLE);
 }
 
 void _drawLight(light *lght) {
