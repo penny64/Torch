@@ -174,7 +174,7 @@ void _actorLogic(character *actor) {
 		actor->y = ny;
 
 		if (actor->itemLight) {
-			actor->itemLight->fuel --;
+			actor->itemLight->fuel -= getLevel();
 		}
 		
 		TCOD_map_compute_fov(actor->fov, actor->x, actor->y, 16, 1, FOV_SHADOW);

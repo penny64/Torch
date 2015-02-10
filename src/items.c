@@ -229,6 +229,10 @@ void createBonfire(int x, int y) {
 	itm->itemLight = lght;
 	lght->fuel = 180;
 	lght->fuelMax = 180;
+	lght->size = 5;
+	lght->r_tint = 65;
+	lght->g_tint = 60;
+	lght->b_tint = 65;
 }
 
 void createBonfireKeystone(int x, int y) {
@@ -241,6 +245,7 @@ void createBonfireKeystone(int x, int y) {
 	lght->b_tint = 5;
 	lght->fuel = 0;
 	lght->fuelMax = 280;
+	lght->size = 7;
 }
 
 void createUnkindledBonfire(int x, int y) {

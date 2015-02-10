@@ -16,9 +16,11 @@ static struct character *PLAYER_ACTOR;
 void createPlayer() {
 	PLAYER_ACTOR = createActor();
 	
-	PLAYER_ACTOR->itemLight->g_tint = 95;
-	PLAYER_ACTOR->itemLight->b_tint = 35;
-	PLAYER_ACTOR->itemLight->fuelMax = 180;
+	PLAYER_ACTOR->itemLight->r_tint = 100;
+	PLAYER_ACTOR->itemLight->g_tint = 100;
+	PLAYER_ACTOR->itemLight->b_tint = 100;
+	PLAYER_ACTOR->itemLight->size = 6;
+	PLAYER_ACTOR->itemLight->fuelMax = 120;
 	PLAYER_ACTOR->itemLight->fuel = PLAYER_ACTOR->itemLight->fuelMax;
 	PLAYER_ACTOR->traitFlags = TORCH_ATTACK_PENALTY;
 }

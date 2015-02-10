@@ -32,6 +32,7 @@ int ROOM_COUNT, ROOM_COUNT_MAX;
 int EXIT_OPEN;
 int EXIT_IN_PROGRESS;
 int EXIT_LOCATION[2];
+int LEVEL_NUMBER;
 int (*openList)[WINDOW_WIDTH * WINDOW_HEIGHT];
 int (*START_POSITIONS)[WINDOW_WIDTH * WINDOW_HEIGHT];
 
@@ -68,6 +69,7 @@ void levelSetup() {
     openList = calloc(1, sizeof(double[WINDOW_WIDTH * WINDOW_HEIGHT][WINDOW_WIDTH * WINDOW_HEIGHT]));
     DIJKSTRA_MAP = malloc(sizeof(double[255][255]));
     START_POSITIONS = malloc(sizeof(double[WINDOW_WIDTH * WINDOW_HEIGHT][WINDOW_WIDTH * WINDOW_HEIGHT]));
+    LEVEL_NUMBER = 1;
 	
 	startLights();
 }
@@ -160,8 +162,17 @@ void completeLevel() {
 
 void exitLevel() {
 	EXIT_IN_PROGRESS = 1;
+	LEVEL_NUMBER ++;
 
 	showMessage("%cYou step down...%c", 20);
+}
+
+void setLevel(int levelNumber) {
+	LEVEL_NUMBER = levelNumber;
+}
+
+int getLevel() {
+	return LEVEL_NUMBER;
 }
 
 int isLevelComplete() {
@@ -481,7 +492,11 @@ void placeTunnels() {
 					EXIT_LOCATION[0] = w_x;
 					EXIT_LOCATION[1] = w_y;
 				} else {
+					//if (ROOM_COUNT == ROOM_COUNT_MAX) {
+					//	createBonfire(w_x, w_y);
+					//} else {
 					createBonfireKeystone(w_x, w_y);
+					//}
 				}
 			}
 
@@ -664,6 +679,8 @@ void generateLevel() {
 	player->x = plotPoints[0][0];
 	player->y = plotPoints[0][1];
 	player->vx = 1;
+	
+	createBonfire(player->x, player->y);
 
 	resetAllActorsForNewLevel();
 	refreshAllLights();
