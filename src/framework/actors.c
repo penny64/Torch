@@ -29,7 +29,7 @@ void actorsShutdown() {
 		next = ptr->next;
 		
 		free(ptr);
-		
+
 		ptr = next;
 	}
 }
@@ -72,9 +72,9 @@ void deleteActor(character *chr) {
 		printf("*** CRASH INCOMING ***\n");
 	}
 
-    if (chr == getPlayer()) {
-        printf("We're deleting the player for some fucking reason\n");
-    }
+	if (chr == getPlayer()) {
+		printf("We're deleting the player for some fucking reason\n");
+	}
 
 	if (chr == CHARACTERS) {
 		CHARACTERS = NULL;
@@ -100,9 +100,9 @@ void _resetActorForNewLevel(character *actor) {
 	
 	actor->fov = copyLevelMap();
 
-    if (actor->itemLight) {
-        resetLight(actor->itemLight);
-    }
+	if (actor->itemLight) {
+		resetLight(actor->itemLight);
+	}
 }
 
 void resetAllActorsForNewLevel() {
@@ -113,6 +113,12 @@ void resetAllActorsForNewLevel() {
 		
 		ptr = ptr->next;
 	}
+}
+
+void plantTorch(character *actor) {
+	createPlantedTorch(actor->x, actor->y, actor->itemLight);
+
+	actor->itemLight = NULL;
 }
 
 void _checkForItemCollisions(character *actor) {
@@ -129,7 +135,7 @@ void _checkForItemCollisions(character *actor) {
 
 void _checkIfPositionLit(character *actor) {
 	if (!isPositionLit(actor->x, actor->y)) {
-        printf("Actor is in unlit position\n");
+		printf("Actor is in unlit position\n");
 		killActor(actor);
 	}
 }

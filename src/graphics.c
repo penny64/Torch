@@ -71,7 +71,7 @@ void postProcess() {
 		return;
 	}
 
-    TCOD_console_set_fade(FADE_VALUE, TCOD_color_RGB(00, 00, 0));
+	TCOD_console_set_fade(FADE_VALUE, TCOD_color_RGB(00, 00, 0));
 }
 
 void applyFov() {

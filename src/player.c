@@ -2,6 +2,7 @@
 #include "framework/actors.h"
 #include "framework/input.h"
 #include "lights.h"
+#include "graphics.h"
 #include "libtcod.h"
 #include "items.h"
 #include "level.h"
@@ -34,9 +35,7 @@ int getPlayerMoveCount() {
 }
 
 void _handlePlantTorch() {
-	createPlantedTorch(PLAYER_ACTOR->itemLight->x, PLAYER_ACTOR->itemLight->y, PLAYER_ACTOR->itemLight);
-
-	PLAYER_ACTOR->itemLight = NULL;
+	plantTorch(PLAYER_ACTOR);
 }
 
 void playerLogic() {

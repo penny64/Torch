@@ -75,19 +75,19 @@ void itemsShutdown() {
 }
 
 void deleteAllOwnerlessItems() {
-    item *next, *ptr = ITEMS;
+	item *next, *ptr = ITEMS;
 
-    printf("Cleaning up items...\n");
+	printf("Cleaning up items...\n");
 
-    while (ptr != NULL) {
-        next = ptr->next;
+	while (ptr != NULL) {
+		next = ptr->next;
 
-        if (!ptr->owner) {
-            deleteItem(ptr);
-        }
+		if (!ptr->owner) {
+			deleteItem(ptr);
+		}
 
-        ptr = next;
-    }
+		ptr = next;
+	}
 }
 
 void deleteItem(item *itm) {
@@ -202,6 +202,16 @@ void itemHandleCharacterCollision(item *itm, character *actor) {
 		}
 	}
 
+	if (itm->itemFlags & IS_SINGLE_USE_FUEL_SOURCE && itm->itemLight->fuel) {
+		if (actor == player) {
+			actor->itemLight->fuel = actor->itemLight->fuelMax;
+			itm->foreColor = TCOD_color_RGB(55, 55, 15);
+			itm->backColor = TCOD_color_RGB(25, 25, 25);
+
+			deleteDynamicLight(itm->itemLight);
+		}
+	}
+
 	if (actor == player) {
 		if (itm->itemFlags & IS_TORCH && !player->itemLight) {
 			player->itemLight = itm->itemLight;
@@ -223,7 +233,7 @@ void itemHandleCharacterCollision(item *itm, character *actor) {
 }
 
 void createBonfire(int x, int y) {
-	item *itm = createItem(x, y, '!', TCOD_color_RGB(255, 255, 155), TCOD_color_RGB(55, 0, 55), IS_FUEL_SOURCE);
+	item *itm = createItem(x, y, '!', TCOD_color_RGB(255, 255, 155), TCOD_color_RGB(55, 0, 55), IS_SINGLE_USE_FUEL_SOURCE);
 
 	light *lght = createDynamicLight(x, y, NULL);
 	itm->itemLight = lght;

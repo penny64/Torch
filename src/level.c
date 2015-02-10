@@ -63,13 +63,13 @@ void levelSetup() {
 	
 	TCOD_noise_set_type(FOG_NOISE, TCOD_NOISE_PERLIN);
 
-    CLOSED_MAP = calloc(1, sizeof(double[255][255]));
-    ROOM_MAP = calloc(1, sizeof(double[255][255]));
-    EFFECTS_MAP = calloc(1, sizeof(float[255][255]));
-    openList = calloc(1, sizeof(double[WINDOW_WIDTH * WINDOW_HEIGHT][WINDOW_WIDTH * WINDOW_HEIGHT]));
-    DIJKSTRA_MAP = malloc(sizeof(double[255][255]));
-    START_POSITIONS = malloc(sizeof(double[WINDOW_WIDTH * WINDOW_HEIGHT][WINDOW_WIDTH * WINDOW_HEIGHT]));
-    LEVEL_NUMBER = 1;
+	CLOSED_MAP = calloc(1, sizeof(double[255][255]));
+	ROOM_MAP = calloc(1, sizeof(double[255][255]));
+	EFFECTS_MAP = calloc(1, sizeof(float[255][255]));
+	openList = calloc(1, sizeof(double[WINDOW_WIDTH * WINDOW_HEIGHT][WINDOW_WIDTH * WINDOW_HEIGHT]));
+	DIJKSTRA_MAP = malloc(sizeof(double[255][255]));
+	START_POSITIONS = malloc(sizeof(double[WINDOW_WIDTH * WINDOW_HEIGHT][WINDOW_WIDTH * WINDOW_HEIGHT]));
+	LEVEL_NUMBER = 1;
 	
 	startLights();
 }
@@ -80,9 +80,9 @@ void levelShutdown() {
 	free(ROOM_MAP);
 	free(EFFECTS_MAP);
 	free(CLOSED_MAP);
-    free(START_POSITIONS);
-    free(DIJKSTRA_MAP);
-    free(openList);
+	free(START_POSITIONS);
+	free(DIJKSTRA_MAP);
+	free(openList);
 	TCOD_console_delete(LEVEL_CONSOLE);
 	TCOD_console_delete(LIGHT_CONSOLE);
 	TCOD_console_delete(SHADOW_CONSOLE);
@@ -196,11 +196,11 @@ int levelLogic() {
 		if (!player->itemLight->sizeMod && isScreenFadedOut()) {
 			generateLevel();
 
-            return 1;
+			return 1;
 		}
 	}
 
-    return 0;
+	return 0;
 }
 
 void carve(int x, int y) {
@@ -320,7 +320,7 @@ void findRooms() {
 			CLOSED_MAP[x][y] = 0;
 			ROOM_MAP[x][y] = 0;
 			EFFECTS_MAP[x][y] = 0.1f;
-            openList[x][y] = 0;
+			openList[x][y] = 0;
 		}
 	}
 	
@@ -409,17 +409,25 @@ void findRooms() {
 }
 
 void placeTunnels() {
-	int i, x, y, x1, y1, w_x, w_y, mapUpdates, currentValue, neighborValue, lowestValue, index, lowestX, lowestY, invalid, roomSize, randomRoomSize, dist;
-    int startCount = 0;
+	int i, x, y, x1, y1, w_x, w_y, mapUpdates, currentValue, neighborValue, lowestValue, index, lowestX, lowestY, invalid, minRoomSize, maxRoomSize, randomRoomSize, dist;
+	int startCount = 0;
 	
 	for (y = 2; y < WINDOW_HEIGHT - 1; y++) {
 		for (x = 2; x < WINDOW_WIDTH - 1; x++) {
 			DIJKSTRA_MAP[x][y] = 0;
 		}
 	}
+
+	if (!TCOD_random_get_int(RANDOM, 0, 15)) {
+		maxRoomSize = 6;
+		minRoomSize = 4;
+	} else {
+		maxRoomSize = 3;
+		minRoomSize = 2;
+	}
 	
 	//TODO: Adjust max for more "connected" levels
-	for (i = 0; i <= 2; i++) {
+	for (i = 0; i <= LEVEL_NUMBER - 1; i++) {
 		ROOM_COUNT = ROOM_COUNT_MAX;
 		
 		while (ROOM_COUNT > 1) {
@@ -575,15 +583,10 @@ void placeTunnels() {
 				
 				w_x = lowestX;
 				w_y = lowestY;
-				
+
 				//printf("Walking to %i, %i\n", w_x, w_y);
-				if (!TCOD_random_get_int(RANDOM, 0, 15)) {
-					roomSize = 6;
-				} else {
-					roomSize = 3;
-				}
 				
-				randomRoomSize = TCOD_random_get_int(RANDOM, roomSize - 1, roomSize);
+				randomRoomSize = TCOD_random_get_int(RANDOM, minRoomSize, maxRoomSize);
 				
 				for (y1 = -16; y1 <= 16; y1++) {
 					for (x1 = -16; x1 <= 16; x1++) {
@@ -633,14 +636,14 @@ void generateLevel() {
 	EXIT_OPEN = 0;
 	EXIT_WAVE_DIST = 0;
 
-    TCOD_map_clear(LEVEL_MAP, 0, 0);
-    TCOD_map_clear(TUNNEL_WALLS, 0, 0);
-    TCOD_console_clear(LEVEL_CONSOLE);
-    TCOD_console_clear(LIGHT_CONSOLE);
-    TCOD_console_clear(SHADOW_CONSOLE);
-    TCOD_console_clear(SEEN_CONSOLE);
-    TCOD_console_clear(FOG_CONSOLE);
-    deleteAllOwnerlessItems();
+	TCOD_map_clear(LEVEL_MAP, 0, 0);
+	TCOD_map_clear(TUNNEL_WALLS, 0, 0);
+	TCOD_console_clear(LEVEL_CONSOLE);
+	TCOD_console_clear(LIGHT_CONSOLE);
+	TCOD_console_clear(SHADOW_CONSOLE);
+	TCOD_console_clear(SEEN_CONSOLE);
+	TCOD_console_clear(FOG_CONSOLE);
+	deleteAllOwnerlessItems();
 	
 	for (i = 0; i < MAX_ROOMS; i++) {
 		foundPlot = 0;
@@ -679,10 +682,15 @@ void generateLevel() {
 	player->x = plotPoints[0][0];
 	player->y = plotPoints[0][1];
 	player->vx = 1;
-	
-	createBonfire(player->x, player->y);
 
 	resetAllActorsForNewLevel();
+
+    if (LEVEL_NUMBER == 1) {
+        plantTorch(player);
+    } else {
+        createBonfire(player->x, player->y);
+    }
+
 	refreshAllLights();
 	fadeBackIn();
 	

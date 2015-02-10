@@ -42,4 +42,5 @@ void drawActors(void);
 void actorSetup(void);
 void actorsShutdown(void);
 void actorCleanup(void);
+void plantTorch(character*);
 void killActor(character*);

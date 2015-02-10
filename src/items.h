@@ -4,10 +4,11 @@
 
 
 enum {
-	IS_FUEL_SOURCE = 0x01,
-	IS_TORCH = 0x02,
-	IS_KEY = 0x04,
-	IS_EXIT = 0x08,
+	IS_FUEL_SOURCE = 0x01 << 0,
+	IS_TORCH = 0x01 << 1,
+	IS_KEY = 0x01 << 2,
+	IS_EXIT = 0x01 << 3,
+    IS_SINGLE_USE_FUEL_SOURCE = 0x01 << 4,
 } itemFlag_t;
 
 
