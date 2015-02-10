@@ -655,9 +655,7 @@ void generateLevel() {
 
 	//smooth();
 	//placeLights();
-	printf("Finding rooms\n");
 	findRooms();
-	printf("Placing tuns\n");
 	placeTunnels();
 	smooth();
 	
@@ -667,8 +665,8 @@ void generateLevel() {
 	player->y = plotPoints[0][1];
 	player->vx = 1;
 
-	refreshAllLights();
 	resetAllActorsForNewLevel();
+	refreshAllLights();
 	fadeBackIn();
 	
 	for (y = 0; y < WINDOW_HEIGHT; y++) {

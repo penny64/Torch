@@ -7,7 +7,7 @@
 #include "level.h"
 
 
-const int SIZEMOD_TIME_MAX = 10;
+#define SIZEMOD_TIME_MAX 10;
 int SIZEMOD_TIME = SIZEMOD_TIME_MAX;
 
 static struct character *PLAYER_ACTOR;
@@ -43,10 +43,17 @@ void playerLogic() {
 			SIZEMOD_TIME --;
 		} else {
 			SIZEMOD_TIME = SIZEMOD_TIME_MAX;
-			PLAYER_ACTOR->itemLight->sizeMod -= .3f;//clipFloat(PLAYER_ACTOR->itemLight->sizeMod - .1f, 0.f, 1.f);
+			
+			if (isScreenFadingBackIn()) {
+				PLAYER_ACTOR->itemLight->sizeMod += .3f;
+			} else {
+				PLAYER_ACTOR->itemLight->sizeMod -= .3f;
+			}
 
 			if (PLAYER_ACTOR->itemLight->sizeMod < 0) {
 				PLAYER_ACTOR->itemLight->sizeMod = 0.f;
+			} else if (PLAYER_ACTOR->itemLight->sizeMod > 1) {
+				PLAYER_ACTOR->itemLight->sizeMod = 1.f;
 			}
 		}
 	}

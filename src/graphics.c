@@ -29,6 +29,10 @@ int isScreenFadedOut() {
 	return !FADE_VALUE;
 }
 
+int isScreenFadingBackIn() {
+	return FADE_BACK_IN;
+}
+
 void fadeBackIn() {
 	FADE_BACK_IN = 1;
 }
