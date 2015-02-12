@@ -76,6 +76,10 @@ void deleteActor(character *chr) {
 		printf("We're deleting the player for some fucking reason\n");
 	}
 
+	if (chr->itemLight) {
+		deleteDynamicLight(chr->itemLight);
+	}
+
 	if (chr == CHARACTERS) {
 		CHARACTERS = NULL;
 	} else {
@@ -116,6 +120,12 @@ void resetAllActorsForNewLevel() {
 }
 
 void plantTorch(character *actor) {
+	if (!actor->itemLight) {
+		printf("Trying to plant a torch that isn't held.\n");
+
+		return;
+	}
+
 	createPlantedTorch(actor->x, actor->y, actor->itemLight);
 
 	actor->itemLight = NULL;

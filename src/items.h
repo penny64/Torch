@@ -45,3 +45,4 @@ void createUnkindledBonfire(int, int);
 void createTreasure(int, int);
 void createPlantedTorch(int, int, light*);
 void createExit(int, int);
+void createSign(int, int, char*);

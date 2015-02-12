@@ -9,6 +9,7 @@
 #include "player.h"
 #include "level.h"
 #include "items.h"
+#include "intro.h"
 #include "ui.h"
 
 
@@ -31,14 +32,16 @@ void setup() {
 
 int main() {
 	setup();
+
+	showIntro();
 	
 	while (!TCOD_console_is_window_closed()) {
 		inputLogic();
 		playerInputLogic();
 
-        if (isTCODCharPressed(TCODK_ESCAPE)) {
-            break;
-        }
+		if (isTCODCharPressed(TCODK_ESCAPE)) {
+			break;
+		}
 		
 		//While loop?
 		if (getPlayerMoveCount()) {

@@ -280,6 +280,10 @@ void createTreasure(int x, int y) {
 	createItem(x, y, '*', TCOD_color_RGB(255, 255, 0), TCOD_color_RGB(55, 0, 55), 0x0);
 }
 
+void createSign(int x, int y, char *text) {
+	createItem(x, y, 'D', TCOD_color_RGB(255, 255, 0), TCOD_color_RGB(55, 0, 55), 0x0);
+}
+
 void createExit(int x, int y) {
 	createItem(x, y, '>', TCOD_color_RGB(200, 200, 150), TCOD_color_RGB(50, 50, 25), IS_EXIT);
 }

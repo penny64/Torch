@@ -497,8 +497,7 @@ void placeTunnels() {
 				createBat(w_x, w_y);
 
 				if (ROOM_COUNT == 2) {
-					EXIT_LOCATION[0] = w_x;
-					EXIT_LOCATION[1] = w_y;
+					createSign(w_x, w_y, "%cFollow me...%c");
 				} else {
 					//if (ROOM_COUNT == ROOM_COUNT_MAX) {
 					//	createBonfire(w_x, w_y);
@@ -609,6 +608,11 @@ void placeTunnels() {
 				}
 			}
 
+			if (ROOM_COUNT == 2) {
+				EXIT_LOCATION[0] = w_x;
+				EXIT_LOCATION[1] = w_y;
+			}
+
 			/*for (y = 2; y < WINDOW_HEIGHT - 1; y++) {
 				for (x = 2; x < WINDOW_WIDTH - 1; x++) {
 					if (x == START_POSITIONS[index][0] && y == START_POSITIONS[index][1]) {
@@ -631,6 +635,7 @@ void generateLevel() {
 	float fogValue, colorMod;
 	float p[2];
 	TCOD_noise_t fog = getFogNoise();
+	TCOD_console_t dynamicLightConsole = getDynamicLightConsole();
 	character *player = getPlayer();
 
 	EXIT_OPEN = 0;
@@ -643,6 +648,11 @@ void generateLevel() {
 	TCOD_console_clear(SHADOW_CONSOLE);
 	TCOD_console_clear(SEEN_CONSOLE);
 	TCOD_console_clear(FOG_CONSOLE);
+
+	if (LEVEL_NUMBER > 1) {
+		TCOD_console_clear(dynamicLightConsole);
+	}
+
 	deleteAllOwnerlessItems();
 	
 	for (i = 0; i < MAX_ROOMS; i++) {
@@ -685,11 +695,11 @@ void generateLevel() {
 
 	resetAllActorsForNewLevel();
 
-    if (LEVEL_NUMBER == 1) {
-        plantTorch(player);
-    } else {
-        createBonfire(player->x, player->y);
-    }
+	if (LEVEL_NUMBER == 1) {
+		plantTorch(player);
+	} else {
+		createBonfire(player->x, player->y);
+	}
 
 	refreshAllLights();
 	fadeBackIn();
