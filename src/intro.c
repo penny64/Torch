@@ -10,8 +10,8 @@
 TCOD_console_t INTRO_CONSOLE;
 int FADE_IN_VALUE = 0;
 int FADE_IN_TIMER = 0;
-int FADE_IN_TIMER_MAX = 12;
-int INTRO_MODE_TIME = 3;
+int FADE_IN_TIMER_MAX = 6;
+int INTRO_MODE_TIME = 9;
 int FADE_IN = 1;
 
 
@@ -38,7 +38,7 @@ int drawIntro() {
 		FADE_IN_TIMER = 0;
 
 		if (FADE_IN) {
-			FADE_IN_VALUE += 45;
+			FADE_IN_VALUE += 35;
 		} else {
 			FADE_IN_VALUE -= 55;
 		}
@@ -57,7 +57,7 @@ int drawIntro() {
 	TCOD_console_blit(INTRO_CONSOLE, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, NULL, 0, 0, 1, 1);
 	TCOD_console_flush();
 
-	if (!INTRO_MODE_TIME || isTCODCharPressed(TCODK_ESCAPE)) {
+	if (!INTRO_MODE_TIME || isTCODCharPressed(TCODK_ESCAPE) || isTCODCharPressed(TCODK_SPACE)) {
 		TCOD_console_set_fade(255, TCOD_color_RGB(0, 0, 0));
 
 		return 0;

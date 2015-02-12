@@ -13,6 +13,9 @@
 #include "ui.h"
 
 
+int ATTRACT_TIME = 0, ATTRACT_TIME_MAX = 8;
+
+
 void setup() {
 	//Setup systems
 	startLogging(LOGGING_DEBUG);
@@ -23,11 +26,11 @@ void setup() {
 	setupUi();
 	actorSetup();
 	itemSetup();
-	createPlayer();
-	levelSetup();
+	//createPlayer();
+	//levelSetup();
 
 	//Attract screen
-	generateLevel();
+	//generateLevel();
 }
 
 int main() {
@@ -42,9 +45,17 @@ int main() {
 		if (isTCODCharPressed(TCODK_ESCAPE)) {
 			break;
 		}
+
+		if (getPlayer() != NULL) {
+			if (!ATTRACT_TIME) {
+				ATTRACT_TIME = ATTRACT_TIME_MAX;
+			} else {
+				ATTRACT_TIME --;
+			}
+		}
 		
 		//While loop?
-		if (getPlayerMoveCount()) {
+		if ((getPlayer() == NULL && !ATTRACT_TIME) || getPlayerMoveCount()) {
 			actorLogic();
 			itemLogic();
 			lightLogic();

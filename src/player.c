@@ -39,6 +39,10 @@ void _handlePlantTorch() {
 }
 
 void playerLogic() {
+	if (!PLAYER_ACTOR) {
+		return;
+	}
+	
 	if (isTransitionInProgress()) {
 		if (SIZEMOD_TIME > 0) {
 			SIZEMOD_TIME --;
