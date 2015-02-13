@@ -131,6 +131,7 @@ void applyFov() {
 			
 			if (!player) {
 				visible = 1;
+				visibleToPlayer = 1;
 				isLit = 1;
 			}
 			
@@ -138,7 +139,7 @@ void applyFov() {
 				if (player) {
 					distMod = distanceFloat(player->x, player->y, x, y);
 				} else {
-					distMod = 1;
+					distMod = 45.0f;
 				}
 				
 				if (distMod < 0) {
@@ -151,7 +152,7 @@ void applyFov() {
 					fadeValue = .75f;
 				}
 
-				if (isLevelComplete() && player != NULL) {
+				if (isLevelComplete() && player) {
 					distToExitWave = 25.f - clipFloat(25.f * labs(distanceFloat(x, y, player->x, player->y) - exitWaveDistance), 0.f, 25.f);
 					distToExitWave = distToExitWave / 25.f;
 

@@ -46,6 +46,16 @@ int main() {
 			break;
 		}
 		
+		if (!getPlayer() && isTCODCharPressed(TCODK_SPACE)) {
+			printf("Playing...\n");
+			
+			setLevel(1);
+			createPlayer();
+			generateLevel();
+			
+			//continue;
+		}
+		
 		//While loop?
 		if ((getPlayer() == NULL && !ATTRACT_TIME) || (getPlayer() && getPlayerMoveCount())) {
 			actorLogic();

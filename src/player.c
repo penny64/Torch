@@ -1,3 +1,5 @@
+#include <stdio.h>
+
 #include "player.h"
 #include "framework/actors.h"
 #include "framework/input.h"
@@ -24,6 +26,8 @@ void createPlayer() {
 	PLAYER_ACTOR->itemLight->fuelMax = 120;
 	PLAYER_ACTOR->itemLight->fuel = PLAYER_ACTOR->itemLight->fuelMax;
 	PLAYER_ACTOR->traitFlags = TORCH_ATTACK_PENALTY;
+	
+	printf("Created player.\n");
 }
 
 character *getPlayer() {

@@ -97,6 +97,20 @@ void deleteActor(character *chr) {
 	free(chr);
 }
 
+void deleteEnemies() {
+	character *next, *ptr = CHARACTERS;
+	
+	while (ptr != NULL) {
+		next = ptr->next;
+		
+		if (ptr != getPlayer()) {
+			deleteActor(ptr);
+		}
+		
+		ptr = next;
+	}
+}
+
 void _resetActorForNewLevel(character *actor) {
 	if (actor->fov) {
 		TCOD_map_delete(actor->fov);

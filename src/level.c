@@ -649,10 +649,11 @@ void generateLevel() {
 	TCOD_console_clear(SEEN_CONSOLE);
 	TCOD_console_clear(FOG_CONSOLE);
 
-	if (LEVEL_NUMBER > 1) {
+	//if (LEVEL_NUMBER >= 1) {
 		TCOD_console_clear(dynamicLightConsole);
-	}
+	//}
 
+	//deleteEnemies();
 	deleteAllOwnerlessItems();
 	
 	for (i = 0; i < MAX_ROOMS; i++) {
@@ -688,11 +689,14 @@ void generateLevel() {
 	smooth();
 	
 	drawLights();
+	drawDynamicLights();
 	
 	if (player) {
 		player->x = plotPoints[0][0];
 		player->y = plotPoints[0][1];
 		player->vx = 1;
+		
+		printf("Spawning at %i, %i\n", player->x, player->y);
 	}
 
 	resetAllActorsForNewLevel();
