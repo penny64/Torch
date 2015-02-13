@@ -101,7 +101,7 @@ void lightsShutdown() {
 
 void deleteDynamicLight(light *lght) {
 	if (lght == DYNAMIC_LIGHTS) {
-		DYNAMIC_LIGHTS = NULL;
+		DYNAMIC_LIGHTS = lght->next;
 	} else {
 		lght->prev->next = lght->next;
 

@@ -92,7 +92,7 @@ void deleteAllOwnerlessItems() {
 
 void deleteItem(item *itm) {
 	if (itm == ITEMS) {
-		ITEMS = NULL;
+		ITEMS = itm->next;
 	} else {
 		itm->prev->next = itm->next;
 

@@ -653,7 +653,7 @@ void generateLevel() {
 		TCOD_console_clear(dynamicLightConsole);
 	//}
 
-	//deleteEnemies();
+	deleteEnemies();
 	deleteAllOwnerlessItems();
 	
 	for (i = 0; i < MAX_ROOMS; i++) {

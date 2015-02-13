@@ -81,7 +81,7 @@ void deleteActor(character *chr) {
 	}
 
 	if (chr == CHARACTERS) {
-		CHARACTERS = NULL;
+		CHARACTERS = chr->next;
 	} else {
 		chr->prev->next = chr->next;
 
@@ -98,15 +98,21 @@ void deleteActor(character *chr) {
 }
 
 void deleteEnemies() {
-	character *next, *ptr = CHARACTERS;
-	
+	character *next = NULL, *ptr = CHARACTERS;
+
+	if (CHARACTERS == NULL) {
+		printf("No enemies to delete.\n");
+
+		return;
+	}
+
 	while (ptr != NULL) {
 		next = ptr->next;
-		
+
 		if (ptr != getPlayer()) {
 			deleteActor(ptr);
 		}
-		
+
 		ptr = next;
 	}
 }
@@ -157,11 +163,15 @@ void _checkForItemCollisions(character *actor) {
 	}
 }
 
-void _checkIfPositionLit(character *actor) {
+int _checkIfPositionLit(character *actor) {
 	if (!isPositionLit(actor->x, actor->y)) {
 		printf("Actor is in unlit position\n");
 		killActor(actor);
+
+		return 1;
 	}
+
+	return 0;
 }
 
 void _actorAi(character *actor) {
@@ -198,7 +208,9 @@ void _actorLogic(character *actor) {
 	}
 
 	if (hitActor) {
-		meleeAttack(actor, ptr);
+		if (meleeAttack(actor, ptr)) {
+			return;
+		}
 	} else if ((actor->vx || actor->vy) && isPositionWalkable(nx, ny)) {
 		actor->x = nx;
 		actor->y = ny;
@@ -211,7 +223,9 @@ void _actorLogic(character *actor) {
 	}
 
 	_checkForItemCollisions(actor);
-	_checkIfPositionLit(actor);
+	if (_checkIfPositionLit(actor)) {
+		return;
+	}
 	
 	if (actor->itemLight) {
 		actor->itemLight->x = actor->x;
@@ -223,13 +237,15 @@ void _actorLogic(character *actor) {
 }
 
 void actorLogic() {
-	character *ptr = CHARACTERS;
+	character *next = NULL, *ptr = CHARACTERS;
 
 	while (ptr != NULL) {
+		next = ptr->next;
+
 		_actorAi(ptr);
 		_actorLogic(ptr);
 
-		ptr = ptr->next;
+		ptr = next;
 	}
 }
 

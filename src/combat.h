@@ -1,4 +1,4 @@
 #include "framework/actors.h"
 
 
-void meleeAttack(character*, character*);
+int meleeAttack(character*, character*);

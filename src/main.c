@@ -47,17 +47,15 @@ int main() {
 		}
 		
 		if (!getPlayer() && isTCODCharPressed(TCODK_SPACE)) {
-			printf("Playing...\n");
-			
 			setLevel(1);
 			createPlayer();
 			generateLevel();
 			
-			//continue;
+			continue;
 		}
 		
 		//While loop?
-		if ((getPlayer() == NULL && !ATTRACT_TIME) || (getPlayer() && getPlayerMoveCount())) {
+		if ((!getPlayer() && !ATTRACT_TIME) || (getPlayer() && getPlayerMoveCount())) {
 			actorLogic();
 			itemLogic();
 			lightLogic();
