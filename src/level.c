@@ -29,7 +29,7 @@ int (*CLOSED_MAP)[255];
 float (*EFFECTS_MAP)[255];
 float EXIT_WAVE_DIST;
 int ROOM_COUNT, ROOM_COUNT_MAX;
-int EXIT_OPEN;
+int EXIT_OPEN = 0;
 int EXIT_IN_PROGRESS;
 int EXIT_LOCATION[2];
 int LEVEL_NUMBER;
@@ -689,16 +689,20 @@ void generateLevel() {
 	
 	drawLights();
 	
-	player->x = plotPoints[0][0];
-	player->y = plotPoints[0][1];
-	player->vx = 1;
+	if (player) {
+		player->x = plotPoints[0][0];
+		player->y = plotPoints[0][1];
+		player->vx = 1;
+	}
 
 	resetAllActorsForNewLevel();
 
-	if (LEVEL_NUMBER == 1) {
-		plantTorch(player);
-	} else {
-		createBonfire(player->x, player->y);
+	if (player) {
+		if (LEVEL_NUMBER == 1) {
+			plantTorch(player);
+		} else {
+			createBonfire(player->x, player->y);
+		}
 	}
 
 	refreshAllLights();

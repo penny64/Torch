@@ -27,10 +27,10 @@ void setup() {
 	actorSetup();
 	itemSetup();
 	//createPlayer();
-	//levelSetup();
+	levelSetup();
 
 	//Attract screen
-	//generateLevel();
+	generateLevel();
 }
 
 int main() {
@@ -45,27 +45,27 @@ int main() {
 		if (isTCODCharPressed(TCODK_ESCAPE)) {
 			break;
 		}
-
-		if (getPlayer() != NULL) {
+		
+		//While loop?
+		if ((getPlayer() == NULL && !ATTRACT_TIME) || (getPlayer() && getPlayerMoveCount())) {
+			actorLogic();
+			itemLogic();
+			lightLogic();
+		}
+		
+		if (getPlayer() == NULL) {
 			if (!ATTRACT_TIME) {
 				ATTRACT_TIME = ATTRACT_TIME_MAX;
 			} else {
 				ATTRACT_TIME --;
 			}
 		}
-		
-		//While loop?
-		if ((getPlayer() == NULL && !ATTRACT_TIME) || getPlayerMoveCount()) {
-			actorLogic();
-			itemLogic();
-			lightLogic();
-		}
 
 		//effectsLogic();
 		playerLogic();
 		uiLogic();
 
-        if (levelLogic()) {
+        if (getPlayer() && levelLogic()) {
             continue;
         }
 

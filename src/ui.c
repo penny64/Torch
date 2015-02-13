@@ -55,6 +55,10 @@ void _drawTorchFuel() {
 	int x, barWidth = WINDOW_WIDTH;
 	float fuelMod;
 	character *player = getPlayer();
+	
+	if (!player) {
+		return;
+	}
 
 	if (player->itemLight) {
 		fuelMod = player->itemLight->fuel / (float)player->itemLight->fuelMax;

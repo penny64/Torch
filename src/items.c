@@ -133,7 +133,7 @@ void itemLogic() {
 		ptr = ptr->next;
 	}
 
-	if (!isLevelComplete() && getNumberOfLitKeytorches() == getTotalNumberOfKeytorches()) {
+	if (getTotalNumberOfKeytorches() > 0 && !isLevelComplete() && getNumberOfLitKeytorches() == getTotalNumberOfKeytorches()) {
 		completeLevel();
 	}
 }

@@ -11,7 +11,7 @@
 #define SIZEMOD_TIME_MAX 10;
 int SIZEMOD_TIME = SIZEMOD_TIME_MAX;
 
-static struct character *PLAYER_ACTOR;
+static struct character *PLAYER_ACTOR = NULL;
 
 
 void createPlayer() {

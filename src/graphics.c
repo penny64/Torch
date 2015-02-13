@@ -22,6 +22,10 @@ void generateFov() {
 	TCOD_map_t map = getLevelMap();
 	character *player = getPlayer();
 	
+	if (!player) {
+		return;
+	}
+	
 	TCOD_map_compute_fov(map, player->x, player->y, 24, 1, FOV_SHADOW);
 }
 
@@ -117,7 +121,7 @@ void applyFov() {
 				if (isLit && TCOD_map_is_in_fov(map, x, y) && TCOD_map_is_in_fov(actor->fov, x, y)) {
 					visible = 1;
 					
-					if (visibleToPlayer && !TCOD_map_is_in_fov(player->fov, x, y)) {
+					if (!player || (visibleToPlayer && !TCOD_map_is_in_fov(player->fov, x, y))) {
 						visibleToPlayer = 0;
 					}
 				}
@@ -125,8 +129,17 @@ void applyFov() {
 				actor = actor->next;
 			}
 			
+			if (!player) {
+				visible = 1;
+				isLit = 1;
+			}
+			
 			if (!visible) {
-				distMod = distanceFloat(player->x, player->y, x, y);
+				if (player) {
+					distMod = distanceFloat(player->x, player->y, x, y);
+				} else {
+					distMod = 1;
+				}
 				
 				if (distMod < 0) {
 					distMod = 0;
@@ -138,7 +151,7 @@ void applyFov() {
 					fadeValue = .75f;
 				}
 
-				if (isLevelComplete()) {
+				if (isLevelComplete() && player != NULL) {
 					distToExitWave = 25.f - clipFloat(25.f * labs(distanceFloat(x, y, player->x, player->y) - exitWaveDistance), 0.f, 25.f);
 					distToExitWave = distToExitWave / 25.f;
 
