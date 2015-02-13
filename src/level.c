@@ -418,13 +418,8 @@ void placeTunnels() {
 		}
 	}
 
-	if (!TCOD_random_get_int(RANDOM, 0, 15)) {
-		maxRoomSize = 6;
-		minRoomSize = 4;
-	} else {
-		maxRoomSize = 3;
-		minRoomSize = 2;
-	}
+	minRoomSize = TCOD_random_get_int(RANDOM, 1, 3);;
+	maxRoomSize = minRoomSize + TCOD_random_get_int(RANDOM, 1, 3);
 	
 	//TODO: Adjust max for more "connected" levels
 	for (i = 0; i <= LEVEL_NUMBER - 1; i++) {
@@ -699,16 +694,16 @@ void generateLevel() {
 		printf("Spawning at %i, %i\n", player->x, player->y);
 	}
 
-	resetAllActorsForNewLevel();
-
 	if (player) {
 		if (LEVEL_NUMBER == 1) {
 			plantTorch(player);
+			createVoidWorm(player->x + 1, player->y + 1);
 		} else {
 			createBonfire(player->x, player->y);
 		}
 	}
 
+	resetAllActorsForNewLevel();
 	refreshAllLights();
 	fadeBackIn();
 	

@@ -42,6 +42,7 @@ character *createActor() {
 	_c->y = WINDOW_HEIGHT / 2;
 	_c->vx = 0;
 	_c->vy = 0;
+	_c->sightRange = 16;
 	_c->prev = NULL;
 	_c->next = NULL;
 	_c->itemLight = createDynamicLight(_c->x, _c->y, _c);
@@ -68,10 +69,6 @@ character *createActor() {
 }
 
 void deleteActor(character *chr) {
-	if (chr == NULL) {
-		printf("*** CRASH INCOMING ***\n");
-	}
-
 	if (chr == getPlayer()) {
 		printf("We're deleting the player for some fucking reason\n");
 	}
@@ -88,10 +85,6 @@ void deleteActor(character *chr) {
 		if (chr->next) {
 			chr->next->prev = chr->prev;
 		}
-	}
-
-	if (chr == NULL) {
-		printf("*** CRASH INCOMING (2) ***\n");
 	}
 
 	free(chr);
@@ -127,6 +120,8 @@ void _resetActorForNewLevel(character *actor) {
 	if (actor->itemLight) {
 		resetLight(actor->itemLight);
 	}
+
+	TCOD_map_compute_fov(actor->fov, actor->x, actor->y, actor->sightRange, 1, FOV_SHADOW);
 }
 
 void resetAllActorsForNewLevel() {
@@ -178,6 +173,22 @@ void _actorAi(character *actor) {
 	if (actor->aiFlags & RANDOM_WALK) {
 		actor->vx += getRandomInt(-1, 1);
 		actor->vy += getRandomInt(-1, 1);
+	} else if (actor->aiFlags & WORM_WALK) {
+		//TODO: Potentially store AI info in a different struct,
+		//a linked list containing AI states per AI type
+
+		//TODO: Move to its own function
+
+		character *player = getPlayer();
+
+		if (!player) {
+			return;
+		}
+
+		if (TCOD_map_is_in_fov(actor->fov, player->x, player->y)) {
+			printf("Player is visible!\n");
+		}
+
 	}
 }
 
@@ -218,8 +229,8 @@ void _actorLogic(character *actor) {
 		if (actor->itemLight) {
 			actor->itemLight->fuel -= getLevel();
 		}
-		
-		TCOD_map_compute_fov(actor->fov, actor->x, actor->y, 16, 1, FOV_SHADOW);
+
+		TCOD_map_compute_fov(actor->fov, actor->x, actor->y, actor->sightRange, 1, FOV_SHADOW);
 	}
 
 	_checkForItemCollisions(actor);

@@ -7,10 +7,11 @@
 
 
 enum {
-	RANDOM_WALK = 0x01,
-	CHASE = 0x02,
-	DROP_LIGHT_ON_DEATH = 0x04,
-	EXPLODE = 0x08,
+	RANDOM_WALK = 0x01 << 0,
+	WORM_WALK = 0x01 << 1,
+	DROP_LIGHT_ON_DEATH = 0x01 << 2,
+	EXPLODE_ON_DEATH = 0x01 << 3,
+	DROP_VOID_ON_DEATH = 0x01 << 4,
 } aiFlag_t;
 
 enum {
@@ -23,7 +24,7 @@ enum {
 typedef struct character character;
 
 struct character {
-	int x, y, vx, vy, hp, chr;
+	int x, y, vx, vy, hp, chr, sightRange;
 	struct character *next, *prev;
 	struct light *itemLight;
 	unsigned int aiFlags, traitFlags;

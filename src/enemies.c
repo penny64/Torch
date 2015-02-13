@@ -13,6 +13,7 @@ void createBat(int x, int y) {
 	actor->x = x;
 	actor->y = y;
 	actor->hp = 25;
+	actor->sightRange = 4;
 	actor->aiFlags = RANDOM_WALK | DROP_LIGHT_ON_DEATH;
 	actor->chr = (int)'^';
 	actor->foreColor = TCOD_color_RGB(205, 25, 25);
@@ -22,3 +23,18 @@ void createBat(int x, int y) {
 	actor->itemLight->fuel = actor->itemLight->fuelMax;
 }
 
+void createVoidWorm(int x, int y) {
+	character *actor = createActor();
+
+	actor->x = x;
+	actor->y = y;
+	actor->hp = 15;
+	actor->sightRange = 12;
+	actor->aiFlags = WORM_WALK | DROP_VOID_ON_DEATH;
+	actor->chr = (int)'O';
+	actor->foreColor = TCOD_color_RGB(205, 25, 25);
+	actor->itemLight->r_tint = 125;
+	actor->itemLight->size = 4;
+	actor->itemLight->fuelMax = 99999;
+	actor->itemLight->fuel = actor->itemLight->fuelMax;
+}
