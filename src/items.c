@@ -63,7 +63,7 @@ item *createItem(int x, int y, char chr, TCOD_color_t foreColor, TCOD_color_t ba
 void itemsShutdown() {
 	item *next, *ptr = ITEMS;
 	
-	printf("Cleaning up items...\n");
+	printf("Shutting down items...\n");
 	
 	while (ptr != NULL) {
 		next = ptr->next;
@@ -77,7 +77,7 @@ void itemsShutdown() {
 void deleteAllOwnerlessItems() {
 	item *next, *ptr = ITEMS;
 
-	printf("Cleaning up items...\n");
+	printf("Deleting all ownerless items...\n");
 
 	while (ptr != NULL) {
 		next = ptr->next;
@@ -91,6 +91,11 @@ void deleteAllOwnerlessItems() {
 }
 
 void deleteItem(item *itm) {
+	if (itm->itemLight) {
+		printf("Deleting item\n");
+		deleteDynamicLight(itm->itemLight);
+	}
+	
 	if (itm == ITEMS) {
 		ITEMS = itm->next;
 	} else {
@@ -181,6 +186,7 @@ int getNumberOfLitKeytorches() {
 	return count;
 }
 
+//WARNING: If you delete an item, RETURN.
 void itemHandleCharacterCollision(item *itm, character *actor) {
 	character *player = getPlayer();
 
@@ -202,13 +208,16 @@ void itemHandleCharacterCollision(item *itm, character *actor) {
 		}
 	}
 
-	if (itm->itemFlags & IS_SINGLE_USE_FUEL_SOURCE && itm->itemLight->fuel) {
+	if (actor->itemLight && itm->itemFlags & IS_SINGLE_USE_FUEL_SOURCE && itm->itemLight) {
 		if (actor == player) {
 			actor->itemLight->fuel = actor->itemLight->fuelMax;
 			itm->foreColor = TCOD_color_RGB(55, 55, 15);
 			itm->backColor = TCOD_color_RGB(25, 25, 25);
 
 			deleteDynamicLight(itm->itemLight);
+			itm->itemLight = NULL;
+			
+			printf("One of those\n");
 		}
 	}
 
@@ -216,10 +225,13 @@ void itemHandleCharacterCollision(item *itm, character *actor) {
 		if (itm->itemFlags & IS_TORCH && !player->itemLight) {
 			player->itemLight = itm->itemLight;
 			itm->itemLight->owner = player;
+			itm->itemLight = NULL;
 
 			deleteItem(itm);
 
 			showMessage("%cYou pick up the torch.%c", 10);
+			
+			return;
 		}
 
 		if (itm->itemFlags & IS_EXIT && isLevelComplete()) {

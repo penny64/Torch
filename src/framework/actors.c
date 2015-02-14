@@ -75,6 +75,7 @@ void deleteActor(character *chr) {
 
 	if (chr->itemLight) {
 		deleteDynamicLight(chr->itemLight);
+		chr->itemLight = NULL;
 	}
 
 	if (chr == CHARACTERS) {

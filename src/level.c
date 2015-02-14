@@ -207,8 +207,8 @@ void carve(int x, int y) {
 	int x1, y1, xMod, yMod, lastXMod = -3, lastYMod = -3;
 	int i, ii;
 	
-	for (i = 0; i < TCOD_random_get_int(RANDOM, 4, 8); i++) {
-		for (ii = 0; ii < TCOD_random_get_int(RANDOM, 0, 1); ii++) {
+	for (i = 0; i < TCOD_random_get_int(RANDOM, 9, 12); i++) {
+		for (ii = 0; ii <= TCOD_random_get_int(RANDOM, 0, 1); ii++) {
 			for (y1 = -1 - ii; y1 <= 1 + ii; y1++) {
 				for (x1 = -1; x1 <= 1; x1++) {
 					if (x + x1 <= 1 || x + x1 >= WINDOW_WIDTH - 2 || y + y1 <= 1 || y + y1 >= WINDOW_HEIGHT - 2) {
@@ -225,7 +225,7 @@ void carve(int x, int y) {
 		}
 		
 		while (TCOD_map_is_walkable(LEVEL_MAP, x, y)) {
-			if (TCOD_random_get_int(RANDOM, 0, 1)) {
+			if (TCOD_random_get_int(RANDOM, 0, 2)) {
 				xMod = TCOD_random_get_int(RANDOM, -2, 2);
 
 				while (xMod == lastXMod) {
@@ -234,7 +234,7 @@ void carve(int x, int y) {
 
 				x += xMod;
 				lastXMod = xMod;
-			} else {
+
 				yMod = TCOD_random_get_int(RANDOM, -2, 2);
 
 				while (yMod == lastYMod) {
@@ -418,11 +418,11 @@ void placeTunnels() {
 		}
 	}
 
-	minRoomSize = TCOD_random_get_int(RANDOM, 1, 3);;
-	maxRoomSize = minRoomSize + TCOD_random_get_int(RANDOM, 1, 3);
+	minRoomSize = TCOD_random_get_int(RANDOM, 2, 3);
+	maxRoomSize = minRoomSize + TCOD_random_get_int(RANDOM, 0, 1);
 	
 	//TODO: Adjust max for more "connected" levels
-	for (i = 0; i <= LEVEL_NUMBER - 1; i++) {
+	for (i = 0; i <= LEVEL_NUMBER; i++) {
 		ROOM_COUNT = ROOM_COUNT_MAX;
 		
 		while (ROOM_COUNT > 1) {
@@ -492,7 +492,8 @@ void placeTunnels() {
 				createBat(w_x, w_y);
 
 				if (ROOM_COUNT == 2) {
-					createSign(w_x, w_y, "%cFollow me...%c");
+					EXIT_LOCATION[0] = w_x;
+					EXIT_LOCATION[1] = w_y;
 				} else {
 					//if (ROOM_COUNT == ROOM_COUNT_MAX) {
 					//	createBonfire(w_x, w_y);
@@ -603,11 +604,6 @@ void placeTunnels() {
 				}
 			}
 
-			if (ROOM_COUNT == 2) {
-				EXIT_LOCATION[0] = w_x;
-				EXIT_LOCATION[1] = w_y;
-			}
-
 			/*for (y = 2; y < WINDOW_HEIGHT - 1; y++) {
 				for (x = 2; x < WINDOW_WIDTH - 1; x++) {
 					if (x == START_POSITIONS[index][0] && y == START_POSITIONS[index][1]) {
@@ -663,7 +659,7 @@ void generateLevel() {
 			for (ii = 0; ii < i; ii++) {
 				plotDist = distance(x, y, plotPoints[ii - 1][0], plotPoints[ii - 1][1]);
 
-				if (plotDist <= 18) {
+				if (plotDist <= 9 || plotDist >= 50) {
 					foundPlot = 0;
 					
 					break;
@@ -698,6 +694,7 @@ void generateLevel() {
 		if (LEVEL_NUMBER == 1) {
 			plantTorch(player);
 			createVoidWorm(player->x + 1, player->y + 1);
+			showMessage("%cSomething watches from the shadows...%c", 10);
 		} else {
 			createBonfire(player->x, player->y);
 		}
