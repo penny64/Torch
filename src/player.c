@@ -5,9 +5,10 @@
 #include "framework/input.h"
 #include "lights.h"
 #include "graphics.h"
-#include "libtcod.h"
-#include "items.h"
+//#include "libtcod.h"
+//#include "items.h"
 #include "level.h"
+#include "ui.h"
 
 
 #define SIZEMOD_TIME_MAX 10;
@@ -40,6 +41,10 @@ int getPlayerMoveCount() {
 
 void _handlePlantTorch() {
 	plantTorch(PLAYER_ACTOR);
+}
+
+void killPlayer() {
+	PLAYER_ACTOR = NULL;
 }
 
 void playerLogic() {

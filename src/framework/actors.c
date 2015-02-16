@@ -70,7 +70,7 @@ character *createActor() {
 
 void deleteActor(character *chr) {
 	if (chr == getPlayer()) {
-		printf("We're deleting the player for some fucking reason\n");
+		killPlayer();
 	}
 
 	if (chr->itemLight) {
@@ -162,6 +162,11 @@ void _checkForItemCollisions(character *actor) {
 int _checkIfPositionLit(character *actor) {
 	if (!isPositionLit(actor->x, actor->y)) {
 		printf("Actor is in unlit position\n");
+
+		if (actor == getPlayer()) {
+			showMessage("%cYou are lost to the shadows...%c", 20);
+		}
+
 		killActor(actor);
 
 		return 1;

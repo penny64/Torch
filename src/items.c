@@ -272,7 +272,6 @@ void createBonfireKeystone(int x, int y) {
 
 void createUnkindledBonfire(int x, int y) {
 	item *itm = createItem(x, y, '!', TCOD_color_RGB(55, 55, 15), TCOD_color_RGB(55, 0, 55), IS_FUEL_SOURCE);
-
 	light *lght = createDynamicLight(x, y, NULL);
 	itm->itemLight = lght;
 	lght->fuel = 0;
