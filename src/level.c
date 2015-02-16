@@ -216,7 +216,7 @@ void carve(int x, int y) {
 					}
 					
 					TCOD_map_set_properties(LEVEL_MAP, x + x1, y + y1, 1, 1);
-					drawCharBackEx(LEVEL_CONSOLE, x, y, TCOD_color_RGB(155, 255, 155), TCOD_BKGND_SET);
+					drawCharBackEx(LEVEL_CONSOLE, x, y, TCOD_color_RGB(155 + RED_SHIFT, 255, 155), TCOD_BKGND_SET);
 				}
 			}
 		}
@@ -276,7 +276,7 @@ void smooth() {
 				
 				if (count == 4) {
 					TCOD_map_set_properties(LEVEL_MAP, x, y, 1, 1);
-					drawCharBackEx(LEVEL_CONSOLE, x, y, TCOD_color_RGB(35, 155, 205), TCOD_BKGND_SET);
+					drawCharBackEx(LEVEL_CONSOLE, x, y, TCOD_color_RGB(35 + RED_SHIFT, 155, 205), TCOD_BKGND_SET);
 				}
 			}
 		}
@@ -605,7 +605,7 @@ void placeTunnels() {
 						}
 						
 						if (TCOD_map_is_walkable(LEVEL_MAP, w_x + x1, w_y + y1)) {
-							drawCharBackEx(LEVEL_CONSOLE, w_x + x1, w_y + y1, TCOD_color_RGB(15, 105, 155), TCOD_BKGND_SET);
+							drawCharBackEx(LEVEL_CONSOLE, w_x + x1, w_y + y1, TCOD_color_RGB(15 + RED_SHIFT, 105, 155), TCOD_BKGND_SET);
 						}
 						
 						TCOD_map_set_properties(LEVEL_MAP, w_x + x1, w_y + y1, 1, 1);

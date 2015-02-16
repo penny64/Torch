@@ -168,7 +168,7 @@ void applyFov() {
 				if (fadeValue < .03126) {
 					drawCharBackEx(shadowConsole, x, y, TCOD_color_RGB(1, 0, 0), TCOD_BKGND_SET);
 				} else {
-					drawCharBackEx(shadowConsole, x, y, TCOD_color_RGB(35, 35, 35), TCOD_BKGND_ALPHA(fadeValue));
+					drawCharBackEx(shadowConsole, x, y, TCOD_color_RGB(35, 15, 15), TCOD_BKGND_ALPHA(fadeValue));
 				}
 			} else {
 				drawCharBack(seenConsole, x, y, TCOD_color_RGB(255, 0, 255));

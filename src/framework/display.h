@@ -5,5 +5,7 @@
 #define WINDOW_HEIGHT 40
 #define WINDOW_TITLE "Torch and Darkness - flagsdev 2015"
 
+#define RED_SHIFT 45
+
 extern void createDisplay(void);
 void displayLogic(void);

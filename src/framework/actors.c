@@ -49,7 +49,7 @@ character *createActor() {
 	_c->hp = 100;
 	_c->fov = copyLevelMap();
 	_c->chr = (int)'@';
-	_c->foreColor = TCOD_color_RGB(255, 255, 255);
+	_c->foreColor = TCOD_color_RGB(255, 255 - RED_SHIFT, 255 - RED_SHIFT);
 	_c->backColor = TCOD_color_RGB(255, 0, 0);
 	
 	if (CHARACTERS == NULL) {

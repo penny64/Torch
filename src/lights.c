@@ -341,7 +341,7 @@ void _drawDynamicLight(light *lght) {
 				alpha *= lght->sizeMod;
 				
 				if (!TCOD_map_is_walkable(levelMap, x, y)) {
-					r_tint = 55;
+					r_tint = 55 + RED_SHIFT;
 					g_tint = 55;
 					b_tint = 55;
 					
@@ -349,7 +349,7 @@ void _drawDynamicLight(light *lght) {
 						alpha = .45;
 					}
 				} else {
-					r_tint = lght->r_tint;
+					r_tint = lght->r_tint + RED_SHIFT;
 					g_tint = lght->g_tint;
 					b_tint = lght->b_tint;
 

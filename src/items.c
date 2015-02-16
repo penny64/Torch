@@ -245,7 +245,7 @@ void itemHandleCharacterCollision(item *itm, character *actor) {
 }
 
 void createBonfire(int x, int y) {
-	item *itm = createItem(x, y, '!', TCOD_color_RGB(255, 255, 155), TCOD_color_RGB(55, 0, 55), IS_SINGLE_USE_FUEL_SOURCE);
+	item *itm = createItem(x, y, '!', TCOD_color_RGB(255, 255, 155), TCOD_color_RGB(55, 0, 55), 0x0);
 
 	light *lght = createDynamicLight(x, y, NULL);
 	itm->itemLight = lght;
