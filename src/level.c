@@ -216,6 +216,7 @@ void carve(int x, int y) {
 					}
 					
 					TCOD_map_set_properties(LEVEL_MAP, x + x1, y + y1, 1, 1);
+					drawCharBackEx(LEVEL_CONSOLE, x, y, TCOD_color_RGB(155, 255, 155), TCOD_BKGND_SET);
 				}
 			}
 		}
@@ -225,25 +226,24 @@ void carve(int x, int y) {
 		}
 		
 		while (TCOD_map_is_walkable(LEVEL_MAP, x, y)) {
-			if (TCOD_random_get_int(RANDOM, 0, 2)) {
-				xMod = TCOD_random_get_int(RANDOM, -2, 2);
+			xMod = TCOD_random_get_int(RANDOM, -1, 1);
 
-				while (xMod == lastXMod) {
-					xMod = TCOD_random_get_int(RANDOM, -2, 2);
-				}
-
-				x += xMod;
-				lastXMod = xMod;
-
-				yMod = TCOD_random_get_int(RANDOM, -2, 2);
-
-				while (yMod == lastYMod) {
-					yMod = TCOD_random_get_int(RANDOM, -2, 2);
-				}
-
-				y += yMod;
-				lastYMod = yMod;
+			while (xMod == lastXMod) {
+				xMod = TCOD_random_get_int(RANDOM, -1, 1);
 			}
+
+			x += xMod;
+			lastXMod = xMod;
+
+			yMod = TCOD_random_get_int(RANDOM, -1, 1);
+
+			while (yMod == lastYMod) {
+				yMod = TCOD_random_get_int(RANDOM, -1, 1);
+			}
+
+			y += yMod;
+			lastYMod = yMod;
+			
 		}
 	}
 }
@@ -276,6 +276,7 @@ void smooth() {
 				
 				if (count == 4) {
 					TCOD_map_set_properties(LEVEL_MAP, x, y, 1, 1);
+					drawCharBackEx(LEVEL_CONSOLE, x, y, TCOD_color_RGB(35, 155, 205), TCOD_BKGND_SET);
 				}
 			}
 		}
@@ -418,14 +419,14 @@ void placeTunnels() {
 		}
 	}
 
-	minRoomSize = TCOD_random_get_int(RANDOM, 2, 3);
-	maxRoomSize = minRoomSize + TCOD_random_get_int(RANDOM, 0, 1);
+	minRoomSize = TCOD_random_get_int(RANDOM, 0, 1);
+	maxRoomSize = minRoomSize + TCOD_random_get_int(RANDOM, 1, 2);
 	
 	//TODO: Adjust max for more "connected" levels
-	for (i = 0; i <= LEVEL_NUMBER; i++) {
+	for (i = 0; i <= 1; i++) {
 		ROOM_COUNT = ROOM_COUNT_MAX;
 		
-		while (ROOM_COUNT > 1) {
+		while (ROOM_COUNT >= 1) {
 			if (i) {
 				printf("Generating random tunnels for room %i\n", ROOM_COUNT);
 			} else {
@@ -441,6 +442,10 @@ void placeTunnels() {
 					
 					for (y1 = -1; y1 <= 1; y1++) {
 						for (x1 = -1; x1 <= 1; x1++) {
+							if ((y1 == -1 && x1 == 1) || (y1 == -1 && x1 == -1) || (y1 == 1 && x1 == 1) || (y1 == 1 && x1 == -1)) {
+								continue;
+							}
+							
 							if (!ROOM_MAP[x + x1][y + y1]) {
 								invalid = 1;
 								
@@ -563,9 +568,9 @@ void placeTunnels() {
 							continue;
 						}
 						
-						//if ((y1 == -1 && x1 == 1) || (y1 == -1 && x1 == -1) || (y1 == 1 && x1 == 1) || (y1 == 1 && x1 == -1)) {
-						//	continue;
-						//}
+						if ((y1 == -1 && x1 == 1) || (y1 == -1 && x1 == -1) || (y1 == 1 && x1 == 1) || (y1 == 1 && x1 == -1)) {
+							continue;
+						}
 						
 						if (DIJKSTRA_MAP[w_x + x1][w_y + y1] < lowestValue) {
 							lowestValue = DIJKSTRA_MAP[w_x + x1][w_y + y1];
@@ -581,7 +586,7 @@ void placeTunnels() {
 
 				//printf("Walking to %i, %i\n", w_x, w_y);
 				
-				randomRoomSize = TCOD_random_get_int(RANDOM, minRoomSize, maxRoomSize);
+				randomRoomSize = clip(TCOD_random_get_int(RANDOM, minRoomSize, maxRoomSize), 1, 255);
 				
 				for (y1 = -16; y1 <= 16; y1++) {
 					for (x1 = -16; x1 <= 16; x1++) {
@@ -592,11 +597,15 @@ void placeTunnels() {
 						dist = distance(w_x, w_y, w_x + x1, w_y + y1);
 						
 						if (dist >= randomRoomSize) {
-							if (dist - randomRoomSize <= 3) {
+							if (dist - randomRoomSize <= 4) {
 								TCOD_map_set_properties(TUNNEL_WALLS, w_x + x1, w_y + y1, 1, 1);
 							}
 							
 							continue;
+						}
+						
+						if (TCOD_map_is_walkable(LEVEL_MAP, w_x + x1, w_y + y1)) {
+							drawCharBackEx(LEVEL_CONSOLE, w_x + x1, w_y + y1, TCOD_color_RGB(15, 105, 155), TCOD_BKGND_SET);
 						}
 						
 						TCOD_map_set_properties(LEVEL_MAP, w_x + x1, w_y + y1, 1, 1);
@@ -638,7 +647,7 @@ void generateLevel() {
 	TCOD_console_clear(LIGHT_CONSOLE);
 	TCOD_console_clear(SHADOW_CONSOLE);
 	TCOD_console_clear(SEEN_CONSOLE);
-	TCOD_console_clear(FOG_CONSOLE);
+	//TCOD_console_clear(FOG_CONSOLE);
 
 	//if (LEVEL_NUMBER >= 1) {
 		TCOD_console_clear(dynamicLightConsole);
@@ -659,7 +668,7 @@ void generateLevel() {
 			for (ii = 0; ii < i; ii++) {
 				plotDist = distance(x, y, plotPoints[ii - 1][0], plotPoints[ii - 1][1]);
 
-				if (plotDist <= 9 || plotDist >= 50) {
+				if (plotDist <= 14 || plotDist >= 50) {
 					foundPlot = 0;
 					
 					break;
@@ -723,18 +732,18 @@ void generateLevel() {
 
 			if (!TCOD_map_is_walkable(LEVEL_MAP, x, y)) {
 				if (TCOD_map_is_walkable(TUNNEL_WALLS, x, y)) {
-					drawCharBackEx(LEVEL_CONSOLE, x, y, TCOD_color_RGB(85, 85, 85), TCOD_BKGND_SET);
+					drawCharBackEx(LEVEL_CONSOLE, x, y, TCOD_color_RGB(125, 16, 16), TCOD_BKGND_SET);
 				} else {
 					drawCharBackEx(LEVEL_CONSOLE, x, y, TCOD_color_RGB(95, 8, 8), TCOD_BKGND_SET);
 				}
 			} else {
-				colorMod = (int)(fogValue * 150);
+				colorMod = (int)(fogValue * 120);
 				
 				if (!TCOD_random_get_int(RANDOM, 0, 4)) {
-					setCharEx(LEVEL_CONSOLE, x, y, ',' + TCOD_random_get_int(RANDOM, 0, 4), TCOD_color_RGB(155 - colorMod, 140 - colorMod, 140 - colorMod));
+					setCharEx(LEVEL_CONSOLE, x, y, ',' + TCOD_random_get_int(RANDOM, 0, 4), TCOD_color_RGB(155 - colorMod, 290 - colorMod, 190 - colorMod));
 				}
 				
-				drawCharBackEx(FOG_CONSOLE, x, y, TCOD_color_RGB(135 - colorMod, 120 - colorMod, 120 - colorMod), TCOD_BKGND_ALPHA(1));
+				//drawCharBackEx(FOG_CONSOLE, x, y, TCOD_color_RGB(135 - colorMod, 120 - colorMod, 120 - colorMod), TCOD_BKGND_ALPHA(1));
 			}
 		}
 	}
