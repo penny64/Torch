@@ -14,6 +14,7 @@ TCOD_noise_t getFogNoise(void);
 void levelSetup(void);
 void levelShutdown(void);
 void generateLevel(void);
+void generatePuzzles(void);
 void completeLevel(void);
 void exitLevel(void);
 void transitionIsComplete(void);

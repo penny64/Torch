@@ -33,6 +33,7 @@ int EXIT_OPEN = 0;
 int EXIT_IN_PROGRESS;
 int EXIT_LOCATION[2];
 int LEVEL_NUMBER;
+int KEY_TORCH_COUNT, (*KEY_TORCH_POSITIONS)[255];
 int (*openList)[WINDOW_WIDTH * WINDOW_HEIGHT];
 int (*START_POSITIONS)[WINDOW_WIDTH * WINDOW_HEIGHT];
 
@@ -69,6 +70,7 @@ void levelSetup() {
 	openList = calloc(1, sizeof(double[WINDOW_WIDTH * WINDOW_HEIGHT][WINDOW_WIDTH * WINDOW_HEIGHT]));
 	DIJKSTRA_MAP = malloc(sizeof(double[255][255]));
 	START_POSITIONS = malloc(sizeof(double[WINDOW_WIDTH * WINDOW_HEIGHT][WINDOW_WIDTH * WINDOW_HEIGHT]));
+	KEY_TORCH_POSITIONS = calloc(1, sizeof(double[12][12]));
 	LEVEL_NUMBER = 1;
 	
 	startLights();
@@ -83,6 +85,7 @@ void levelShutdown() {
 	free(START_POSITIONS);
 	free(DIJKSTRA_MAP);
 	free(openList);
+	free(KEY_TORCH_POSITIONS);
 	TCOD_console_delete(LEVEL_CONSOLE);
 	TCOD_console_delete(LIGHT_CONSOLE);
 	TCOD_console_delete(SHADOW_CONSOLE);
@@ -395,7 +398,7 @@ void findRooms() {
 		if (added) {
 			ROOM_COUNT ++;
 
-			printf("Found new room: %i\n", ROOM_COUNT);
+			printf("Found new room: %i (%i)\n", ROOM_COUNT, oLen);
 		}
 
 		for (i = 0; i < oLen; i++) {
@@ -412,6 +415,8 @@ void findRooms() {
 void placeTunnels() {
 	int i, x, y, x1, y1, w_x, w_y, mapUpdates, currentValue, neighborValue, lowestValue, index, lowestX, lowestY, invalid, minRoomSize, maxRoomSize, randomRoomSize, dist;
 	int startCount = 0;
+
+	KEY_TORCH_COUNT = 0;
 	
 	for (y = 2; y < WINDOW_HEIGHT - 1; y++) {
 		for (x = 2; x < WINDOW_WIDTH - 1; x++) {
@@ -503,8 +508,11 @@ void placeTunnels() {
 					//if (ROOM_COUNT == ROOM_COUNT_MAX) {
 					//	createBonfire(w_x, w_y);
 					//} else {
-					createBonfireKeystone(w_x, w_y);
+					//createBonfireKeystone(w_x, w_y);
 					//}
+					KEY_TORCH_POSITIONS[KEY_TORCH_COUNT][0] = w_x;
+					KEY_TORCH_POSITIONS[KEY_TORCH_COUNT][1] = w_y;
+					KEY_TORCH_COUNT ++;
 				}
 			}
 
@@ -630,6 +638,22 @@ void placeTunnels() {
 	}
 }
 
+void placeKeyTorches() {
+	int i;
+
+	for (i = 0; i < KEY_TORCH_COUNT; i++) {
+		createBonfireKeystone(KEY_TORCH_POSITIONS[i][0], KEY_TORCH_POSITIONS[i][1]);
+	}
+}
+
+void generatePuzzles() {
+	if (ROOM_COUNT_MAX > 4) {
+		placeKeyTorches();
+
+		printf("Level type: Key Torches\n");
+	}
+}
+
 void generateLevel() {
 	int x, y, i, ii, foundPlot, plotDist, plotPoints[MAX_ROOMS][2];
 	float fogValue, colorMod;
@@ -649,9 +673,9 @@ void generateLevel() {
 	TCOD_console_clear(SEEN_CONSOLE);
 	//TCOD_console_clear(FOG_CONSOLE);
 
-	//if (LEVEL_NUMBER >= 1) {
+	if (LEVEL_NUMBER > 1) {
 		TCOD_console_clear(dynamicLightConsole);
-	//}
+	}
 
 	deleteEnemies();
 	deleteAllOwnerlessItems();
@@ -682,11 +706,10 @@ void generateLevel() {
 		carve(x, y);
 	}
 
-	//smooth();
-	//placeLights();
 	findRooms();
 	placeTunnels();
 	smooth();
+	generatePuzzles();
 	
 	drawLights();
 	drawDynamicLights();
