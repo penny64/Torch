@@ -207,14 +207,39 @@ int levelLogic() {
 }
 
 void carve(int x, int y) {
-	int x1, y1, xMod, yMod, lastXMod = -3, lastYMod = -3;
+	int x1, y1, x2, y2, nx, ny, xMod, yMod, invalidPos, lastXMod = -3, lastYMod = -3;
 	int i, ii;
+
+	TCOD_map_t existingLevel = copyLevelMap();
 	
 	for (i = 0; i < TCOD_random_get_int(RANDOM, 9, 12); i++) {
 		for (ii = 0; ii <= TCOD_random_get_int(RANDOM, 0, 1); ii++) {
 			for (y1 = -1 - ii; y1 <= 1 + ii; y1++) {
-				for (x1 = -1; x1 <= 1; x1++) {
+				for (x1 = -1 - ii; x1 <= 1 + ii; x1++) {
 					if (x + x1 <= 1 || x + x1 >= WINDOW_WIDTH - 2 || y + y1 <= 1 || y + y1 >= WINDOW_HEIGHT - 2) {
+						continue;
+					}
+
+					invalidPos = 0;
+
+					for (y2 = -1; y2 <= 1; y2++) {
+						for (x2 = -1; x2 <= 1; x2++) {
+							nx = x + x1 + x2;
+							ny = y + y1 + y2;
+
+							if (TCOD_map_is_walkable(existingLevel, nx, ny)) {
+								invalidPos = 1;
+
+								break;
+							}
+						}
+
+						if (invalidPos) {
+							break;
+						}
+					}
+
+					if (invalidPos) {
 						continue;
 					}
 					
@@ -224,9 +249,9 @@ void carve(int x, int y) {
 			}
 		}
 		
-		if (!i && !TCOD_random_get_int(RANDOM, 0, 3)) {
-			createTreasure(x, y);
-		}
+		//if (!i && !TCOD_random_get_int(RANDOM, 0, 3)) {
+		//	createTreasure(x, y);
+		//}
 		
 		while (TCOD_map_is_walkable(LEVEL_MAP, x, y)) {
 			xMod = TCOD_random_get_int(RANDOM, -1, 1);
@@ -246,7 +271,6 @@ void carve(int x, int y) {
 
 			y += yMod;
 			lastYMod = yMod;
-			
 		}
 	}
 }
@@ -285,33 +309,6 @@ void smooth() {
 		}
 		
 		TCOD_map_delete(mapCopy);
-	}
-}
-
-void placeLights() {
-	int x, y, x1, y1, count;
-	TCOD_map_t mapCopy = copyLevelMap();
-	
-	for (y = 0; y < WINDOW_HEIGHT; y++) {
-		for (x = 0; x < WINDOW_WIDTH; x++) {
-			if (!TCOD_map_is_walkable(mapCopy, x, y)) {
-				continue;
-			}
-			
-			count = 0;
-			
-			for (y1 = -1; y1 <= 1; y1++) {
-				for (x1 = -1; x1 <= 1; x1++) {
-					if (!TCOD_map_is_walkable(mapCopy, x + x1, y + y1)) {
-						count ++;
-					}
-				}
-			}
-			
-			if (count == 1 && !TCOD_random_get_int(RANDOM, 0, 5)) {
-				createLight(x, y);
-			}
-		}
 	}
 }
 
@@ -425,7 +422,7 @@ void placeTunnels() {
 	}
 
 	minRoomSize = TCOD_random_get_int(RANDOM, 0, 1);
-	maxRoomSize = minRoomSize + TCOD_random_get_int(RANDOM, 1, 2);
+	maxRoomSize = minRoomSize + 1;
 	
 	//TODO: Adjust max for more "connected" levels
 	for (i = 0; i <= 1; i++) {
@@ -505,11 +502,6 @@ void placeTunnels() {
 					EXIT_LOCATION[0] = w_x;
 					EXIT_LOCATION[1] = w_y;
 				} else {
-					//if (ROOM_COUNT == ROOM_COUNT_MAX) {
-					//	createBonfire(w_x, w_y);
-					//} else {
-					//createBonfireKeystone(w_x, w_y);
-					//}
 					KEY_TORCH_POSITIONS[KEY_TORCH_COUNT][0] = w_x;
 					KEY_TORCH_POSITIONS[KEY_TORCH_COUNT][1] = w_y;
 					KEY_TORCH_COUNT ++;
@@ -612,7 +604,7 @@ void placeTunnels() {
 							continue;
 						}
 						
-						if (TCOD_map_is_walkable(LEVEL_MAP, w_x + x1, w_y + y1)) {
+						if (dist < randomRoomSize && !TCOD_map_is_walkable(LEVEL_MAP, w_x + x1, w_y + y1)) {
 							drawCharBackEx(LEVEL_CONSOLE, w_x + x1, w_y + y1, TCOD_color_RGB(15 + RED_SHIFT, 105, 155), TCOD_BKGND_SET);
 						}
 						
@@ -646,12 +638,20 @@ void placeKeyTorches() {
 	}
 }
 
+void placeItemChest() {
+
+}
+
 void generatePuzzles() {
 	if (ROOM_COUNT_MAX > 4) {
 		placeKeyTorches();
 
 		printf("Level type: Key Torches\n");
+	} else {
+
 	}
+
+	placeItemChest();
 }
 
 void generateLevel() {
@@ -680,7 +680,7 @@ void generateLevel() {
 	deleteEnemies();
 	deleteAllOwnerlessItems();
 	
-	for (i = 0; i < MAX_ROOMS; i++) {
+	for (i = 0; i <= MAX_ROOMS; i++) {
 		foundPlot = 0;
 
 		while (!foundPlot) {
