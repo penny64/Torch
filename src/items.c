@@ -298,3 +298,7 @@ void createSign(int x, int y, char *text) {
 void createExit(int x, int y) {
 	createItem(x, y, '>', TCOD_color_RGB(200, 200, 150), TCOD_color_RGB(50, 50, 25), IS_EXIT);
 }
+
+void createDoor(int x, int y) {
+	createItem(x, y, '#', TCOD_color_RGB(200, 75, 75), TCOD_color_RGB(40, 75, 75), IS_DOOR);
+}

@@ -213,7 +213,7 @@ void carve(int x, int y) {
 	TCOD_map_t existingLevel = copyLevelMap();
 	
 	for (i = 0; i < TCOD_random_get_int(RANDOM, 9, 12); i++) {
-		for (ii = 0; ii <= TCOD_random_get_int(RANDOM, 0, 1); ii++) {
+		for (ii = 0; ii <= 0; ii++) { //Useless
 			for (y1 = -1 - ii; y1 <= 1 + ii; y1++) {
 				for (x1 = -1 - ii; x1 <= 1 + ii; x1++) {
 					if (x + x1 <= 1 || x + x1 >= WINDOW_WIDTH - 2 || y + y1 <= 1 || y + y1 >= WINDOW_HEIGHT - 2) {
@@ -410,7 +410,7 @@ void findRooms() {
 }
 
 void placeTunnels() {
-	int i, x, y, x1, y1, w_x, w_y, mapUpdates, currentValue, neighborValue, lowestValue, index, lowestX, lowestY, invalid, minRoomSize, maxRoomSize, randomRoomSize, dist;
+	int i, x, y, x1, y1, w_x, w_y, prev_w_x, prev_w_y, tunnelPlaced, mapUpdates, currentValue, neighborValue, lowestValue, index, lowestX, lowestY, invalid, minRoomSize, maxRoomSize, randomRoomSize, dist;
 	int startCount = 0;
 
 	KEY_TORCH_COUNT = 0;
@@ -421,8 +421,8 @@ void placeTunnels() {
 		}
 	}
 
-	minRoomSize = TCOD_random_get_int(RANDOM, 0, 1);
-	maxRoomSize = minRoomSize + 1;
+	minRoomSize = 0;
+	maxRoomSize = TCOD_random_get_int(RANDOM, 0, 1);
 	
 	//TODO: Adjust max for more "connected" levels
 	for (i = 0; i <= 1; i++) {
@@ -556,6 +556,8 @@ void placeTunnels() {
 					}
 				}
 			}
+
+			tunnelPlaced = 0;
 			
 			while (DIJKSTRA_MAP[w_x][w_y]) {
 				lowestValue = DIJKSTRA_MAP[w_x][w_y];
@@ -579,8 +581,9 @@ void placeTunnels() {
 						}
 					}
 				}
-				
-				
+
+				prev_w_x = w_x;
+				prev_w_y = w_y;
 				w_x = lowestX;
 				w_y = lowestY;
 
@@ -604,13 +607,19 @@ void placeTunnels() {
 							continue;
 						}
 						
-						if (dist < randomRoomSize && !TCOD_map_is_walkable(LEVEL_MAP, w_x + x1, w_y + y1)) {
+						if (dist <= randomRoomSize && !TCOD_map_is_walkable(LEVEL_MAP, w_x + x1, w_y + y1)) {
 							drawCharBackEx(LEVEL_CONSOLE, w_x + x1, w_y + y1, TCOD_color_RGB(15 + RED_SHIFT, 105, 155), TCOD_BKGND_SET);
 						}
 						
 						TCOD_map_set_properties(LEVEL_MAP, w_x + x1, w_y + y1, 1, 1);
+
+						tunnelPlaced = 1;
 					}
 				}
+			}
+
+			if (tunnelPlaced && randomRoomSize == 1) {
+				createDoor(prev_w_x, prev_w_y);
 			}
 
 			/*for (y = 2; y < WINDOW_HEIGHT - 1; y++) {
@@ -652,6 +661,40 @@ void generatePuzzles() {
 	}
 
 	placeItemChest();
+}
+
+void cleanUpDoors() {
+	int x1, y1, wallCount;
+	item *next, *itm = getItems();
+
+	while (itm) {
+		next = itm->next;
+		wallCount = 0;
+
+		if (!itm->itemFlags & IS_DOOR) {
+			itm = next;
+
+			continue;
+		}
+
+		for (x1 = -1; x1 <= 1; x1 ++) {
+			for (y1 = -1; y1 <= 1; y1 ++) {
+				if ((y1 == -1 && x1 == 1) || (y1 == -1 && x1 == -1) || (y1 == 1 && x1 == 1) || (y1 == 1 && x1 == -1)) {
+					continue;
+				}
+
+				if (!TCOD_map_is_walkable(LEVEL_MAP, itm->x + x1, itm->y + y1)) {
+					wallCount ++;
+				}
+			}
+		}
+
+		if (wallCount < 2) {
+			deleteItem(itm);
+		}
+
+		itm = next;
+	}
 }
 
 void generateLevel() {
@@ -709,6 +752,7 @@ void generateLevel() {
 	findRooms();
 	placeTunnels();
 	smooth();
+	cleanUpDoors();
 	generatePuzzles();
 	
 	drawLights();

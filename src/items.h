@@ -9,6 +9,7 @@ enum {
 	IS_KEY = 0x01 << 2,
 	IS_EXIT = 0x01 << 3,
     IS_SINGLE_USE_FUEL_SOURCE = 0x01 << 4,
+	IS_DOOR = 0x01 << 5,
 } itemFlag_t;
 
 
@@ -46,3 +47,4 @@ void createTreasure(int, int);
 void createPlantedTorch(int, int, light*);
 void createExit(int, int);
 void createSign(int, int, char*);
+void createDoor(int, int);
