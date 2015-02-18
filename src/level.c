@@ -671,7 +671,7 @@ void cleanUpDoors() {
 		next = itm->next;
 		wallCount = 0;
 
-		if (!itm->itemFlags & IS_DOOR) {
+		if (!(itm->itemFlags & IS_DOOR)) {
 			itm = next;
 
 			continue;
@@ -695,6 +695,30 @@ void cleanUpDoors() {
 
 		itm = next;
 	}
+}
+
+void activateDoors() {
+	item *next, *itm = getItems();
+
+	while (itm) {
+		if (itm->itemFlags & IS_DOOR) {
+			enableDoor(itm);
+		}
+		
+		itm = itm->next;
+	}
+}
+
+void blockPosition(int x, int y) {
+	TCOD_map_set_properties(LEVEL_MAP, x, y, 0, 0);
+	
+	resetAllActorsForNewLevel();
+}
+
+void unblockPosition(int x, int y) {
+	TCOD_map_set_properties(LEVEL_MAP, x, y, 1, 1);
+	
+	resetAllActorsForNewLevel();
 }
 
 void generateLevel() {
@@ -753,6 +777,7 @@ void generateLevel() {
 	placeTunnels();
 	smooth();
 	cleanUpDoors();
+	activateDoors();
 	generatePuzzles();
 	
 	drawLights();

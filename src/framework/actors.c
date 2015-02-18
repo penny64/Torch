@@ -159,6 +159,22 @@ void _checkForItemCollisions(character *actor) {
 	}
 }
 
+int _checkForTouchedItemAndHandle(character *actor, int x, int y) {
+	item *ptr = getItems();
+
+	while (ptr != NULL) {
+		if (x == ptr->x && y == ptr->y) {
+			if (itemHandleCharacterTouch(ptr, actor)) {
+				return 1;
+			}
+		}
+
+		ptr = ptr->next;
+	}
+	
+	return 0;
+}
+
 int _checkIfPositionLit(character *actor) {
 	if (!isPositionLit(actor->x, actor->y)) {
 		printf("Actor is in unlit position\n");
@@ -223,20 +239,29 @@ void _actorLogic(character *actor) {
 
 		ptr = ptr->next;
 	}
+	
+	if (_checkForTouchedItemAndHandle(actor, nx, ny)) {
+		actor->vx = 0;
+		actor->vy = 0;
+		
+		return;
+	}
 
 	if (hitActor) {
 		if (meleeAttack(actor, ptr)) {
 			return;
 		}
-	} else if ((actor->vx || actor->vy) && isPositionWalkable(nx, ny)) {
-		actor->x = nx;
-		actor->y = ny;
+	} else if (actor->vx || actor->vy) {
+		if (isPositionWalkable(nx, ny)) {
+			actor->x = nx;
+			actor->y = ny;
 
-		if (actor->itemLight) {
-			actor->itemLight->fuel -= getLevel();
+			if (actor->itemLight) {
+				actor->itemLight->fuel -= getLevel();
+			}
+
+			TCOD_map_compute_fov(actor->fov, actor->x, actor->y, actor->sightRange, 1, FOV_SHADOW);
 		}
-
-		TCOD_map_compute_fov(actor->fov, actor->x, actor->y, actor->sightRange, 1, FOV_SHADOW);
 	}
 
 	_checkForItemCollisions(actor);

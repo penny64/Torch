@@ -18,6 +18,8 @@ void completeLevel(void);
 void exitLevel(void);
 void transitionIsComplete(void);
 void setLevel(int);
+void blockPosition(int, int);
+void unblockPosition(int, int);
 int levelLogic(void);
 int isPositionWalkable(int, int);
 int isLevelComplete(void);

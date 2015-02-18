@@ -244,6 +244,21 @@ void itemHandleCharacterCollision(item *itm, character *actor) {
 	}
 }
 
+int itemHandleCharacterTouch(item *itm, character *actor) {
+	character *player = getPlayer();
+	
+	if (actor == player) {
+		if (itm->itemFlags & IS_DOOR) {
+			unblockPosition(itm->x, itm->y);
+			deleteItem(itm);
+			
+			return 1;
+		}
+	}
+	
+	return 0;
+}
+
 void createBonfire(int x, int y) {
 	item *itm = createItem(x, y, '!', TCOD_color_RGB(255, 255, 155), TCOD_color_RGB(55, 0, 55), 0x0);
 
@@ -300,5 +315,9 @@ void createExit(int x, int y) {
 }
 
 void createDoor(int x, int y) {
-	createItem(x, y, '#', TCOD_color_RGB(200, 75, 75), TCOD_color_RGB(40, 75, 75), IS_DOOR);
+	createItem(x, y, '#', TCOD_color_RGB(200, 175, 175), TCOD_color_RGB(140, 75, 75), IS_DOOR);
+}
+
+void enableDoor(item *itm) {
+	blockPosition(itm->x, itm->y);
 }
