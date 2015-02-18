@@ -2,6 +2,15 @@
 #define MAX_ROOMS 4
 
 
+typedef struct room room;
+
+struct room {
+	int id;
+	struct room *next, *prev;
+	struct character *owner;
+};
+
+
 TCOD_console_t getLevelConsole(void);
 TCOD_console_t getLightConsole(void);
 TCOD_console_t getShadowConsole(void);
@@ -30,3 +39,4 @@ float getExitWaveDistance(void);
 int *getExitLocation(void);
 float *getEffectsMap(void);
 float getRandomFloat(float, float);
+room *createRoom(int);

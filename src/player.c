@@ -137,6 +137,6 @@ void playerInputLogic() {
 	if (isCharPressed(' ')) {
 		_handlePlantTorch();
 	} else if (isCharPressed('c')) {
-		completeLevel();
+		printf("%i, %i\n", PLAYER_ACTOR->x, PLAYER_ACTOR->y);
 	}
 }

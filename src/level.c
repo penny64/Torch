@@ -36,6 +36,7 @@ int LEVEL_NUMBER;
 int KEY_TORCH_COUNT, (*KEY_TORCH_POSITIONS)[255];
 int (*openList)[WINDOW_WIDTH * WINDOW_HEIGHT];
 int (*START_POSITIONS)[WINDOW_WIDTH * WINDOW_HEIGHT];
+room *ROOMS = NULL;
 
 
 void levelSetup() {
@@ -94,6 +95,27 @@ void levelShutdown() {
 	TCOD_map_delete(LEVEL_MAP);
 	TCOD_map_delete(TUNNEL_WALLS);
 	TCOD_noise_delete(FOG_NOISE);
+}
+
+room *createRoom(int id) {
+	room *ptr, *rm = calloc(1, sizeof(room));
+	
+	rm->id = id;
+	
+	if (ROOMS == NULL) {
+		ROOMS = rm;
+	} else {
+		ptr = ROOMS;
+		
+		while (ptr->next) {
+			ptr = ptr->next;
+		}
+		
+		ptr->next = rm;
+		rm->prev = ptr;
+	}
+
+	return rm;
 }
 
 int getRandomInt(int min, int max) {
@@ -664,12 +686,13 @@ void generatePuzzles() {
 }
 
 void cleanUpDoors() {
-	int x1, y1, wallCount;
+	int x1, y1, closedCount, openCount;
 	item *next, *itm = getItems();
 
 	while (itm) {
 		next = itm->next;
-		wallCount = 0;
+		openCount = 0;
+		closedCount = 0;
 
 		if (!(itm->itemFlags & IS_DOOR)) {
 			itm = next;
@@ -679,19 +702,27 @@ void cleanUpDoors() {
 
 		for (x1 = -1; x1 <= 1; x1 ++) {
 			for (y1 = -1; y1 <= 1; y1 ++) {
-				if ((y1 == -1 && x1 == 1) || (y1 == -1 && x1 == -1) || (y1 == 1 && x1 == 1) || (y1 == 1 && x1 == -1)) {
+				if (!x1 && !y1) {
 					continue;
 				}
-
-				if (!TCOD_map_is_walkable(LEVEL_MAP, itm->x + x1, itm->y + y1)) {
-					wallCount ++;
+				
+				if (!(y1 == -1 && x1 == 1) || (y1 == -1 && x1 == -1) || (y1 == 1 && x1 == 1) || (y1 == 1 && x1 == -1)) {
+					if (TCOD_map_is_walkable(LEVEL_MAP, itm->x + x1, itm->y + y1)) {
+						openCount ++;
+					}
+				} else {
+					if (TCOD_map_is_walkable(LEVEL_MAP, itm->x + x1, itm->y + y1)) {
+						closedCount ++;
+					}
 				}
 			}
 		}
 
-		if (wallCount < 2) {
+		if (closedCount == 2 || openCount > 3) {
 			deleteItem(itm);
 		}
+		
+		printf("%i %i @ %i %i\n", openCount, closedCount, itm->x, itm->y);
 
 		itm = next;
 	}
