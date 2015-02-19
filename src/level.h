@@ -1,11 +1,13 @@
 #include "libtcod.h"
 #define MAX_ROOMS 4
+#define MAX_CONNECTED_ROOMS 5
 
 
 typedef struct room room;
 
 struct room {
-	int id;
+	int id, numberOfConnectedRooms, size, **positionList;
+	int connectedRooms[MAX_CONNECTED_ROOMS];
 	struct room *next, *prev;
 	struct character *owner;
 };
@@ -17,7 +19,6 @@ TCOD_console_t getShadowConsole(void);
 TCOD_console_t getFogConsole(void);
 TCOD_console_t getSeenConsole(void);
 TCOD_map_t getLevelMap(void);
-TCOD_map_t copyLevelMap(void);
 TCOD_map_t copyLevelMap(void);
 TCOD_noise_t getFogNoise(void);
 void levelSetup(void);
@@ -35,8 +36,9 @@ int isLevelComplete(void);
 int isTransitionInProgress(void);
 int getRandomInt(int, int);
 int getLevel(void);
-float getExitWaveDistance(void);
+int isConnectedTo(room*, room*);
 int *getExitLocation(void);
+float getExitWaveDistance(void);
 float *getEffectsMap(void);
 float getRandomFloat(float, float);
-room *createRoom(int);
+room *createRoom(int, int);

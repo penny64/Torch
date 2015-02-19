@@ -9,7 +9,7 @@
 
 TCOD_console_t INTRO_CONSOLE;
 int FADE_IN_VALUE = 0;
-int FADE_IN_TIMER = 0;
+float FADE_IN_TIMER = 0;
 int FADE_IN_TIMER_MAX = 6;
 int INTRO_MODE_TIME = 9;
 int FADE_IN = 1;
@@ -33,7 +33,12 @@ int drawIntro() {
 	inputLogic();
 
 	if (FADE_IN_TIMER < FADE_IN_TIMER_MAX) {
-		FADE_IN_TIMER ++;
+		if (FADE_IN) {
+			FADE_IN_TIMER ++;
+		} else {
+			FADE_IN_TIMER += 1.3f;
+		}
+
 	} else {
 		FADE_IN_TIMER = 0;
 

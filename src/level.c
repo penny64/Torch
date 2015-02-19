@@ -20,6 +20,7 @@ TCOD_console_t SHADOW_CONSOLE;
 TCOD_console_t FOG_CONSOLE;
 TCOD_console_t SEEN_CONSOLE;
 TCOD_map_t LEVEL_MAP;
+TCOD_map_t TUNNEL_MAP;
 TCOD_map_t TUNNEL_WALLS;
 TCOD_noise_t FOG_NOISE;
 TCOD_random_t RANDOM;
@@ -46,6 +47,7 @@ void levelSetup() {
 	SEEN_CONSOLE = TCOD_console_new(WINDOW_WIDTH, WINDOW_HEIGHT);
 	LIGHT_CONSOLE = TCOD_console_new(WINDOW_WIDTH, WINDOW_HEIGHT);
 	LEVEL_MAP = TCOD_map_new(WINDOW_WIDTH, WINDOW_HEIGHT);
+	TUNNEL_MAP = TCOD_map_new(WINDOW_WIDTH, WINDOW_HEIGHT);
 	TUNNEL_WALLS = TCOD_map_new(WINDOW_WIDTH, WINDOW_HEIGHT);
 	FOG_NOISE = TCOD_noise_new(2, TCOD_NOISE_DEFAULT_HURST, TCOD_NOISE_DEFAULT_LACUNARITY, NULL);
 	RANDOM = TCOD_random_get_instance();
@@ -93,14 +95,41 @@ void levelShutdown() {
 	TCOD_console_delete(FOG_CONSOLE);
 	TCOD_console_delete(SEEN_CONSOLE);
 	TCOD_map_delete(LEVEL_MAP);
+	TCOD_map_delete(TUNNEL_MAP);
 	TCOD_map_delete(TUNNEL_WALLS);
 	TCOD_noise_delete(FOG_NOISE);
 }
 
-room *createRoom(int id) {
+room *createRoom(int id, int roomSize) {
 	room *ptr, *rm = calloc(1, sizeof(room));
-	
+	int x, y, i, positionIndex = 0;
+
 	rm->id = id;
+	rm->size = roomSize;
+	rm->numberOfConnectedRooms = 0;
+
+	//TODO: Use memcpy in the future
+	rm->positionList = malloc(sizeof *rm->positionList * roomSize);
+	if (rm->positionList)
+	{
+		for (i = 0; i < roomSize; i++)
+		{
+			rm->positionList[i] = malloc(sizeof *rm->positionList[i] * 2);
+		}
+	}
+
+	for (y = 0; y < WINDOW_HEIGHT; y ++) {
+		for (x = 0; x < WINDOW_WIDTH; x ++) {
+			if (ROOM_MAP[x][y] == id) {
+				rm->positionList[positionIndex][0] = x;
+				rm->positionList[positionIndex][1] = y;
+
+				positionIndex ++;
+			}
+		}
+	}
+
+	printf("%i\n", positionIndex);
 	
 	if (ROOMS == NULL) {
 		ROOMS = rm;
@@ -116,6 +145,26 @@ room *createRoom(int id) {
 	}
 
 	return rm;
+}
+
+void connectRooms(room *srcRoom, room *dstRoom) {
+	srcRoom->connectedRooms[srcRoom->numberOfConnectedRooms] = dstRoom->id;
+	dstRoom->connectedRooms[dstRoom->numberOfConnectedRooms] = srcRoom->id;
+
+	srcRoom->numberOfConnectedRooms ++;
+	dstRoom->numberOfConnectedRooms ++;
+}
+
+int isConnectedTo(room *srcRoom, room *dstRoom) {
+	int i;
+
+	for (i = 0; i < dstRoom->numberOfConnectedRooms; i++) {
+		if (dstRoom->connectedRooms[i] == srcRoom->id) {
+			return 1;
+		}
+	}
+
+	return 0;
 }
 
 int getRandomInt(int min, int max) {
@@ -417,14 +466,16 @@ void findRooms() {
 		if (added) {
 			ROOM_COUNT ++;
 
-			printf("Found new room: %i (%i)\n", ROOM_COUNT, oLen);
-		}
+			for (i = 0; i < oLen; i++) {
+				x = openList[i][0];
+				y = openList[i][1];
 
-		for (i = 0; i < oLen; i++) {
-			x = openList[i][0];
-			y = openList[i][1];
-			
-			ROOM_MAP[x][y] = ROOM_COUNT;
+				ROOM_MAP[x][y] = ROOM_COUNT;
+			}
+
+			createRoom(ROOM_COUNT, oLen);
+
+			printf("Found new room: %i (%i)\n", ROOM_COUNT, oLen);
 		}
 	}
 	
@@ -492,7 +543,7 @@ void placeTunnels() {
 					}
 
 					if (!i) {
-						if (ROOM_MAP[x][y] > ROOM_COUNT) {
+						if (ROOM_MAP[x][y] > ROOM_COUNT || TCOD_map_is_walkable(TUNNEL_MAP, x, y)) {
 							DIJKSTRA_MAP[x][y] = -1;
 						} else if (ROOM_MAP[x][y] > 0 && ROOM_MAP[x][y] < ROOM_COUNT) {
 							DIJKSTRA_MAP[x][y] = 0;
@@ -502,7 +553,9 @@ void placeTunnels() {
 							DIJKSTRA_MAP[x][y] = 99;
 						}
 					} else {
-						if (ROOM_MAP[x][y] > 0 && ROOM_MAP[x][y] != ROOM_COUNT && !TCOD_random_get_int(RANDOM, 0, 3)) {
+						if (TCOD_map_is_walkable(TUNNEL_MAP, x, y)) {
+							DIJKSTRA_MAP[x][y] = -1;
+						} else if (ROOM_MAP[x][y] > 0 && ROOM_MAP[x][y] != ROOM_COUNT && !TCOD_random_get_int(RANDOM, 0, 3)) {
 							DIJKSTRA_MAP[x][y] = 0;
 						} else if (!ROOM_MAP[x][y] || ROOM_MAP[x][y] == ROOM_COUNT) {
 							DIJKSTRA_MAP[x][y] = 99;
@@ -611,7 +664,7 @@ void placeTunnels() {
 
 				//printf("Walking to %i, %i\n", w_x, w_y);
 				
-				randomRoomSize = clip(TCOD_random_get_int(RANDOM, minRoomSize, maxRoomSize), 1, 255);
+				randomRoomSize = 1;//clip(TCOD_random_get_int(RANDOM, minRoomSize, maxRoomSize), 1, 255);
 				
 				for (y1 = -16; y1 <= 16; y1++) {
 					for (x1 = -16; x1 <= 16; x1++) {
@@ -634,6 +687,7 @@ void placeTunnels() {
 						}
 						
 						TCOD_map_set_properties(LEVEL_MAP, w_x + x1, w_y + y1, 1, 1);
+						TCOD_map_set_properties(TUNNEL_MAP, w_x + x1, w_y + y1, 1, 1);
 
 						tunnelPlaced = 1;
 					}
@@ -729,7 +783,7 @@ void cleanUpDoors() {
 }
 
 void activateDoors() {
-	item *next, *itm = getItems();
+	item *itm = getItems();
 
 	while (itm) {
 		if (itm->itemFlags & IS_DOOR) {
@@ -764,6 +818,7 @@ void generateLevel() {
 	EXIT_WAVE_DIST = 0;
 
 	TCOD_map_clear(LEVEL_MAP, 0, 0);
+	TCOD_map_clear(TUNNEL_MAP, 0, 0);
 	TCOD_map_clear(TUNNEL_WALLS, 0, 0);
 	TCOD_console_clear(LEVEL_CONSOLE);
 	TCOD_console_clear(LIGHT_CONSOLE);
@@ -825,8 +880,8 @@ void generateLevel() {
 	if (player) {
 		if (LEVEL_NUMBER == 1) {
 			plantTorch(player);
-			createVoidWorm(player->x + 1, player->y + 1);
-			showMessage("%cSomething watches from the shadows...%c", 10);
+			//createVoidWorm(player->x + 1, player->y + 1);
+			//showMessage("%cSomething watches from the shadows...%c", 10);
 		} else {
 			createBonfire(player->x, player->y);
 		}
