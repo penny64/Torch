@@ -108,6 +108,10 @@ room *createRoom(int id, int roomSize, unsigned int flags) {
 	rm->size = roomSize;
 	rm->numberOfConnectedRooms = 0;
 	rm->flags = flags;
+	rm->prev = NULL;
+	rm->next = NULL;
+
+	printf("FLAGS %i %i  size=%i\n", rm->flags, flags, roomSize);
 
 	//TODO: Use memcpy in the future
 	rm->positionList = malloc(sizeof *rm->positionList * roomSize);
@@ -475,10 +479,10 @@ void findRooms() {
 
 			if (ROOM_COUNT == ROOM_COUNT_MAX) {
 				createRoom(ROOM_COUNT, oLen, IS_TREASURE_ROOM);
-			//else if (getRandomInt(0, 2)) {
-			//	createBonfireKeystone(KEY_TORCH_POSITIONS[i][0], KEY_TORCH_POSITIONS[i][1]);
+			} else if (getRandomInt(0, 2)) {
+				createRoom(ROOM_COUNT, oLen, IS_TORCH_ROOM);
 			} else {
-				createRoom(ROOM_COUNT, oLen, 0x0);
+				createRoom(ROOM_COUNT, oLen, 0x00);
 			}
 
 			printf("Found new room: %i (%i)\n", ROOM_COUNT, oLen);
@@ -517,13 +521,27 @@ void placeTunnels() {
 				srcRoom = roomPtr;
 			}
 			
-			if (!isRoomConnectedTo(srcRoom, roomPtr) && !isRoomConnectedTo(roomPtr, srcRoom) && !roomPtr->flags & IS_TREASURE_ROOM) {
+			roomPtr = roomPtr->next;
+		}
+
+		if (srcRoom == NULL) {
+			printf("CRASH: No src room\n");
+		}
+
+		roomPtr = ROOMS;
+
+		while (roomPtr) {
+			if (!isRoomConnectedTo(srcRoom, roomPtr) && !roomPtr->flags & IS_TREASURE_ROOM) {
 				if (!dstRoom || (roomPtr != srcRoom && roomPtr->numberOfConnectedRooms < dstRoom->numberOfConnectedRooms)) {
 					dstRoom = roomPtr;
 				}
 			}
-			
+
 			roomPtr = roomPtr->next;
+		}
+
+		if (dstRoom == NULL) {
+			printf("CRASH: No src room\n");
 		}
 		
 		for (y = 2; y < WINDOW_HEIGHT - 1; y++) {
@@ -552,7 +570,7 @@ void placeTunnels() {
 							continue;
 						}
 						
-						if (!ROOM_MAP[x + x1][y + y1] && !TUNNEL_ROOM_MAP[x + x1][y + y1] == srcRoom->id) {
+						if (!ROOM_MAP[x + x1][y + y1] && (TUNNEL_ROOM_MAP[x + x1][y + y1] != srcRoom->id || TUNNEL_ROOM_MAP[x + x1][y + y1] != dstRoom->id)) {
 							invalid = 1;
 							
 							break;
@@ -590,28 +608,12 @@ void placeTunnels() {
 				if (neighborCollision) {
 					DIJKSTRA_MAP[x][y] = -1;
 				} else {
-				
 					if (ROOM_MAP[x][y] == dstRoom->id || TUNNEL_ROOM_MAP[x][y] == dstRoom->id) {
 						DIJKSTRA_MAP[x][y] = 0;
-						
-						//printf("%i", dstRoom->id);
-					/*} else if (TCOD_map_is_walkable(TUNNEL_MAP, x, y)) {
-						DIJKSTRA_MAP[x][y] = 99;
-						
-						printf(".");
-						
-					*/} else if ((ROOM_MAP[x][y] && ROOM_MAP[x][y] != dstRoom->id && ROOM_MAP[x][y] != srcRoom->id) || TCOD_map_is_walkable(TUNNEL_MAP, x, y)) {
+					} else if ((ROOM_MAP[x][y] && ROOM_MAP[x][y] != dstRoom->id && ROOM_MAP[x][y] != srcRoom->id) || TCOD_map_is_walkable(TUNNEL_MAP, x, y)) {
 						DIJKSTRA_MAP[x][y] = -1;
-						
-						//printf("-");
 					} else {
 						DIJKSTRA_MAP[x][y] = 99;
-						
-						/*if (ROOM_MAP[x][y] == srcRoom->id) {
-							printf("x");
-						} else {
-							printf(" ");
-						}*/
 					}
 				}
 			}
@@ -706,7 +708,7 @@ void placeTunnels() {
 			w_x = lowestX;
 			w_y = lowestY;
 
-			//printf("Walking to %i, %i (lowest=%i)\n", w_x, w_y, lowestValue);
+			printf("Walking to %i, %i (lowest=%i)\n", w_x, w_y, lowestValue);
 			
 			randomRoomSize = 1;//clip(TCOD_random_get_int(RANDOM, minRoomSize, maxRoomSize), 1, 255);
 			
@@ -745,104 +747,18 @@ void placeTunnels() {
 		if (tunnelPlaced && randomRoomSize == 1) {
 			createDoor(prev_w_x, prev_w_y);
 		}
-		
+
 		printf("Connecting rooms: %i, %i\n", srcRoom->id, dstRoom->id);
+
 		connectRooms(srcRoom, dstRoom);
 
-		/*for (y = 2; y < WINDOW_HEIGHT - 1; y++) {
-			for (x = 2; x < WINDOW_WIDTH - 1; x++) {
-				if (x == START_POSITIONS[index][0] && y == START_POSITIONS[index][1]) {
-					printf("X ");
-				} else {
-					printf("%-2i", DIJKSTRA_MAP[x][y]);
-				}
-			}
-
-			printf("\n");
-		}*/
-
-		//roomPtr = ROOMS;
-		/*openRoomList[0] = srcRoom->id;
-		openListCount = 1;
-		closedListCount = 0;
-		
-		while (openListCount) {
-			roomPtr = ROOMS;
-			
-			printf("1 %i\n", openRoomList[openListCount - 1]);
-			
-			while (roomPtr) {
-				if (roomPtr->id == openRoomList[openListCount - 1]) {
-					break;
-				}
-				
-				printf("comp %i, %i\n", roomPtr->id, openRoomList[openListCount - 1]);
-				
-				roomPtr = roomPtr->next;
-			}
-			
-			if (!roomPtr) {
-				printf("Fuck!!!!: %i\n", openListCount);
-			}
-			
-			printf("2 %i\n", roomPtr->id);
-			
-			closedRoomList[closedListCount] = roomPtr->id;
-			closedListCount ++;
-			openListCount --;
-			
-			printf("3\n");
-			
-			for (i = 0; i < roomPtr->numberOfConnectedRooms; i ++) {
-				id = roomPtr->connectedRooms[i];
-				
-				if (!id) {
-					break;
-				}
-				
-				inOpenList = 0;
-				inClosedList = 0;
-				
-				for (ii = 0; ii < closedListCount; ii ++) {
-					if (closedRoomList[ii] == id) {
-						inClosedList = 1;
-						
-						break;
-					}
-				}
-				
-				if (inClosedList) {
-					continue;
-				}
-				
-				for (ii = 0; ii < openListCount; ii ++) {
-					if (openRoomList[ii] == id) {
-						inOpenList = 1;
-						
-						break;
-					}
-				}
-				
-				if (!inOpenList) {
-					openRoomList[openListCount] = id;
-					openListCount ++;
-				}
-			}
-			
-			printf("4 %i, %i (%i)\n", openListCount, closedListCount, MAX_ROOMS);
-			
-			if (!id) {
-				continue;
-			}
-		}
-		
-		if (closedListCount == ROOM_COUNT_MAX) {
-			break;
-		}*/
+		printf("FUCK 1\n");
 
 		if (srcRoom->numberOfConnectedRooms == ROOM_COUNT_MAX) {
 			break;
 		}
+
+		printf("FUCK 2\n");
 	}
 }
 
@@ -851,6 +767,21 @@ void placeItemChest() {
 }
 
 void generatePuzzles() {
+	int x, y, spawnIndex;
+	room *roomPtr = ROOMS;
+
+	while (roomPtr) {
+		if (roomPtr->flags & IS_TORCH_ROOM) {
+			spawnIndex = getRandomInt(0, roomPtr->size - 1);
+			x = roomPtr->positionList[spawnIndex][0];
+			y = roomPtr->positionList[spawnIndex][1];
+
+			createBonfireKeystone(x, y);
+		}
+
+		roomPtr = roomPtr->next;
+	}
+
 	placeItemChest();
 }
 
@@ -923,30 +854,44 @@ void unblockPosition(int x, int y) {
 
 void colorRooms() {
 	int i, x, y, r, g, b, rMod, gMod, bMod;
-	room *roomPtr;
-
-	roomPtr = ROOMS;
+	room *roomPtr = ROOMS;
 
 	while (roomPtr) {
+		//printf("FLAGS: %i, %i\n", roomPtr->flags, 0x01 << 1);
+
 		rMod = 0;
 		gMod = 0;
 		bMod = 0;
 
 		if (roomPtr->flags & IS_TREASURE_ROOM) {
-			r = 255;
+			r = 235;
 			g = 105;
 			b = 255;
+
+			gMod = 70;
 			printf("1\n");
-		} else if (roomPtr->numberOfConnectedRooms > 3) {
+		} else if (roomPtr->flags & IS_TORCH_ROOM) {
+			r = 140 - RED_SHIFT;
+			g = 140;
+			b = 140;
+
+			rMod = 70;
+			gMod = 70;
+			bMod = 70;
+			printf("2\n");
+		}
+		else if (roomPtr->numberOfConnectedRooms > 3) {
 			r = 15;
 			g = 205;
 			b = 255;
-			printf("2\n");
+			rMod = 120;
+			gMod = 120;
+			printf("3\n");
 		} else {
 			r = 205;
 			g = 25;
 			b = 25;
-			printf("3\n");
+			printf("4\n");
 		}
 
 		for (i = 0; i < roomPtr->size; i ++) {
@@ -969,7 +914,7 @@ void colorRooms() {
 				}
 			}*/
 
-			drawCharBackEx(LEVEL_CONSOLE, x, y, TCOD_color_RGB(clip(r + RED_SHIFT + rMod, 0, 255), clip(g + gMod, 0, 255), clip(b + bMod, 0, 255)), TCOD_BKGND_SET);
+			drawCharBackEx(LEVEL_CONSOLE, x, y, TCOD_color_RGB(clip(r + RED_SHIFT + getRandomInt(0, rMod), 0, 255), clip(g + getRandomInt(0, gMod), 0, 255), clip(b + getRandomInt(0, bMod), 0, 255)), TCOD_BKGND_SET);
 		}
 
 		for (y = 2; y < WINDOW_HEIGHT - 2; y ++) {
