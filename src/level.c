@@ -128,8 +128,6 @@ room *createRoom(int id, int roomSize) {
 			}
 		}
 	}
-
-	printf("%i\n", positionIndex);
 	
 	if (ROOMS == NULL) {
 		ROOMS = rm;
@@ -483,7 +481,7 @@ void findRooms() {
 }
 
 void placeTunnels() {
-	int i, x, y, x1, y1, w_x, w_y, prev_w_x, prev_w_y, tunnelPlaced, mapUpdates, currentValue, neighborValue, lowestValue, index, lowestX, lowestY, invalid, minRoomSize, maxRoomSize, randomRoomSize, dist;
+	int i, x, y, x1, y1, w_x, w_y, prev_w_x, prev_w_y, tunnelPlaced, mapUpdates, currentValue, neighborValue, lowestValue, index, lowestX, lowestY, invalid, randomRoomSize, dist;
 	int startCount = 0;
 
 	KEY_TORCH_COUNT = 0;
@@ -493,9 +491,6 @@ void placeTunnels() {
 			DIJKSTRA_MAP[x][y] = 0;
 		}
 	}
-
-	minRoomSize = 0;
-	maxRoomSize = TCOD_random_get_int(RANDOM, 0, 1);
 	
 	//TODO: Adjust max for more "connected" levels
 	for (i = 0; i <= 1; i++) {
