@@ -5,9 +5,15 @@
 
 typedef struct room room;
 
+enum {
+	IS_TREASURE_ROOM = 0x01 << 0,
+	IS_TORCH_ROOM = 0x02 << 1,
+} roomFlag_t;
+
 struct room {
 	int id, numberOfConnectedRooms, size, **positionList;
 	int connectedRooms[MAX_CONNECTED_ROOMS];
+	unsigned int flags;
 	struct room *next, *prev;
 	struct character *owner;
 };
@@ -36,9 +42,9 @@ int isLevelComplete(void);
 int isTransitionInProgress(void);
 int getRandomInt(int, int);
 int getLevel(void);
-int isConnectedTo(room*, room*);
+int isRoomConnectedTo(room*, room*);
 int *getExitLocation(void);
 float getExitWaveDistance(void);
 float *getEffectsMap(void);
 float getRandomFloat(float, float);
-room *createRoom(int, int);
+room *createRoom(int, int, unsigned int);
