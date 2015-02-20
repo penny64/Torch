@@ -314,7 +314,7 @@ void carve(int x, int y) {
 					}
 					
 					TCOD_map_set_properties(LEVEL_MAP, x + x1, y + y1, 1, 1);
-					drawCharBackEx(LEVEL_CONSOLE, x, y, TCOD_color_RGB(155 + RED_SHIFT, 255, 155), TCOD_BKGND_SET);
+					//drawCharBackEx(LEVEL_CONSOLE, x, y, TCOD_color_RGB(155 + RED_SHIFT, 255, 155), TCOD_BKGND_SET);
 				}
 			}
 		}
@@ -373,7 +373,7 @@ void smooth() {
 				
 				if (count == 4) {
 					TCOD_map_set_properties(LEVEL_MAP, x, y, 1, 1);
-					drawCharBackEx(LEVEL_CONSOLE, x, y, TCOD_color_RGB(35 + RED_SHIFT, 155, 205), TCOD_BKGND_SET);
+					//drawCharBackEx(LEVEL_CONSOLE, x, y, TCOD_color_RGB(35 + RED_SHIFT, 155, 205), TCOD_BKGND_SET);
 				}
 			}
 		}
@@ -490,19 +490,17 @@ void findRooms() {
 
 void placeTunnels() {
 	int x, y, x1, y1, w_x, w_y, prev_w_x, prev_w_y, tunnelPlaced, mapUpdates, currentValue, neighborValue, lowestValue, index, lowestX, lowestY, invalid, randomRoomSize, dist;
-	int neighborCollision, banConnectAtTunnel, banDoubleTunnels, startCount = 0, runCount = -1;
-	int ownsTunnels, openRoomList[MAX_ROOMS], closedRoomList[MAX_ROOMS], openListCount, closedListCount, inClosedList, inOpenList, i, ii, id;
+	int neighborCollision, banDoubleTunnels, startCount = 0, runCount = -1;
+	int ownsTunnels;//, openRoomList[MAX_ROOMS], closedRoomList[MAX_ROOMS], openListCount, closedListCount, inClosedList, inOpenList, i, ii, id;
 	room *srcRoom = NULL, *dstRoom = NULL, *roomPtr;
 	
 	ROOM_COUNT = ROOM_COUNT_MAX;
-	
 	
 	while (1) {
 		runCount ++;
 		startCount = 0;
 		ownsTunnels = 0;
 		banDoubleTunnels = getRandomInt(0, 2);
-		banConnectAtTunnel = getRandomInt(0, 2);
 		
 		for (y = 2; y < WINDOW_HEIGHT - 1; y++) {
 			for (x = 2; x < WINDOW_WIDTH - 1; x++) {
@@ -519,7 +517,7 @@ void placeTunnels() {
 				srcRoom = roomPtr;
 			}
 			
-			if (!isRoomConnectedTo(srcRoom, roomPtr) && !roomPtr->flags & IS_TREASURE_ROOM) {
+			if (!isRoomConnectedTo(srcRoom, roomPtr) && !isRoomConnectedTo(roomPtr, srcRoom) && !roomPtr->flags & IS_TREASURE_ROOM) {
 				if (!dstRoom || (roomPtr != srcRoom && roomPtr->numberOfConnectedRooms < dstRoom->numberOfConnectedRooms)) {
 					dstRoom = roomPtr;
 				}
@@ -554,7 +552,7 @@ void placeTunnels() {
 							continue;
 						}
 						
-						if (!ROOM_MAP[x + x1][y + y1] && !TUNNEL_ROOM_MAP[x + x1][y + y1]) {
+						if (!ROOM_MAP[x + x1][y + y1] && !TUNNEL_ROOM_MAP[x + x1][y + y1] == srcRoom->id) {
 							invalid = 1;
 							
 							break;
@@ -570,19 +568,11 @@ void placeTunnels() {
 				//TODO: Find center?
 				if (!invalid) {
 					if (ROOM_MAP[x][y] == srcRoom->id || TUNNEL_ROOM_MAP[x][y] == srcRoom->id) {
-						if (ownsTunnels && banConnectAtTunnel) {
-							START_POSITIONS[startCount][0] = x;
-							START_POSITIONS[startCount][1] = y;
-							
-							startCount ++;
-						} else {
-							START_POSITIONS[startCount][0] = x;
-							START_POSITIONS[startCount][1] = y;
-							
-							startCount ++;
-						}
+						START_POSITIONS[startCount][0] = x;
+						START_POSITIONS[startCount][1] = y;
+
+						startCount ++;
 					}
-					printf("%i banned=%i\n", startCount, banConnectAtTunnel);
 				}
 				
 				for (y1 = -1; y1 <= 1; y1++) {
@@ -736,9 +726,9 @@ void placeTunnels() {
 						continue;
 					}
 					
-					if (dist <= randomRoomSize && !TCOD_map_is_walkable(LEVEL_MAP, w_x + x1, w_y + y1)) {
-						drawCharBackEx(LEVEL_CONSOLE, w_x + x1, w_y + y1, TCOD_color_RGB(15 + RED_SHIFT, 105, 155), TCOD_BKGND_SET);
-					}
+					//if (dist <= randomRoomSize && !TCOD_map_is_walkable(LEVEL_MAP, w_x + x1, w_y + y1)) {
+					//	drawCharBackEx(LEVEL_CONSOLE, w_x + x1, w_y + y1, TCOD_color_RGB(15 + RED_SHIFT, 105, 155), TCOD_BKGND_SET);
+					//}
 					
 					if (!TCOD_map_is_walkable(LEVEL_MAP, w_x + x1, w_y + y1)) {
 						TCOD_map_set_properties(TUNNEL_MAP, w_x + x1, w_y + y1, 1, 1);
@@ -931,10 +921,74 @@ void unblockPosition(int x, int y) {
 	resetAllActorsForNewLevel();
 }
 
+void colorRooms() {
+	int i, x, y, r, g, b, rMod, gMod, bMod;
+	room *roomPtr;
+
+	roomPtr = ROOMS;
+
+	while (roomPtr) {
+		rMod = 0;
+		gMod = 0;
+		bMod = 0;
+
+		if (roomPtr->flags & IS_TREASURE_ROOM) {
+			r = 255;
+			g = 105;
+			b = 255;
+			printf("1\n");
+		} else if (roomPtr->numberOfConnectedRooms > 3) {
+			r = 15;
+			g = 205;
+			b = 255;
+			printf("2\n");
+		} else {
+			r = 205;
+			g = 25;
+			b = 25;
+			printf("3\n");
+		}
+
+		for (i = 0; i < roomPtr->size; i ++) {
+			x = roomPtr->positionList[i][0];
+			y = roomPtr->positionList[i][1];
+
+			/*if (roomPtr->numberOfConnectedRooms > 2) {
+
+				printf("%i, %i\n", x, y);
+
+				if (!y % 2) {
+					printf("FUCKKKKKKK!, %i\n", y % 2);
+					rMod = 0;
+					bMod = 250;
+					gMod = 255;
+				} else {
+					rMod = 0;
+					bMod = 0;
+					gMod = 0;
+				}
+			}*/
+
+			drawCharBackEx(LEVEL_CONSOLE, x, y, TCOD_color_RGB(clip(r + RED_SHIFT + rMod, 0, 255), clip(g + gMod, 0, 255), clip(b + bMod, 0, 255)), TCOD_BKGND_SET);
+		}
+
+		for (y = 2; y < WINDOW_HEIGHT - 2; y ++) {
+			for (x = 2; x < WINDOW_WIDTH - 2; x ++) {
+				if (TUNNEL_ROOM_MAP[x][y] == roomPtr->id) {
+					drawCharBackEx(LEVEL_CONSOLE, x, y, TCOD_color_RGB(200 + RED_SHIFT, 82, 45), TCOD_BKGND_SET);
+				}
+			}
+		}
+
+		roomPtr = roomPtr->next;
+	}
+}
+
 void generateLevel() {
-	int x, y, i, ii, foundPlot, plotDist, plotPoints[MAX_ROOMS][2];
+	int x, y, i, ii, spawnIndex, foundPlot, plotDist, plotPoints[MAX_ROOMS][2];
 	float fogValue, colorMod;
 	float p[2];
+	room *roomPtr, *startingRoom = NULL;
 	TCOD_noise_t fog = getFogNoise();
 	TCOD_console_t dynamicLightConsole = getDynamicLightConsole();
 	character *player = getPlayer();
@@ -967,8 +1021,8 @@ void generateLevel() {
 		while (!foundPlot) {
 			foundPlot = 1;
 
-			x = TCOD_random_get_int(RANDOM, 4, WINDOW_WIDTH - 4);
-			y = TCOD_random_get_int(RANDOM, 4, WINDOW_HEIGHT - 4);
+			x = TCOD_random_get_int(RANDOM, 8, WINDOW_WIDTH - 8);
+			y = TCOD_random_get_int(RANDOM, 8, WINDOW_HEIGHT - 8);
 
 			for (ii = 0; ii < i; ii++) {
 				plotDist = distance(x, y, plotPoints[ii - 1][0], plotPoints[ii - 1][1]);
@@ -993,13 +1047,24 @@ void generateLevel() {
 	cleanUpDoors();
 	activateDoors();
 	generatePuzzles();
-	
+
 	drawLights();
 	drawDynamicLights();
+	colorRooms();
 	
 	if (player) {
-		player->x = plotPoints[0][0];
-		player->y = plotPoints[0][1];
+		roomPtr = ROOMS;
+
+		while (roomPtr) {
+			if (!startingRoom || roomPtr->numberOfConnectedRooms > startingRoom->numberOfConnectedRooms) {
+				startingRoom = roomPtr;
+			}
+
+			roomPtr = roomPtr->next;
+		}
+		spawnIndex = getRandomInt(0, startingRoom->size - 1);
+		player->x = startingRoom->positionList[spawnIndex][0];
+		player->y = startingRoom->positionList[spawnIndex][1];
 		player->vx = 1;
 		
 		printf("Spawning at %i, %i\n", player->x, player->y);

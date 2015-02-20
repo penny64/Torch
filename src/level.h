@@ -1,5 +1,5 @@
 #include "libtcod.h"
-#define MAX_ROOMS 4
+#define MAX_ROOMS 5
 #define MAX_CONNECTED_ROOMS 5
 
 
