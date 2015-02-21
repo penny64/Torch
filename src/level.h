@@ -11,10 +11,9 @@ enum {
 typedef struct room room;
 
 struct room {
-	int id, numberOfConnectedRooms, size, **positionList;
+	int id, numberOfConnectedRooms, size, *connectedRooms, **positionList;
 	unsigned int flags;
 	struct room *next, *prev;
-	int connectedRooms[MAX_CONNECTED_ROOMS];
 };
 
 
@@ -28,6 +27,7 @@ TCOD_map_t copyLevelMap(void);
 TCOD_noise_t getFogNoise(void);
 void levelSetup(void);
 void levelShutdown(void);
+void deleteAllRooms(void);
 void generateLevel(void);
 void completeLevel(void);
 void exitLevel(void);

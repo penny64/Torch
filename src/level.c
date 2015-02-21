@@ -82,6 +82,7 @@ void levelSetup() {
 void levelShutdown() {
 	printf("Shutting down level...\n");
 	
+	deleteAllRooms();
 	free(ROOM_MAP);
 	free(TUNNEL_ROOM_MAP);
 	free(EFFECTS_MAP);
@@ -110,6 +111,7 @@ room *createRoom(int id, int roomSize, unsigned int flags) {
 	rm->flags = flags;
 	rm->prev = NULL;
 	rm->next = NULL;
+	rm->connectedRooms = calloc(1, (sizeof(int) * MAX_ROOMS) + 1);
 
 	printf("FLAGS %i %i  size=%i\n", rm->flags, flags, roomSize);
 
@@ -148,6 +150,37 @@ room *createRoom(int id, int roomSize, unsigned int flags) {
 	}
 
 	return rm;
+}
+
+void deleteRoom(room *rm) {
+	if (rm == ROOMS) {
+		ROOMS = rm->next;
+	} else {
+		rm->prev->next = rm->next;
+
+		if (rm->next) {
+			rm->next->prev = rm->prev;
+		}
+	}
+
+	free(rm->connectedRooms);
+	free(rm);
+}
+
+void deleteAllRooms() {
+	room *next, *ptr = ROOMS;
+
+	printf("Deleting all rooms...\n");
+
+	while (ptr != NULL) {
+		next = ptr->next;
+
+		deleteRoom(ptr);
+
+		ptr = next;
+	}
+	
+	ROOMS = NULL; //Just in case...?
 }
 
 void connectRooms(room *srcRoom, room *dstRoom) {
@@ -479,8 +512,8 @@ void findRooms() {
 
 			if (ROOM_COUNT == ROOM_COUNT_MAX) {
 				createRoom(ROOM_COUNT, oLen, IS_TREASURE_ROOM);
-			} else if (getRandomInt(0, 2)) {
-				createRoom(ROOM_COUNT, oLen, IS_TORCH_ROOM);
+			//} else if (getRandomInt(0, 2)) {
+			//	createRoom(ROOM_COUNT, oLen, IS_TORCH_ROOM);
 			} else {
 				createRoom(ROOM_COUNT, oLen, 0x00);
 			}
@@ -531,7 +564,7 @@ void placeTunnels() {
 		roomPtr = ROOMS;
 
 		while (roomPtr) {
-			if (!isRoomConnectedTo(srcRoom, roomPtr) && !roomPtr->flags & IS_TREASURE_ROOM) {
+			if (!roomPtr->flags & IS_TREASURE_ROOM) {
 				if (!dstRoom || (roomPtr != srcRoom && roomPtr->numberOfConnectedRooms < dstRoom->numberOfConnectedRooms)) {
 					dstRoom = roomPtr;
 				}
@@ -541,7 +574,7 @@ void placeTunnels() {
 		}
 
 		if (dstRoom == NULL) {
-			printf("CRASH: No src room\n");
+			printf("CRASH: No dst room\n");
 		}
 		
 		for (y = 2; y < WINDOW_HEIGHT - 1; y++) {
@@ -622,6 +655,8 @@ void placeTunnels() {
 		index = TCOD_random_get_int(RANDOM, 0, startCount - 1);
 		w_x = START_POSITIONS[index][0];
 		w_y = START_POSITIONS[index][1];
+		prev_w_x = w_x;
+		prev_w_y = w_y;
 		
 		printf("Starting at %i, %i VAL=%i rm=%i, sr=%i, dr=%i\n", w_x, w_y, DIJKSTRA_MAP[w_x][w_y], ROOM_MAP[w_x][w_y], srcRoom->id, dstRoom->id);
 
@@ -708,7 +743,7 @@ void placeTunnels() {
 			w_x = lowestX;
 			w_y = lowestY;
 
-			printf("Walking to %i, %i (lowest=%i)\n", w_x, w_y, lowestValue);
+			printf("Walking to %i, %i (lowest=%i) (prev=%i, %i)\n", w_x, w_y, lowestValue, prev_w_x, prev_w_y);
 			
 			randomRoomSize = 1;//clip(TCOD_random_get_int(RANDOM, minRoomSize, maxRoomSize), 1, 255);
 			
@@ -752,13 +787,9 @@ void placeTunnels() {
 
 		connectRooms(srcRoom, dstRoom);
 
-		printf("FUCK 1\n");
-
 		if (srcRoom->numberOfConnectedRooms == ROOM_COUNT_MAX) {
 			break;
 		}
-
-		printf("FUCK 2\n");
 	}
 }
 
@@ -820,9 +851,9 @@ void cleanUpDoors() {
 
 		if (closedCount == 2 || openCount > 3) {
 			deleteItem(itm);
+		} else {
+			printf("%i %i @ %i %i\n", openCount, closedCount, itm->x, itm->y);
 		}
-		
-		printf("%i %i @ %i %i\n", openCount, closedCount, itm->x, itm->y);
 
 		itm = next;
 	}
@@ -937,9 +968,6 @@ void generateLevel() {
 	TCOD_noise_t fog = getFogNoise();
 	TCOD_console_t dynamicLightConsole = getDynamicLightConsole();
 	character *player = getPlayer();
-	
-	printf("REMEMBER: Clear all rooms\n");
-	ROOMS = NULL;
 
 	EXIT_OPEN = 0;
 	EXIT_WAVE_DIST = 0;
@@ -957,6 +985,7 @@ void generateLevel() {
 		TCOD_console_clear(dynamicLightConsole);
 	}
 
+	deleteAllRooms();
 	deleteEnemies();
 	deleteAllOwnerlessItems();
 	
