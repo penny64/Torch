@@ -138,5 +138,9 @@ void playerInputLogic() {
 		_handlePlantTorch();
 	} else if (isCharPressed('c')) {
 		printf("%i, %i\n", PLAYER_ACTOR->x, PLAYER_ACTOR->y);
+	} else if (isCharPressed('d')) {
+		if (PLAYER_ACTOR && PLAYER_ACTOR->itemLight) {
+			PLAYER_ACTOR->itemLight->fuel = PLAYER_ACTOR->itemLight->fuelMax;
+		}
 	}
 }

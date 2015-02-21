@@ -121,7 +121,7 @@ room *createRoom(int id, int roomSize, unsigned int flags) {
 	{
 		for (i = 0; i < roomSize; i++)
 		{
-			rm->positionList[i] = malloc(sizeof *rm->positionList[i] * 2);
+			rm->positionList[i] = malloc(sizeof(int) * 2);
 		}
 	}
 
@@ -521,7 +521,7 @@ void findRooms() {
 			printf("Found new room: %i (%i)\n", ROOM_COUNT, oLen);
 		}
 	}
-	
+
 	ROOM_COUNT_MAX = ROOM_COUNT;
 }
 
