@@ -148,28 +148,36 @@ void plantTorch(character *actor) {
 }
 
 void _checkForItemCollisions(character *actor) {
-	item *ptr = getItems();
+	if (!actor) {
+		printf("PANIC\n");
+	}
+	
+	item *next, *ptr = getItems();
 
 	while (ptr != NULL) {
+		next = ptr->next;
+		
 		if (actor->x == ptr->x && actor->y == ptr->y) {
 			itemHandleCharacterCollision(ptr, actor);
 		}
 
-		ptr = ptr->next;
+		ptr = next;
 	}
 }
 
 int _checkForTouchedItemAndHandle(character *actor, int x, int y) {
-	item *ptr = getItems();
+	item *next, *ptr = getItems();
 
 	while (ptr != NULL) {
+		next = ptr->next;
+		
 		if (x == ptr->x && y == ptr->y) {
 			if (itemHandleCharacterTouch(ptr, actor)) {
 				return 1;
 			}
 		}
 
-		ptr = ptr->next;
+		ptr = next;
 	}
 	
 	return 0;
