@@ -47,3 +47,4 @@ float getExitWaveDistance(void);
 float *getEffectsMap(void);
 float getRandomFloat(float, float);
 room *createRoom(int, int, unsigned int);
+room *getRoomViaId(int);

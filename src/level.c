@@ -152,6 +152,22 @@ room *createRoom(int id, int roomSize, unsigned int flags) {
 	return rm;
 }
 
+room *getRoomViaId(int id) {
+	room *roomPtr = ROOMS;
+			
+	while (roomPtr) {
+		if (roomPtr->id == id) {
+			return roomPtr;
+		}
+		
+		roomPtr = roomPtr->next;
+	}
+	
+	printf("FATAL: Failed to return room of ID %i\n", id);
+	
+	return NULL;
+}
+
 void deleteRoom(room *rm) {
 	if (rm == ROOMS) {
 		ROOMS = rm->next;
@@ -202,6 +218,18 @@ int isRoomConnectedTo(room *srcRoom, room *dstRoom) {
 
 	for (i = 0; i <= srcRoom->numberOfConnectedRooms; i++) {
 		if (srcRoom->connectedRooms[i] == dstRoom->id) {
+			return 1;
+		}
+	}
+
+	return 0;
+}
+
+int isRoomConnectedToId(room *srcRoom, int dstRoomId) {
+	int i;
+
+	for (i = 0; i <= srcRoom->numberOfConnectedRooms; i++) {
+		if (srcRoom->connectedRooms[i] == dstRoomId) {
 			return 1;
 		}
 	}
@@ -535,7 +563,7 @@ void placeTunnels() {
 	int x, y, x1, y1, w_x, w_y, prev_w_x, prev_w_y, tunnelPlaced, mapUpdates, currentValue, neighborValue, lowestValue, index, lowestX, lowestY, invalid, randomRoomSize, dist;
 	int neighborCollision, banDoubleTunnels, srcRoomIndex, dstRoomIndex, startCount = 0, runCount = -1;
 	int ownsTunnels;//, openRoomList[MAX_ROOMS], closedRoomList[MAX_ROOMS], openListCount, closedListCount, inClosedList, inOpenList, i, ii, id;
-	room *lastSrcRoom = NULL, *lastDestRoom = NULL, *srcRoom = NULL, *dstRoom = NULL, *roomPtr;
+	room *tempRoom, *srcRoom = NULL, *dstRoom = NULL, *roomPtr;
 	
 	ROOM_COUNT = ROOM_COUNT_MAX;
 	
@@ -557,49 +585,30 @@ void placeTunnels() {
 		dstRoomIndex = -1;
 		
 		while (1) {
-			while (srcRoomIndex == dstRoomIndex) {
-				srcRoomIndex = getRandomInt(1, ROOM_COUNT_MAX);
+			//while (srcRoomIndex == dstRoomIndex) {
+			srcRoomIndex = getRandomInt(1, ROOM_COUNT_MAX);
+			srcRoom = getRoomViaId(srcRoomIndex);
+			//}
+			
+			//while (dstRoomIndex == -1 )
+			while (dstRoomIndex == -1 || isRoomConnectedToId(srcRoom, dstRoomIndex) || (dstRoom->flags & IS_TREASURE_ROOM && dstRoom->numberOfConnectedRooms)) {
 				dstRoomIndex = getRandomInt(1, ROOM_COUNT_MAX);
+				dstRoom = getRoomViaId(dstRoomIndex);
 			}
+			//dstRoomIndex = getRandomInt(1, ROOM_COUNT_MAX);
 			
-			roomPtr = ROOMS;
 			
-			//printf("Looking for: %i, %i\n", srcRoomIndex, dstRoomIndex);
 			
-			while (roomPtr) {
-				//printf("Looking at: %i\n", roomPtr->id);
-				
-				/*if (roomPtr->flags & IS_TREASURE_ROOM && roomPtr->numberOfConnectedRooms) {
-					roomPtr = roomPtr->next;
-					printf("Skip\n");
-					
-					continue;
-				} else {
-					printf("NO skip\n");
-				}*/
-				
-				if (roomPtr->id == srcRoomIndex) {
-					srcRoom = roomPtr;
-					
-					//printf("Set src room\n");
-				}
-				
-				if (roomPtr->id == dstRoomIndex) {
-					dstRoom = roomPtr;
-					
-					//printf("Set dst room\n");
-				}
-				
-				if (srcRoom && dstRoom) {
-					break;
-				}
-							
-				roomPtr = roomPtr->next;
-			}
 			
-			if (srcRoom && dstRoom) {
-				break;
-			}
+			printf("SHIT\n");
+			
+			//while (isRoomConnectedToId(dstRoom, srcRoomIndex)) {
+			//	srcRoomIndex = getRandomInt(1, ROOM_COUNT_MAX);
+				
+			//	continue;
+			//}
+			
+			break;
 		}
 
 		if (srcRoom == NULL) {
@@ -608,6 +617,10 @@ void placeTunnels() {
 		
 		if (dstRoom == NULL) {
 			printf("CRASH: No dst room\n");
+		}
+		
+		if (srcRoom->flags & IS_TREASURE_ROOM || dstRoom->flags & IS_TREASURE_ROOM) {
+			banDoubleTunnels = 1;
 		}
 		
 		for (y = 2; y < WINDOW_HEIGHT - 1; y++) {
