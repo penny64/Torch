@@ -43,6 +43,7 @@ character *createActor() {
 	_c->vx = 0;
 	_c->vy = 0;
 	_c->sightRange = 16;
+	_c->numberOfItems = 0;
 	_c->prev = NULL;
 	_c->next = NULL;
 	_c->itemLight = createDynamicLight(_c->x, _c->y, _c);
@@ -111,6 +112,24 @@ void deleteEnemies() {
 	}
 }
 
+void pickUpItem(character *actor, item *itm) {
+	itm->owner = actor;
+
+	actor->inventory[actor->numberOfItems] = itm;
+	actor->numberOfItems ++;
+}
+item *actorGetItemWithFlag(character *actor, unsigned int flag) {
+	int i;
+
+	for (i = 0; i < actor->numberOfItems; i ++) {
+		if (actor->inventory[i]->itemFlags & flag) {
+			return actor->inventory[i];
+		}
+	}
+
+	return NULL;
+}
+
 void _resetActorForNewLevel(character *actor) {
 	if (actor->fov) {
 		TCOD_map_delete(actor->fov);
@@ -169,6 +188,12 @@ int _checkForTouchedItemAndHandle(character *actor, int x, int y) {
 	item *next, *ptr = getItems();
 
 	while (ptr != NULL) {
+		if (ptr->owner) {
+			ptr = ptr->next;
+
+			continue;
+		}
+
 		next = ptr->next;
 		
 		if (x == ptr->x && y == ptr->y) {

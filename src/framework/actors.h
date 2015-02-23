@@ -1,6 +1,7 @@
 #include <stdlib.h>
 
 #include "libtcod.h"
+#include "../items.h"
 
 #ifndef ACTORS_H
 #define ACTORS_H
@@ -24,9 +25,10 @@ enum {
 typedef struct character character;
 
 struct character {
-	int x, y, vx, vy, hp, chr, sightRange;
+	int x, y, vx, vy, hp, chr, sightRange, numberOfItems;
 	struct character *next, *prev;
 	struct light *itemLight;
+	struct item *inventory[4];
 	unsigned int aiFlags, traitFlags;
 	TCOD_color_t foreColor, backColor;
 	TCOD_console_t fov;
@@ -46,3 +48,4 @@ void actorCleanup(void);
 void deleteEnemies(void);
 void plantTorch(character*);
 void killActor(character*);
+struct item *actorGetItemWithFlag(character*, unsigned int);

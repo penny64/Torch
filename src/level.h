@@ -6,12 +6,13 @@
 enum {
 	IS_TREASURE_ROOM = 0x01 << 0,
 	IS_TORCH_ROOM = 0x01 << 1,
+	IS_EXIT_ROOM = 0x01 << 2,
 } roomFlag_t;
 
 typedef struct room room;
 
 struct room {
-	int id, numberOfConnectedRooms, size, *connectedRooms, **positionList;
+	int id, centerX, centerY, numberOfConnectedRooms, size, *connectedRooms, **positionList;
 	unsigned int flags;
 	struct room *next, *prev;
 };

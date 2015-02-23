@@ -161,7 +161,7 @@ int getTotalNumberOfKeytorches() {
 	item *ptr = ITEMS;
 	
 	while (ptr != NULL) {
-		if (ptr->itemFlags & IS_KEY) {
+		if (ptr->itemFlags & IS_KEYTORCH) {
 			count ++;
 		}
 		
@@ -176,7 +176,7 @@ int getNumberOfLitKeytorches() {
 	item *ptr = ITEMS;
 	
 	while (ptr != NULL) {
-		if (ptr->itemFlags & IS_KEY && ptr->itemLight->fuel) {
+		if (ptr->itemFlags & IS_KEYTORCH && ptr->itemLight->fuel) {
 			count ++;
 		}
 		
@@ -249,6 +249,11 @@ int itemHandleCharacterTouch(item *itm, character *actor) {
 	
 	if (actor == player) {
 		if (itm->itemFlags & IS_DOOR) {
+			if (itm->itemFlags & NEEDS_KEY && !actorGetItemWithFlag(player, IS_KEY)) {
+				showMessage("%cThe door refuses to open...%c", 10);
+
+				return 0;
+			}
 			unblockPosition(itm->x, itm->y);
 			deleteItem(itm);
 			
@@ -273,7 +278,7 @@ void createBonfire(int x, int y) {
 }
 
 void createBonfireKeystone(int x, int y) {
-	item *itm = createItem(x, y, '!', TCOD_color_RGB(15, 15, 15), TCOD_color_RGB(55, 55, 55), IS_FUEL_SOURCE | IS_KEY);
+	item *itm = createItem(x, y, '!', TCOD_color_RGB(15, 15, 15), TCOD_color_RGB(55, 55, 55), IS_FUEL_SOURCE | IS_KEYTORCH);
 
 	light *lght = createDynamicLight(x, y, NULL);
 	itm->itemLight = lght;
@@ -315,7 +320,11 @@ void createExit(int x, int y) {
 }
 
 void createDoor(int x, int y) {
-	createItem(x, y, '#', TCOD_color_RGB(200, 175, 175), TCOD_color_RGB(140, 75, 75), IS_DOOR);
+	createItem(x, y, '#', TCOD_color_RGB(200, 175, 175), TCOD_color_RGB(140, 75, 75), IS_DOOR | NEEDS_KEY);
+}
+
+void createKey(int x, int y) {
+	createItem(x, y, '-', TCOD_color_RGB(30, 175, 175), TCOD_color_RGB(30, 75, 75), IS_KEY);
 }
 
 void enableDoor(item *itm) {
