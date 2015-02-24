@@ -4,6 +4,7 @@
 #include "framework/numbers.h"
 #include "framework/input.h"
 #include "libtcod.h"
+#include "level.h"
 #include "intro.h"
 
 
@@ -17,6 +18,9 @@ int FADE_IN = 1;
 
 void setupIntro() {
 	INTRO_CONSOLE = TCOD_console_new(WINDOW_WIDTH, WINDOW_HEIGHT);
+	
+	TCOD_console_set_default_background(INTRO_CONSOLE, TCOD_color_RGB(0, 0, 0));
+	TCOD_console_clear(INTRO_CONSOLE);
 }
 
 void showIntro() {
@@ -30,6 +34,7 @@ void introLoop() {
 }
 
 int drawIntro() {
+	int colorIndex;
 	inputLogic();
 
 	if (FADE_IN_TIMER < FADE_IN_TIMER_MAX) {
@@ -56,8 +61,22 @@ int drawIntro() {
 			INTRO_MODE_TIME --;
 		}
 	}
+	
+	colorIndex = getRandomInt(0, 2);
+	
+	/*if (INTRO_MODE_TIME > 2) {
+		if (colorIndex == 1) {
+			TCOD_console_set_color_control(TCOD_COLCTRL_3, TCOD_color_RGB(255, 255, 255), TCOD_color_RGB(10, 10, 255));
+		} else if (colorIndex == 2) {
+			TCOD_console_set_color_control(TCOD_COLCTRL_3, TCOD_color_RGB(255, 255, 255), TCOD_color_RGB(10, 255, 10));
+		} else {
+			TCOD_console_set_color_control(TCOD_COLCTRL_3, TCOD_color_RGB(255, 255, 255), TCOD_color_RGB(255, 10, 10));
+		}
+	} else {*/
+		TCOD_console_set_color_control(TCOD_COLCTRL_3, TCOD_color_RGB(255, 255, 255), TCOD_color_RGB(0, 0, 0));
+	//}
 
-	TCOD_console_print_ex(INTRO_CONSOLE, WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2, TCOD_BKGND_SET, TCOD_CENTER, "%cflagsdev. LLC%c", TCOD_COLCTRL_2, TCOD_COLCTRL_STOP);
+	TCOD_console_print_ex(INTRO_CONSOLE, WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2, TCOD_BKGND_SET, TCOD_CENTER, "%cflagsdev. LLC%c", TCOD_COLCTRL_3, TCOD_COLCTRL_STOP);
 	TCOD_console_set_fade(clip(FADE_IN_VALUE, 0, 255), TCOD_color_RGB(0, 0, 0));
 	TCOD_console_blit(INTRO_CONSOLE, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, NULL, 0, 0, 1, 1);
 	TCOD_console_flush();

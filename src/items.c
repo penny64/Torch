@@ -189,6 +189,10 @@ int getNumberOfLitKeytorches() {
 //WARNING: If you delete an item, RETURN.
 void itemHandleCharacterCollision(item *itm, character *actor) {
 	character *player = getPlayer();
+	
+	if (itm->owner) {
+		return;
+	}
 
 	if (itm->itemFlags & IS_FUEL_SOURCE && actor->itemLight) {
 		actor->itemLight->fuel = actor->itemLight->fuelMax;
@@ -240,6 +244,10 @@ void itemHandleCharacterCollision(item *itm, character *actor) {
 			} else {
 				exitLevel();
 			}
+		}
+		
+		if (itm->itemFlags & CAN_PICK_UP) {
+			pickUpItem(actor, itm);
 		}
 	}
 }
@@ -324,7 +332,7 @@ void createDoor(int x, int y) {
 }
 
 void createKey(int x, int y) {
-	createItem(x, y, '-', TCOD_color_RGB(30, 175, 175), TCOD_color_RGB(30, 75, 75), IS_KEY);
+	createItem(x, y, '-', TCOD_color_RGB(30, 175, 175), TCOD_color_RGB(30, 75, 75), IS_KEY | CAN_PICK_UP);
 }
 
 void enableDoor(item *itm) {

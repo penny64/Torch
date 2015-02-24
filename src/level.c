@@ -366,7 +366,7 @@ void carve(int x, int y) {
 
 	TCOD_map_t existingLevel = copyLevelMap();
 	
-	for (i = 0; i < TCOD_random_get_int(RANDOM, 9, 12); i++) {
+	for (i = 0; i < TCOD_random_get_int(RANDOM, 9, 12 + getRandomInt(5, 44)); i++) {
 		for (ii = 0; ii <= 0; ii++) { //Useless
 			for (y1 = -1 - ii; y1 <= 1 + ii; y1++) {
 				for (x1 = -1 - ii; x1 <= 1 + ii; x1++) {
@@ -1011,7 +1011,7 @@ void colorRooms() {
 }
 
 void generateLevel() {
-	int x, y, i, ii, foundPlot, plotDist, plotPoints[MAX_ROOMS][2];
+	int x, y, i, ii, spawnIndex, foundPlot, plotDist, plotPoints[MAX_ROOMS][2];
 	float fogValue, colorMod;
 	float p[2];
 	room *roomPtr, *startingRoom = NULL;
@@ -1065,10 +1065,10 @@ void generateLevel() {
 		carve(x, y);
 	}
 
+	smooth();
 	findRooms();
 	placeTunnels();
-	smooth();
-	cleanUpDoors();
+	//cleanUpDoors();
 	activateDoors();
 	generatePuzzles();
 
@@ -1089,8 +1089,9 @@ void generateLevel() {
 		player->x = startingRoom->centerX;
 		player->y = startingRoom->centerY;
 		player->vx = 1;
-
-		createKey(player->x+2, player->y);
+		
+		spawnIndex = getRandomInt(0, startingRoom->size - 1);
+		createKey(startingRoom->positionList[spawnIndex][0], startingRoom->positionList[spawnIndex][1]);
 		
 		printf("Spawning at %i, %i\n", player->x, player->y);
 	}
@@ -1101,7 +1102,8 @@ void generateLevel() {
 			//createVoidWorm(player->x + 1, player->y + 1);
 			//showMessage("%cSomething watches from the shadows...%c", 10);
 		} else {
-			createBonfire(player->x, player->y);
+			spawnIndex = getRandomInt(0, startingRoom->size - 1);
+			createBonfire(startingRoom->positionList[spawnIndex][0], startingRoom->positionList[spawnIndex][1]);
 		}
 	}
 

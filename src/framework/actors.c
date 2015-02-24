@@ -117,6 +117,10 @@ void pickUpItem(character *actor, item *itm) {
 
 	actor->inventory[actor->numberOfItems] = itm;
 	actor->numberOfItems ++;
+	
+	if (actor == getPlayer()) {
+		showMessage("%cPicked up item.%c", 10);
+	}
 }
 item *actorGetItemWithFlag(character *actor, unsigned int flag) {
 	int i;
