@@ -558,13 +558,13 @@ void findRooms() {
 				ROOM_MAP[x][y] = ROOM_COUNT;
 			}
 
-			if (ROOM_COUNT == ROOM_COUNT_MAX) {
+			/*if (ROOM_COUNT == ROOM_COUNT_MAX) {
 				roomFlags = IS_TREASURE_ROOM;
 			} else if (getRandomInt(0, 2)) {
 				roomFlags = IS_TORCH_ROOM | IS_EXIT_ROOM;
-			}
+			}*/
 
-			createRoom(ROOM_COUNT, oLen, roomFlags);
+			createRoom(ROOM_COUNT, oLen, 0x0);
 
 			printf("Found new room: %i (%i)\n", ROOM_COUNT, oLen);
 		}
@@ -835,12 +835,14 @@ void placeTunnels() {
 			createDoor(prev_w_x, prev_w_y);
 		}
 
-		printf("Connecting rooms: %i, %i\n", srcRoom->id, dstRoom->id);
+		if (ROOM_MAP[w_x][w_y] == dstRoom->id) {
+			printf("Connecting rooms: %i, %i\n", srcRoom->id, dstRoom->id);
 
-		connectRooms(srcRoom, dstRoom);
+			connectRooms(srcRoom, dstRoom);
 
-		if (srcRoom->numberOfConnectedRooms == ROOM_COUNT_MAX - 1) {
-			break;
+			if (srcRoom->numberOfConnectedRooms == ROOM_COUNT_MAX - 1) {
+				break;
+			}
 		}
 	}
 }
@@ -850,11 +852,40 @@ void placeItemChest() {
 }
 
 void generatePuzzles() {
+	int spawnIndex, exitPlaced = 0, treasureRooms = 0;
 	room *roomPtr = ROOMS;
 
 	while (roomPtr) {
+		if (!exitPlaced && roomPtr->size <= 80) {
+			roomPtr->flags = roomPtr->flags | IS_EXIT_ROOM;
+
+			exitPlaced = 1;
+		}
+
+		if (roomPtr->size <= 100) {
+			roomPtr->flags = roomPtr->flags | IS_TORCH_ROOM;
+		}
+
+		if (roomPtr->size <= 60 + (treasureRooms * 40)) {
+			roomPtr->flags = roomPtr->flags | IS_TREASURE_ROOM;
+		}
+
+		roomPtr = roomPtr->next;
+	}
+
+	roomPtr = ROOMS;
+
+	while (roomPtr) {
 		if (roomPtr->flags & IS_TORCH_ROOM) {
-			createBonfireKeystone(roomPtr->centerX, roomPtr->centerY);
+			spawnIndex = getRandomInt(0, roomPtr->size - 1);
+
+			createBonfireKeystone(roomPtr->positionList[spawnIndex][0], roomPtr->positionList[spawnIndex][1]);
+		}
+
+		if (roomPtr->flags & IS_TREASURE_ROOM) {
+			spawnIndex = getRandomInt(0, roomPtr->size - 1);
+
+			createTreasure(roomPtr->positionList[spawnIndex][0], roomPtr->positionList[spawnIndex][1]);
 		}
 
 		roomPtr = roomPtr->next;
@@ -942,17 +973,17 @@ void colorRooms() {
 		if (roomPtr->flags & IS_TREASURE_ROOM) {
 			r = 235;
 			g = 105;
-			b = 255;
+			b = 105;
 
-			gMod = 70;
+			rMod = 70;
 		} else if (roomPtr->flags & IS_TORCH_ROOM) {
 			r = 140 - RED_SHIFT;
-			g = 140;
+			g = 0;
 			b = 140;
 
 			rMod = 70;
 			gMod = 70;
-			bMod = 70;
+			bMod = 170;
 		} else if (roomPtr->flags & IS_EXIT_ROOM) {
 			r = 10;
 			g = 10;
@@ -1067,10 +1098,10 @@ void generateLevel() {
 
 	smooth();
 	findRooms();
+	generatePuzzles();
 	placeTunnels();
 	//cleanUpDoors();
 	activateDoors();
-	generatePuzzles();
 
 	drawLights();
 	drawDynamicLights();

@@ -328,7 +328,7 @@ void createExit(int x, int y) {
 }
 
 void createDoor(int x, int y) {
-	createItem(x, y, '#', TCOD_color_RGB(200, 175, 175), TCOD_color_RGB(140, 75, 75), IS_DOOR | NEEDS_KEY);
+	createItem(x, y, '#', TCOD_color_RGB(50, 175, 175), TCOD_color_RGB(50, 75, 75), IS_DOOR | NEEDS_KEY);
 }
 
 void createKey(int x, int y) {
