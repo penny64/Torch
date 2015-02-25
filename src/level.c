@@ -575,7 +575,7 @@ void findRooms() {
 
 void placeTunnels() {
 	int x, y, x1, y1, w_x, w_y, prev_w_x, prev_w_y, tunnelPlaced, mapUpdates, currentValue, neighborValue, lowestValue, index, lowestX, lowestY, invalid, randomRoomSize, dist;
-	int neighborCollision, banDoubleTunnels, srcRoomIndex, dstRoomIndex, startCount = 0, runCount = -1;
+	int numberOfFailedAttemptsToFindADestRoom, neighborCollision, banDoubleTunnels, srcRoomIndex, dstRoomIndex, startCount = 0, runCount = -1;
 	int doorPlaced, ownsTunnels;//, openRoomList[MAX_ROOMS], closedRoomList[MAX_ROOMS], openListCount, closedListCount, inClosedList, inOpenList, i, ii, id;
 	room *tempRoom, *srcRoom = NULL, *dstRoom = NULL, *roomPtr;
 	
@@ -597,14 +597,25 @@ void placeTunnels() {
 		dstRoom = NULL;
 		srcRoomIndex = -1;
 		dstRoomIndex = -1;
-		
+
 		while (1) {
 			srcRoomIndex = getRandomInt(1, ROOM_COUNT_MAX);
 			srcRoom = getRoomViaId(srcRoomIndex);
+			numberOfFailedAttemptsToFindADestRoom = 0;
 
-			while (dstRoomIndex == -1 || isRoomConnectedToId(srcRoom, dstRoomIndex) || (dstRoom->flags & IS_TREASURE_ROOM && dstRoom->numberOfConnectedRooms)) {
+			while (dstRoomIndex == -1 || isRoomConnectedToId(srcRoom, dstRoomIndex)) {
 				dstRoomIndex = getRandomInt(1, ROOM_COUNT_MAX);
 				dstRoom = getRoomViaId(dstRoomIndex);
+
+				if (numberOfFailedAttemptsToFindADestRoom < 5) {
+					numberOfFailedAttemptsToFindADestRoom ++;
+				} else {
+					break;
+				}
+			}
+
+			if (numberOfFailedAttemptsToFindADestRoom == 5) {
+				continue;
 			}
 			
 			break;
@@ -775,7 +786,7 @@ void placeTunnels() {
 					if (DIJKSTRA_MAP[w_x + x1][w_y + y1] == -1) {
 						continue;
 					}
-					
+
 					if (DIJKSTRA_MAP[w_x + x1][w_y + y1] < lowestValue) {
 						lowestValue = DIJKSTRA_MAP[w_x + x1][w_y + y1];
 						lowestX = w_x + x1;
@@ -790,7 +801,7 @@ void placeTunnels() {
 			w_y = lowestY;
 
 			//printf("Walking to %i, %i (lowest=%i) (prev=%i, %i)\n", w_x, w_y, lowestValue, prev_w_x, prev_w_y);
-			
+
 			randomRoomSize = 1;//clip(TCOD_random_get_int(RANDOM, minRoomSize, maxRoomSize), 1, 255);
 			
 			for (y1 = -16; y1 <= 16; y1++) {
@@ -843,6 +854,8 @@ void placeTunnels() {
 			if (srcRoom->numberOfConnectedRooms == ROOM_COUNT_MAX - 1) {
 				break;
 			}
+		} else {
+			printf("A possible bad path...?\n");
 		}
 	}
 }
@@ -1099,6 +1112,7 @@ void generateLevel() {
 	smooth();
 	findRooms();
 	generatePuzzles();
+	
 	placeTunnels();
 	//cleanUpDoors();
 	activateDoors();

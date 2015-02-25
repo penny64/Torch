@@ -142,5 +142,7 @@ void playerInputLogic() {
 		if (PLAYER_ACTOR && PLAYER_ACTOR->itemLight) {
 			PLAYER_ACTOR->itemLight->fuel = PLAYER_ACTOR->itemLight->fuelMax;
 		}
+	} else if (isCharPressed('z')) {
+		PLAYER_ACTOR->hp = 0;
 	}
 }
