@@ -156,7 +156,7 @@ void applyFov() {
 					distToExitWave = 25.f - clipFloat(25.f * labs(distanceFloat(x, y, player->x, player->y) - exitWaveDistance), 0.f, 25.f);
 					distToExitWave = distToExitWave / 25.f;
 
-					effectsMap[x][y] = clipFloat((effectsMap[x][y] + getRandomFloat(-.03, .03) + distToExitWave), .85, 1.25);
+					effectsMap[x][y] = clipFloat((effectsMap[x][y] + getRandomFloat(-.03, .03) + distToExitWave), .85, 1.05);
 				} else {
 					effectsMap[x][y] = clipFloat(effectsMap[x][y] + getRandomFloat(-.01, .01), .65, .8);
 				}

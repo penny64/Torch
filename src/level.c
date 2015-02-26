@@ -875,12 +875,14 @@ void generatePuzzles() {
 			exitPlaced = 1;
 		}
 
-		if (roomPtr->size <= 100) {
+		if (roomPtr->size >= 45 && roomPtr->size <= 80) {
 			roomPtr->flags = roomPtr->flags | IS_TORCH_ROOM;
 		}
 
-		if (roomPtr->size <= 60 + (treasureRooms * 40)) {
+		if (roomPtr->size >= 75 + (treasureRooms * 50)) {
 			roomPtr->flags = roomPtr->flags | IS_TREASURE_ROOM;
+
+			treasureRooms ++;
 		}
 
 		roomPtr = roomPtr->next;
@@ -905,6 +907,25 @@ void generatePuzzles() {
 	}
 
 	placeItemChest();
+}
+
+void spawnEnemies() {
+	int x, y, spawnIndex;
+	room *roomPtr = ROOMS;
+
+	while (roomPtr) {
+		spawnIndex = getRandomInt(0, roomPtr->size - 1);
+		x = roomPtr->positionList[spawnIndex][0];
+		y = roomPtr->positionList[spawnIndex][1];
+
+		if (roomPtr->flags & IS_TREASURE_ROOM) {
+			createBat(x, y);
+		} else if (roomPtr->flags & IS_TORCH_ROOM) {
+		} else if (roomPtr->flags & IS_EXIT_ROOM) {
+		}
+
+		roomPtr = roomPtr->next;
+	}
 }
 
 void cleanUpDoors() {
@@ -984,11 +1005,11 @@ void colorRooms() {
 		bMod = 0;
 
 		if (roomPtr->flags & IS_TREASURE_ROOM) {
-			r = 235;
-			g = 105;
-			b = 105;
+			r = 255;
+			g = 255;
+			b = 0;
 
-			rMod = 70;
+			bMod = 170;
 		} else if (roomPtr->flags & IS_TORCH_ROOM) {
 			r = 140 - RED_SHIFT;
 			g = 0;
@@ -1002,11 +1023,10 @@ void colorRooms() {
 			g = 10;
 			b = 10;
 
-			rMod = 70;
+			rMod = 250;
 			gMod = 70;
 			bMod = 70;
-		}
-		else if (roomPtr->numberOfConnectedRooms > 3) {
+		} else if (roomPtr->numberOfConnectedRooms > 3) {
 			r = 205 - RED_SHIFT;
 			g = 205;
 			b = 255;
@@ -1022,22 +1042,6 @@ void colorRooms() {
 		for (i = 0; i < roomPtr->size; i ++) {
 			x = roomPtr->positionList[i][0];
 			y = roomPtr->positionList[i][1];
-
-			/*if (roomPtr->numberOfConnectedRooms > 2) {
-
-				printf("%i, %i\n", x, y);
-
-				if (!y % 2) {
-					printf("FUCKKKKKKK!, %i\n", y % 2);
-					rMod = 0;
-					bMod = 250;
-					gMod = 255;
-				} else {
-					rMod = 0;
-					bMod = 0;
-					gMod = 0;
-				}
-			}*/
 
 			drawCharBackEx(LEVEL_CONSOLE, x, y, TCOD_color_RGB(clip(r + RED_SHIFT + getRandomInt(0, rMod), 0, 255), clip(g + getRandomInt(0, gMod), 0, 255), clip(b + getRandomInt(0, bMod), 0, 255)), TCOD_BKGND_SET);
 		}
@@ -1112,12 +1116,13 @@ void generateLevel() {
 	smooth();
 	findRooms();
 	generatePuzzles();
-	
+	spawnEnemies();
+
 	placeTunnels();
 	//cleanUpDoors();
 	activateDoors();
 
-	drawLights();
+	//drawLights();
 	drawDynamicLights();
 	colorRooms();
 	
@@ -1125,6 +1130,10 @@ void generateLevel() {
 		roomPtr = ROOMS;
 
 		while (roomPtr) {
+			if (roomPtr->flags & IS_TREASURE_ROOM) {
+				roomPtr = roomPtr->next;
+			}
+
 			if (!startingRoom || roomPtr->numberOfConnectedRooms > startingRoom->numberOfConnectedRooms) {
 				startingRoom = roomPtr;
 			}
