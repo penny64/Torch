@@ -468,7 +468,6 @@ void smooth() {
 
 void findRooms() {
 	int i, x, y, x1, y1, w_x, w_y, oLen, cLen, added = 1;
-	unsigned int roomFlags = 0x0;
 	ROOM_COUNT = 0;
 
 	for (y = 0; y <= WINDOW_HEIGHT; y++) {
@@ -577,7 +576,7 @@ void placeTunnels() {
 	int x, y, x1, y1, w_x, w_y, prev_w_x, prev_w_y, tunnelPlaced, mapUpdates, currentValue, neighborValue, lowestValue, index, lowestX, lowestY, invalid, randomRoomSize, dist;
 	int numberOfFailedAttemptsToFindADestRoom, neighborCollision, banDoubleTunnels, srcRoomIndex, dstRoomIndex, startCount = 0, runCount = -1;
 	int doorPlaced, destDoorPlaced, ownsTunnels;//, openRoomList[MAX_ROOMS], closedRoomList[MAX_ROOMS], openListCount, closedListCount, inClosedList, inOpenList, i, ii, id;
-	room *tempRoom, *srcRoom = NULL, *dstRoom = NULL, *roomPtr;
+	room *srcRoom = NULL, *dstRoom = NULL;
 	
 	ROOM_COUNT = ROOM_COUNT_MAX;
 	

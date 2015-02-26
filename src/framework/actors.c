@@ -230,8 +230,6 @@ int _checkIfPositionLit(character *actor) {
 }
 
 void _actorAi(character *actor) {
-	int x1, y1;
-
 	if (actor->aiFlags & RANDOM_WALK) {
 		actor->vx += getRandomInt(-1, 1);
 		actor->vy += getRandomInt(-1, 1);

@@ -50,4 +50,5 @@ void actorCleanup(void);
 void deleteEnemies(void);
 void plantTorch(character*);
 void killActor(character*);
+void pickUpItem(character*, struct item*);
 struct item *actorGetItemWithFlag(character*, unsigned int);
