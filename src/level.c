@@ -892,7 +892,10 @@ void generatePuzzles() {
 	while (roomPtr) {
 		if (!exitPlaced && roomPtr->size <= 80) {
 			roomPtr->flags = roomPtr->flags | IS_EXIT_ROOM;
+			spawnIndex = getRandomInt(0, roomPtr->size - 1);
 
+			EXIT_LOCATION[0] = roomPtr->positionList[spawnIndex][0];
+			EXIT_LOCATION[1] = roomPtr->positionList[spawnIndex][1];
 			exitPlaced = 1;
 		}
 
