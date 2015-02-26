@@ -950,9 +950,9 @@ void spawnEnemies() {
 
 		if (roomPtr->flags & IS_TREASURE_ROOM) {
 			createBat(x, y);
-		} else if (numberOfVoidWorms < maxNumberOfVoidWorms && roomPtr->flags & IS_TORCH_ROOM) {
+		} else if (numberOfVoidWorms < maxNumberOfVoidWorms) {
 			createVoidWorm(x, y);
-			
+
 			numberOfVoidWorms ++;
 		} else if (roomPtr->flags & IS_EXIT_ROOM) {
 		}
