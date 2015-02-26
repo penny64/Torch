@@ -934,8 +934,14 @@ void generatePuzzles() {
 }
 
 void spawnEnemies() {
-	int x, y, spawnIndex, numberOfVoidWorms = 0;
+	int x, y, spawnIndex, maxNumberOfVoidWorms, numberOfVoidWorms = 0;
 	room *roomPtr = ROOMS;
+
+	if (LEVEL_NUMBER >= 2) {
+		maxNumberOfVoidWorms = 2;
+	} else {
+		maxNumberOfVoidWorms = 1;
+	}
 
 	while (roomPtr) {
 		spawnIndex = getRandomInt(0, roomPtr->size - 1);
@@ -944,8 +950,9 @@ void spawnEnemies() {
 
 		if (roomPtr->flags & IS_TREASURE_ROOM) {
 			createBat(x, y);
-		} else if (numberOfVoidWorms < 2 && roomPtr->flags & IS_TORCH_ROOM) {
+		} else if (numberOfVoidWorms < maxNumberOfVoidWorms && roomPtr->flags & IS_TORCH_ROOM) {
 			createVoidWorm(x, y);
+			
 			numberOfVoidWorms ++;
 		} else if (roomPtr->flags & IS_EXIT_ROOM) {
 		}
