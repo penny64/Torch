@@ -30,11 +30,32 @@ void createVoidWorm(int x, int y) {
 	actor->y = y;
 	actor->hp = 15;
 	actor->sightRange = 12;
-	actor->aiFlags = WORM_WALK | DROP_VOID_ON_DEATH;
+	actor->aiFlags = IS_VOID_WORM | RANDOM_WALK | DROP_VOID_ON_DEATH | IS_IMMUNE_TO_DARKNESS;
 	actor->chr = (int)'O';
-	actor->foreColor = TCOD_color_RGB(205, 25, 25);
+	actor->foreColor = TCOD_color_RGB(25, 205, 25);
 	actor->itemLight->r_tint = 125;
-	actor->itemLight->size = 4;
+	actor->itemLight->b_tint = 125;
+	actor->itemLight->size = 6;
 	actor->itemLight->fuelMax = 99999;
 	actor->itemLight->fuel = actor->itemLight->fuelMax;
+}
+
+void createVoidWormTail(int x, int y) {
+	character *actor = createActor();
+
+	actor->x = x;
+	actor->y = y;
+	actor->hp = 5;
+	actor->sightRange = 0;
+	actor->aiFlags = 0x0;
+	actor->chr = (int)'o';
+	actor->foreColor = TCOD_color_RGB(15, 100, 15);
+	deleteDynamicLight(actor->itemLight);
+	actor->itemLight = NULL;
+	/*actor->itemLight->r_tint = 0;
+	actor->itemLight->g_tint = 255;
+	actor->itemLight->b_tint = 0;
+	actor->itemLight->size = 4;
+	actor->itemLight->fuelMax = 12;
+	actor->itemLight->fuel = actor->itemLight->fuelMax;*/
 }

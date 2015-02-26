@@ -576,7 +576,7 @@ void findRooms() {
 void placeTunnels() {
 	int x, y, x1, y1, w_x, w_y, prev_w_x, prev_w_y, tunnelPlaced, mapUpdates, currentValue, neighborValue, lowestValue, index, lowestX, lowestY, invalid, randomRoomSize, dist;
 	int numberOfFailedAttemptsToFindADestRoom, neighborCollision, banDoubleTunnels, srcRoomIndex, dstRoomIndex, startCount = 0, runCount = -1;
-	int doorPlaced, ownsTunnels;//, openRoomList[MAX_ROOMS], closedRoomList[MAX_ROOMS], openListCount, closedListCount, inClosedList, inOpenList, i, ii, id;
+	int doorPlaced, destDoorPlaced, ownsTunnels;//, openRoomList[MAX_ROOMS], closedRoomList[MAX_ROOMS], openListCount, closedListCount, inClosedList, inOpenList, i, ii, id;
 	room *tempRoom, *srcRoom = NULL, *dstRoom = NULL, *roomPtr;
 	
 	ROOM_COUNT = ROOM_COUNT_MAX;
@@ -647,7 +647,6 @@ void placeTunnels() {
 			}
 		}
 
-		//Find our first room
 		for (y = 2; y < WINDOW_HEIGHT - 1; y++) {
 			for (x = 2; x < WINDOW_WIDTH - 1; x++) {
 				invalid = 0;
@@ -767,6 +766,7 @@ void placeTunnels() {
 
 		tunnelPlaced = 0;
 		doorPlaced = 0;
+		destDoorPlaced = 0;
 		
 		while (DIJKSTRA_MAP[w_x][w_y]) {
 			lowestValue = DIJKSTRA_MAP[w_x][w_y];
@@ -840,18 +840,40 @@ void placeTunnels() {
 					tunnelPlaced = 1;
 				}
 			}
+
+			if (dstRoom->flags & IS_TREASURE_ROOM && !destDoorPlaced) {
+				for (y1 = -1; y1 <= 1; y1++) {
+					for (x1 = -1; x1 <= 1; x1++) {
+						if (!x1 && !y1) {
+							continue;
+						}
+
+						if (ROOM_MAP[w_x + x1][w_y + y1] == dstRoom->id) {
+							createDoor(w_x, w_y);
+
+							destDoorPlaced = 1;
+
+							break;
+						}
+					}
+
+					if (destDoorPlaced) {
+						break;
+					}
+				}
+			}
 		}
 
-		if (tunnelPlaced && dstRoom->flags & IS_TREASURE_ROOM) {
-			createDoor(prev_w_x, prev_w_y);
-		}
+		//if (tunnelPlaced && dstRoom->flags & IS_TREASURE_ROOM) {
+		//	createDoor(prev_w_x, prev_w_y);
+		//}
 
 		if (ROOM_MAP[w_x][w_y] == dstRoom->id) {
 			printf("Connecting rooms: %i, %i\n", srcRoom->id, dstRoom->id);
 
 			connectRooms(srcRoom, dstRoom);
 
-			if (srcRoom->numberOfConnectedRooms == ROOM_COUNT_MAX - 1) {
+			if (srcRoom->numberOfConnectedRooms == ROOM_COUNT_MAX) {
 				break;
 			}
 		} else {
@@ -910,7 +932,7 @@ void generatePuzzles() {
 }
 
 void spawnEnemies() {
-	int x, y, spawnIndex;
+	int x, y, spawnIndex, numberOfVoidWorms = 0;
 	room *roomPtr = ROOMS;
 
 	while (roomPtr) {
@@ -920,7 +942,9 @@ void spawnEnemies() {
 
 		if (roomPtr->flags & IS_TREASURE_ROOM) {
 			createBat(x, y);
-		} else if (roomPtr->flags & IS_TORCH_ROOM) {
+		} else if (numberOfVoidWorms < 2 && roomPtr->flags & IS_TORCH_ROOM) {
+			createVoidWorm(x, y);
+			numberOfVoidWorms ++;
 		} else if (roomPtr->flags & IS_EXIT_ROOM) {
 		}
 

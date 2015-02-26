@@ -10,6 +10,7 @@
 #include "logging.h"
 #include "actors.h"
 #include "draw.h"
+#include "../enemies.h"
 
 
 TCOD_console_t ACTOR_CONSOLE;
@@ -229,6 +230,8 @@ int _checkIfPositionLit(character *actor) {
 }
 
 void _actorAi(character *actor) {
+	int x1, y1;
+
 	if (actor->aiFlags & RANDOM_WALK) {
 		actor->vx += getRandomInt(-1, 1);
 		actor->vy += getRandomInt(-1, 1);
@@ -237,7 +240,6 @@ void _actorAi(character *actor) {
 		//a linked list containing AI states per AI type
 
 		//TODO: Move to its own function
-
 		character *player = getPlayer();
 
 		if (!player) {
@@ -247,7 +249,6 @@ void _actorAi(character *actor) {
 		if (TCOD_map_is_in_fov(actor->fov, player->x, player->y)) {
 			printf("Player is visible!\n");
 		}
-
 	}
 }
 
@@ -290,6 +291,10 @@ void _actorLogic(character *actor) {
 		}
 	} else if (actor->vx || actor->vy) {
 		if (isPositionWalkable(nx, ny)) {
+			if (actor->aiFlags & IS_VOID_WORM) {
+				createVoidWormTail(actor->x, actor->y);
+			}
+
 			actor->x = nx;
 			actor->y = ny;
 
@@ -302,7 +307,7 @@ void _actorLogic(character *actor) {
 	}
 
 	_checkForItemCollisions(actor);
-	if (_checkIfPositionLit(actor)) {
+	if (!actor->aiFlags & IS_IMMUNE_TO_DARKNESS && _checkIfPositionLit(actor)) {
 		return;
 	}
 	

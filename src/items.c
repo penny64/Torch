@@ -194,24 +194,6 @@ void itemHandleCharacterCollision(item *itm, character *actor) {
 		return;
 	}
 
-	if (itm->itemFlags & IS_FUEL_SOURCE && actor->itemLight) {
-		actor->itemLight->fuel = actor->itemLight->fuelMax;
-
-		if (actor == player) {
-			if (itm->itemLight && actor->itemLight && actor->itemLight->fuel) {
-				if (!itm->itemLight->fuel) {
-					showMessage("%cBonfire rekindled. Torch has x fuel remaining.%c", 10);
-				} else {
-					showMessage("%cTorch rekindled. Bonfire has x fuel remaining.%c", 10);
-				}
-
-				itm->itemLight->fuel = itm->itemLight->fuelMax;
-				itm->foreColor = TCOD_color_RGB(255, 255, 155);
-				itm->backColor = TCOD_color_RGB(155, 155, 155);
-			}
-		}
-	}
-
 	if (actor->itemLight && itm->itemFlags & IS_SINGLE_USE_FUEL_SOURCE && itm->itemLight) {
 		if (actor == player) {
 			actor->itemLight->fuel = actor->itemLight->fuelMax;
@@ -267,6 +249,24 @@ int itemHandleCharacterTouch(item *itm, character *actor) {
 			
 			return 1;
 		}
+
+		if (itm->itemFlags & IS_FUEL_SOURCE && actor->itemLight) {
+			actor->itemLight->fuel = actor->itemLight->fuelMax;
+
+			if (actor == player) {
+				if (itm->itemLight && actor->itemLight && actor->itemLight->fuel) {
+					if (!itm->itemLight->fuel) {
+						showMessage("%cBonfire rekindled. Torch has x fuel remaining.%c", 10);
+					} else {
+						showMessage("%cTorch rekindled. Bonfire has x fuel remaining.%c", 10);
+					}
+
+					itm->itemLight->fuel = itm->itemLight->fuelMax;
+					itm->foreColor = TCOD_color_RGB(255, 255, 155);
+					itm->backColor = TCOD_color_RGB(155, 155, 155);
+				}
+			}
+		}
 	}
 	
 	return 0;
@@ -296,6 +296,8 @@ void createBonfireKeystone(int x, int y) {
 	lght->fuel = 0;
 	lght->fuelMax = 280;
 	lght->size = 7;
+
+	blockPosition(itm->x, itm->y);
 }
 
 void createUnkindledBonfire(int x, int y) {
@@ -304,6 +306,8 @@ void createUnkindledBonfire(int x, int y) {
 	itm->itemLight = lght;
 	lght->fuel = 0;
 	lght->fuelMax = 120;
+
+	blockPosition(itm->x, itm->y);
 }
 
 void createPlantedTorch(int x, int y, light *lght) {
