@@ -359,8 +359,8 @@ void killActor(character *actor) {
 		if (actor->aiFlags & DROP_LIGHT_ON_DEATH) {
 			actor->itemLight->owner = NULL;
 
-			if (actor->itemLight->fuel > (int)(actor->itemLight->fuelMax * .25f)) {
-				actor->itemLight->fuel = (int)(actor->itemLight->fuelMax * .25f);
+			if (actor->itemLight->fuel > 25) {
+				actor->itemLight->fuel = 25;
 			}
 		} else {
 			deleteDynamicLight(actor->itemLight);
