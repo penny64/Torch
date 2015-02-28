@@ -43,6 +43,8 @@ character *createActor() {
 	_c->y = WINDOW_HEIGHT / 2;
 	_c->vx = 0;
 	_c->vy = 0;
+	_c->speed = 0;
+	_c->maxSpeed = 1;
 	_c->sightRange = 16;
 	_c->numberOfItems = 0;
 	_c->prev = NULL;
@@ -230,9 +232,16 @@ int _checkIfPositionLit(character *actor) {
 }
 
 void _actorAi(character *actor) {
+	if (actor->speed) {
+		return;
+	}
+	
 	if (actor->aiFlags & RANDOM_WALK) {
 		actor->vx += getRandomInt(-1, 1);
 		actor->vy += getRandomInt(-1, 1);
+		
+		actor->speed = actor->maxSpeed;
+		actor->turns = 1;
 	} else if (actor->aiFlags & WORM_WALK) {
 		//TODO: Potentially store AI info in a different struct,
 		//a linked list containing AI states per AI type
@@ -259,6 +268,19 @@ void _actorLogic(character *actor) {
 	int hitActor = 0;
 	int nx = actor->x + actor->vx;
 	int ny = actor->y + actor->vy;
+	
+	if (!actor->turns) {
+		return;
+	}
+	
+	if (actor->speed > 1) {
+		actor->speed --;
+		
+		return;
+	}
+	
+	actor->turns = 0;
+	actor->speed = 0;
 	
 	while (ptr != NULL) {
 		if (ptr == actor || ptr->hp <= 0) {

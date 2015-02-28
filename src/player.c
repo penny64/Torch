@@ -145,4 +145,11 @@ void playerInputLogic() {
 	} else if (isCharPressed('z')) {
 		PLAYER_ACTOR->hp = 0;
 	}
+	
+	if (PLAYER_ACTOR->vx || PLAYER_ACTOR->vy) {
+		if (!PLAYER_ACTOR->speed) {
+			PLAYER_ACTOR->speed = PLAYER_ACTOR->maxSpeed;
+			PLAYER_ACTOR->turns = 1;
+		}
+	}
 }
