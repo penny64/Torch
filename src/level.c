@@ -108,6 +108,7 @@ room *createRoom(int id, int roomSize, unsigned int flags) {
 	rm->id = id;
 	rm->size = roomSize;
 	rm->numberOfConnectedRooms = 0;
+	rm->numberOfDoorPositions = 0;
 	rm->flags = flags;
 	rm->prev = NULL;
 	rm->next = NULL;
@@ -122,6 +123,15 @@ room *createRoom(int id, int roomSize, unsigned int flags) {
 		for (i = 0; i < roomSize; i++)
 		{
 			rm->positionList[i] = malloc(sizeof(int) * 2);
+		}
+	}
+	
+	rm->doorPositions = malloc(sizeof *rm->doorPositions * roomSize);
+	if (rm->doorPositions)
+	{
+		for (i = 0; i < roomSize; i++)
+		{
+			rm->doorPositions[i] = malloc(sizeof(int) * 2);
 		}
 	}
 
@@ -210,6 +220,13 @@ void deleteAllRooms() {
 	}
 	
 	ROOMS = NULL; //Just in case...?
+}
+
+void addRoomDoorPosition(room *srcRoom, int x, int y) {
+	srcRoom->doorPositions[srcRoom->numberOfDoorPositions][0] = x;
+	srcRoom->doorPositions[srcRoom->numberOfDoorPositions][1] = y;
+	
+	srcRoom->numberOfDoorPositions ++;
 }
 
 void connectRooms(room *srcRoom, room *dstRoom) {
@@ -827,8 +844,9 @@ void placeTunnels() {
 						TCOD_map_set_properties(TUNNEL_MAP, w_x + x1, w_y + y1, 1, 1);
 						TUNNEL_ROOM_MAP[w_x + x1][w_y + y1] = srcRoom->id;
 
-						if (!doorPlaced && srcRoom->flags & IS_TREASURE_ROOM) {
-							createDoor(w_x + x1, w_y + y1);
+						if (!doorPlaced) {// && srcRoom->flags & IS_TREASURE_ROOM) {
+							//createDoor(w_x + x1, w_y + y1);
+							addRoomDoorPosition(srcRoom, w_x + x1, w_y + y1);
 
 							doorPlaced = 1;
 						}
@@ -840,7 +858,7 @@ void placeTunnels() {
 				}
 			}
 
-			if (dstRoom->flags & IS_TREASURE_ROOM && !destDoorPlaced) {
+			if (!destDoorPlaced) {
 				for (y1 = -1; y1 <= 1; y1++) {
 					for (x1 = -1; x1 <= 1; x1++) {
 						if (!x1 && !y1) {
@@ -848,7 +866,8 @@ void placeTunnels() {
 						}
 
 						if (ROOM_MAP[w_x + x1][w_y + y1] == dstRoom->id) {
-							createDoor(w_x, w_y);
+							//createDoor(w_x, w_y);
+							addRoomDoorPosition(dstRoom, w_x, w_y);
 
 							destDoorPlaced = 1;
 
@@ -902,9 +921,12 @@ void generatePuzzles() {
 		if (roomPtr->size >= 45 && roomPtr->size <= 80) {
 			roomPtr->flags = roomPtr->flags | IS_TORCH_ROOM;
 		}
+		
+		printf("Conned: %i\n", roomPtr->numberOfConnectedRooms);
 
-		if (roomPtr->numberOfConnectedRooms == 1) {
+		if (roomPtr->numberOfConnectedRooms <= 2) {
 			roomPtr->flags = roomPtr->flags | IS_TREASURE_ROOM;
+			roomPtr->flags = roomPtr->flags | NEEDS_DOORS;
 
 			treasureRooms ++;
 		}
@@ -1003,7 +1025,19 @@ void cleanUpDoors() {
 }
 
 void activateDoors() {
+	int i;
+	room *roomPtr = ROOMS;
 	item *itm = getItems();
+	
+	while (roomPtr) {
+		if (roomPtr->flags & NEEDS_DOORS) {
+			for (i = 0; i < roomPtr->numberOfDoorPositions; i++) {
+				createDoor(roomPtr->doorPositions[i][0], roomPtr->doorPositions[i][1]);
+			}
+		}
+		
+		roomPtr = roomPtr->next;
+	}
 
 	while (itm) {
 		if (itm->itemFlags & IS_DOOR) {
@@ -1059,13 +1093,13 @@ void colorRooms() {
 			rMod = 250;
 			gMod = 70;
 			bMod = 70;
-		} else if (roomPtr->numberOfConnectedRooms > 3) {
-			r = 205 - RED_SHIFT;
-			g = 205;
-			b = 255;
+		} else if (roomPtr->numberOfConnectedRooms >= 3) {
+			r = 205;
+			g = 35;
+			b = 30;
 			rMod = 120;
-			gMod = 120;
-			bMod = 120;
+			gMod = 30;
+			bMod = 30;
 		} else {
 			r = 205;
 			g = 25;
@@ -1148,10 +1182,10 @@ void generateLevel() {
 
 	smooth();
 	findRooms();
-	generatePuzzles();
 	spawnEnemies();
 
 	placeTunnels();
+	generatePuzzles();
 	//cleanUpDoors();
 	activateDoors();
 
