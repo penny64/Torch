@@ -903,7 +903,7 @@ void generatePuzzles() {
 			roomPtr->flags = roomPtr->flags | IS_TORCH_ROOM;
 		}
 
-		if (roomPtr->numberOfConnectedRooms == 1 && roomPtr->size >= 75 + (treasureRooms * 50)) {
+		if (roomPtr->numberOfConnectedRooms == 1) {
 			roomPtr->flags = roomPtr->flags | IS_TREASURE_ROOM;
 
 			treasureRooms ++;

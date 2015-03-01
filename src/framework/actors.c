@@ -327,7 +327,7 @@ void _actorLogic(character *actor) {
 	}
 
 	_checkForItemCollisions(actor);
-	if (!actor->aiFlags & IS_IMMUNE_TO_DARKNESS && _checkIfPositionLit(actor)) {
+	if (!(actor->aiFlags & IS_IMMUNE_TO_DARKNESS) && _checkIfPositionLit(actor)) {
 		return;
 	}
 	
