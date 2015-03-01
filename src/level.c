@@ -589,6 +589,42 @@ void findRooms() {
 	ROOM_COUNT_MAX = ROOM_COUNT;
 }
 
+int isLevelValid() {
+	
+	return 1;
+	
+	int i, ii, invalid, closedList[MAX_CONNECTED_ROOMS];
+	int connectedRoomsIndex = 0;
+	room *roomPtr = ROOMS;
+	
+	while (roomPtr) {
+		for (i = 0; i < roomPtr->numberOfConnectedRooms; i++) {
+			invalid = 0;
+			
+			for (ii = 0; ii < connectedRoomsIndex; ii++) {
+				if (roomPtr->connectedRooms[i] == closedList[ii]) {
+					invalid = 1;
+					
+					break;
+				}
+			}
+			
+			if (!invalid) {
+				closedList[connectedRoomsIndex] = roomPtr->connectedRooms[i];
+				connectedRoomsIndex ++; 
+			}
+		}
+		
+		roomPtr = roomPtr->next;
+	}
+	
+	if (connectedRoomsIndex == MAX_ROOMS - 1) {
+		return 1;
+	}
+	
+	return 0;
+}
+
 void placeTunnels() {
 	int x, y, x1, y1, w_x, w_y, prev_w_x, prev_w_y, tunnelPlaced, mapUpdates, currentValue, neighborValue, lowestValue, index, lowestX, lowestY, invalid, randomRoomSize, dist;
 	int numberOfFailedAttemptsToFindADestRoom, neighborCollision, banDoubleTunnels, srcRoomIndex, dstRoomIndex, startCount = 0, runCount = -1;
@@ -891,6 +927,9 @@ void placeTunnels() {
 
 			connectRooms(srcRoom, dstRoom);
 
+			//if (isLevelValid()) {
+			//	break;
+			//}
 			if (srcRoom->numberOfConnectedRooms == ROOM_COUNT_MAX) {
 				break;
 			}

@@ -1,5 +1,5 @@
 #include "libtcod.h"
-#define MAX_ROOMS 5
+#define MAX_ROOMS 4
 #define MAX_CONNECTED_ROOMS 5
 
 
@@ -41,6 +41,7 @@ int levelLogic(void);
 int isPositionWalkable(int, int);
 int isLevelComplete(void);
 int isTransitionInProgress(void);
+int isLevelValid();
 int getRandomInt(int, int);
 int getLevel(void);
 int isRoomConnectedTo(room*, room*);
