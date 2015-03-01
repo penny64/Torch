@@ -17,6 +17,8 @@ void createBat(int x, int y) {
 	actor->aiFlags = RANDOM_WALK | DROP_LIGHT_ON_DEATH;
 	actor->chr = (int)'^';
 	actor->foreColor = TCOD_color_RGB(205, 25, 25);
+	actor->itemLight->x = x;
+	actor->itemLight->y = y;
 	actor->itemLight->r_tint = 125;
 	actor->itemLight->size = 4;
 	actor->itemLight->fuelMax = 99999;
@@ -34,6 +36,8 @@ void createVoidWorm(int x, int y) {
 	actor->aiFlags = IS_VOID_WORM | RANDOM_WALK | DROP_VOID_ON_DEATH | IS_IMMUNE_TO_DARKNESS;
 	actor->chr = (int)'O';
 	actor->foreColor = TCOD_color_RGB(25, 205, 25);
+	actor->itemLight->x = x;
+	actor->itemLight->y = y;
 	actor->itemLight->r_tint = 125;
 	actor->itemLight->b_tint = 125;
 	actor->itemLight->size = 6;

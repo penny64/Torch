@@ -1175,6 +1175,8 @@ void generateLevel() {
 		}
 		player->x = startingRoom->centerX;
 		player->y = startingRoom->centerY;
+		player->itemLight->x = player->x;
+		player->itemLight->y = player->y;
 		player->vx = 1;
 		
 		spawnIndex = getRandomInt(0, startingRoom->size - 1);
