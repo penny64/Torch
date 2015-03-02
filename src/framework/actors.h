@@ -6,7 +6,6 @@
 #ifndef ACTORS_H
 #define ACTORS_H
 
-
 enum {
 	RANDOM_WALK = 0x01 << 0,
 	WORM_WALK = 0x01 << 1,
@@ -18,27 +17,35 @@ enum {
 } aiFlag_t;
 
 enum {
-	TORCH_ATTACK_PENALTY = 0x01,
-	FREE = 0x02,
-	FREE2 = 0x04,
-	FREE3 = 0x08,
+	TORCH_ATTACK_PENALTY = 0x01 << 0,
+	FREE = 0x01 << 1,
+	FREE2 = 0x01 << 2,
+	FREE3 = 0x01 << 3,
 } traitFlags_t;
+
+enum {
+	IS_STANDING = 0x01 << 0,
+	IS_SWINGING = 0x01 << 1,
+	IS_STABBING = 0x01 << 2,
+	IS_KICKING = 0x01 << 3,
+	IS_CRAWLING = 0x01 << 4,
+} stanceFlags_t;
 
 typedef struct character character;
 
 struct character {
-	int x, y, vx, vy, hp, speed, maxSpeed, turns, chr, sightRange, numberOfItems;
+	int x, y, vx, vy, hp, stanceDelay, speed, maxSpeed, turns, chr, sightRange, numberOfItems;
 	struct character *next, *prev;
 	struct light *itemLight;
 	struct item *inventory[4];
-	unsigned int aiFlags, traitFlags;
+	unsigned int aiFlags, traitFlags, stanceFlags;
 	TCOD_color_t foreColor, backColor;
 	TCOD_console_t fov;
 };
 
 #endif
 
-character *createActor(void);
+character *createActor(int, int);
 character *getActors(void);
 TCOD_console_t getActorConsole(void);
 void resetAllActorsForNewLevel();

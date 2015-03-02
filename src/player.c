@@ -18,7 +18,7 @@ static struct character *PLAYER_ACTOR = NULL;
 
 
 void createPlayer() {
-	PLAYER_ACTOR = createActor();
+	PLAYER_ACTOR = createActor(0, 0);
 	
 	PLAYER_ACTOR->itemLight->r_tint = 90 - 45;
 	PLAYER_ACTOR->itemLight->g_tint = 130;

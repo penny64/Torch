@@ -8,10 +8,8 @@
 
 
 void createBat(int x, int y) {
-	character *actor = createActor();
+	character *actor = createActor(x, y);
 	
-	actor->x = x;
-	actor->y = y;
 	actor->hp = 25;
 	actor->sightRange = 4;
 	actor->aiFlags = RANDOM_WALK | DROP_LIGHT_ON_DEATH;
@@ -26,10 +24,8 @@ void createBat(int x, int y) {
 }
 
 void createVoidWorm(int x, int y) {
-	character *actor = createActor();
+	character *actor = createActor(x, y);
 
-	actor->x = x;
-	actor->y = y;
 	actor->hp = 15;
 	actor->sightRange = 12;
 	actor->maxSpeed = 8;
@@ -43,24 +39,24 @@ void createVoidWorm(int x, int y) {
 	actor->itemLight->size = 6;
 	actor->itemLight->fuelMax = 99999;
 	actor->itemLight->fuel = actor->itemLight->fuelMax;
+	actor->stanceFlags = IS_STANDING;
 }
 
 void createVoidWormTail(int x, int y) {
-	character *actor = createActor();
+	character *actor = createActor(x, y);
 
-	actor->x = x;
-	actor->y = y;
 	actor->hp = 5;
 	actor->sightRange = 0;
 	actor->aiFlags = 0x0;
 	actor->chr = (int)'o';
 	actor->foreColor = TCOD_color_RGB(15, 100, 15);
-	deleteDynamicLight(actor->itemLight);
-	actor->itemLight = NULL;
-	/*actor->itemLight->r_tint = 0;
-	actor->itemLight->g_tint = 255;
+	//deleteDynamicLight(actor->itemLight);
+	//actor->itemLight = NULL;
+	actor->stanceFlags = IS_STANDING;
+	actor->itemLight->r_tint = 0;
+	actor->itemLight->g_tint = 35;
 	actor->itemLight->b_tint = 0;
-	actor->itemLight->size = 4;
+	actor->itemLight->size = 3;
 	actor->itemLight->fuelMax = 12;
-	actor->itemLight->fuel = actor->itemLight->fuelMax;*/
+	actor->itemLight->fuel = actor->itemLight->fuelMax;
 }

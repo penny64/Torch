@@ -35,12 +35,12 @@ void actorsShutdown() {
 	}
 }
 
-character *createActor() {
+character *createActor(int x, int y) {
 	character *_c, *_p_c;
 	
 	_c = calloc(1, sizeof(character));
-	_c->x = WINDOW_WIDTH / 2;
-	_c->y = WINDOW_HEIGHT / 2;
+	_c->x = x;
+	_c->y = y;
 	_c->vx = 0;
 	_c->vy = 0;
 	_c->speed = 0;
@@ -55,6 +55,7 @@ character *createActor() {
 	_c->chr = (int)'@';
 	_c->foreColor = TCOD_color_RGB(255, 255 - RED_SHIFT, 255 - RED_SHIFT);
 	_c->backColor = TCOD_color_RGB(255, 0, 0);
+	_c->stanceFlags = IS_STANDING;
 	
 	if (CHARACTERS == NULL) {
 		CHARACTERS = _c;
