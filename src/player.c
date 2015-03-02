@@ -147,8 +147,8 @@ void playerInputLogic() {
 	}
 	
 	if (PLAYER_ACTOR->vx || PLAYER_ACTOR->vy) {
-		if (!PLAYER_ACTOR->speed) {
-			PLAYER_ACTOR->speed = PLAYER_ACTOR->maxSpeed;
+		if (!PLAYER_ACTOR->delay) {
+			PLAYER_ACTOR->delay = PLAYER_ACTOR->statSpeed;
 			PLAYER_ACTOR->turns = 1;
 		}
 	}

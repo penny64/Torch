@@ -55,15 +55,20 @@ void considerKnockback(character *attacker, character *target, int attackDamage,
 	
 	if (percentageOfTargetHealthAfterDamage >= .4) {
 		if (!(target->stanceFlags & IS_STUNNED)) {
-			target->stanceFlags |= IS_STUNNED;
+			//target->stanceFlags |= IS_STUNNED;
+			setStance(target, IS_STUNNED);
+			setDelay(target, 5);
 			
 			if (attacker == player) {
 				showMessage("%cTarget stunned!%c", 4);
 			}
 		} else {
 			if (target->stanceFlags & IS_STANDING) {
-				target->stanceFlags ^= IS_STANDING;
-				target->stanceFlags |= IS_CRAWLING;
+				//target->stanceFlags ^= IS_STANDING;
+				//target->stanceFlags |= IS_CRAWLING;
+				unsetStance(target, IS_STANDING);
+				setStance(target, IS_CRAWLING);
+				setDelay(target, 8);
 				
 				if (attacker == player) {
 					showMessage("%cTarget knocked down!%c", 4);

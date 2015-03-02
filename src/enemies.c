@@ -26,7 +26,7 @@ void createRagdoll(int x, int y) {
 	
 	actor->hp = 25;
 	actor->sightRange = 4;
-	actor->aiFlags = 0x0;
+	actor->aiFlags = RANDOM_WALK;
 	actor->chr = (int)'&';
 	actor->foreColor = TCOD_color_RGB(205, 205, 205);
 	actor->itemLight->r_tint = 50;
@@ -42,7 +42,7 @@ void createVoidWorm(int x, int y) {
 
 	actor->hp = 15;
 	actor->sightRange = 12;
-	actor->maxSpeed = 8;
+	actor->statSpeed = 8;
 	actor->aiFlags = IS_VOID_WORM | RANDOM_WALK | DROP_VOID_ON_DEATH | IS_IMMUNE_TO_DARKNESS;
 	actor->chr = 128;
 	actor->foreColor = TCOD_color_RGB(25, 205, 25);

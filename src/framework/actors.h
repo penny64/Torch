@@ -36,7 +36,7 @@ enum {
 typedef struct character character;
 
 struct character {
-	int x, y, vx, vy, hp, stanceDelay, speed, maxSpeed, turns, chr, sightRange, numberOfItems;
+	int x, y, vx, vy, hp, delay, statSpeed, turns, chr, sightRange, numberOfItems;
 	struct character *next, *prev;
 	struct light *itemLight;
 	struct item *inventory[4];
@@ -60,4 +60,7 @@ void deleteEnemies(void);
 void plantTorch(character*);
 void killActor(character*);
 void pickUpItem(character*, struct item*);
+void setStance(character*, unsigned int);
+void unsetStance(character*, unsigned int);
+void setDelay(character*, int);
 struct item *actorGetItemWithFlag(character*, unsigned int);

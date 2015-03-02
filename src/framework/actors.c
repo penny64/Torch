@@ -1,5 +1,6 @@
 #include <stdio.h>
 
+#include "../graphics.h"
 #include "../level.h" //Will fix this later
 #include "../lights.h"
 #include "../items.h"
@@ -43,8 +44,8 @@ character *createActor(int x, int y) {
 	_c->y = y;
 	_c->vx = 0;
 	_c->vy = 0;
-	_c->speed = 0;
-	_c->maxSpeed = 1;
+	_c->delay = 0;
+	_c->statSpeed = 1;
 	_c->sightRange = 16;
 	_c->numberOfItems = 0;
 	_c->prev = NULL;
@@ -114,6 +115,19 @@ void deleteEnemies() {
 
 		ptr = next;
 	}
+}
+
+void unsetStance(character *actor, unsigned int stance) {
+	actor->stanceFlags ^= stance;
+}
+
+void setStance(character *actor, unsigned int stance) {
+	actor->stanceFlags |= stance;
+}
+
+void setDelay(character *actor, int time) {
+	actor->turns = 1;
+	actor->delay = time;
 }
 
 void pickUpItem(character *actor, item *itm) {
@@ -233,7 +247,7 @@ int _checkIfPositionLit(character *actor) {
 }
 
 void _actorAi(character *actor) {
-	if (actor->speed) {
+	if (actor->delay) {
 		return;
 	}
 	
@@ -241,7 +255,7 @@ void _actorAi(character *actor) {
 		actor->vx += getRandomInt(-1, 1);
 		actor->vy += getRandomInt(-1, 1);
 		
-		actor->speed = actor->maxSpeed;
+		actor->delay = actor->statSpeed;
 		actor->turns = 1;
 	} else if (actor->aiFlags & WORM_WALK) {
 		//TODO: Potentially store AI info in a different struct,
@@ -274,14 +288,14 @@ void _actorLogic(character *actor) {
 		return;
 	}
 	
-	if (actor->speed > 1) {
-		actor->speed --;
+	if (actor->delay > 1) {
+		actor->delay --;
 		
 		return;
 	}
 	
 	actor->turns = 0;
-	actor->speed = 0;
+	actor->delay = 0;
 	
 	while (ptr != NULL) {
 		if (ptr == actor || ptr->hp <= 0) {
@@ -364,6 +378,8 @@ void _drawActor(character *actor) {
 	if (isAnimateFrame()) {
 		if (actor->stanceFlags & IS_CRAWLING && actor->stanceFlags & IS_STUNNED) {
 			chr = 25;
+		} else if (actor->stanceFlags & IS_STUNNED) {
+			chr = (int)'*';
 		}
 	}
 	
