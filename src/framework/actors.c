@@ -307,7 +307,7 @@ void _actorLogic(character *actor) {
 	}
 
 	if (hitActor) {
-		if (meleeAttack(actor, ptr)) {
+		if (punch(actor, ptr)) {
 			return;
 		}
 	} else if (actor->vx || actor->vy) {
@@ -355,13 +355,19 @@ void actorLogic() {
 }
 
 void _drawActor(character *actor) {
-	//int colorMod = 0;
-	
 	if (actor->hp <= 0 || (isTransitionInProgress() && actor->itemLight && actor->itemLight->sizeMod == 0)) {
 		return;
 	}
 	
-	drawChar(ACTOR_CONSOLE, actor->x, actor->y, actor->chr, actor->foreColor, actor->backColor);
+	int chr = actor->chr;
+	
+	if (isAnimateFrame()) {
+		if (actor->stanceFlags & IS_CRAWLING && actor->stanceFlags & IS_STUNNED) {
+			chr = 25;
+		}
+	}
+	
+	drawChar(ACTOR_CONSOLE, actor->x, actor->y, chr, actor->foreColor, actor->backColor);
 }
 
 void drawActors() {

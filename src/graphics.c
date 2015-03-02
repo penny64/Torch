@@ -16,6 +16,7 @@ const int FADE_TIME_MAX = 10;
 int FADE_TIME = 60;
 int FADE_VALUE = 255;
 int FADE_BACK_IN = 0;
+int ANIMATE_TIME = 0;
 
 
 void generateFov() {
@@ -27,6 +28,10 @@ void generateFov() {
 	}
 	
 	TCOD_map_compute_fov(map, player->x, player->y, 24, 1, FOV_SHADOW);
+}
+
+int isAnimateFrame() {
+	return ANIMATE_TIME >= 30;
 }
 
 int isScreenFadedOut() {
@@ -43,6 +48,12 @@ void fadeBackIn() {
 
 void graphicsLogic() {
 	character *player = getPlayer();
+	
+	if (ANIMATE_TIME < 60) {
+		ANIMATE_TIME ++;
+	} else {
+		ANIMATE_TIME = 0;
+	}
 
 	if (FADE_BACK_IN) {
 		if (FADE_TIME < FADE_TIME_MAX) {

@@ -1255,6 +1255,9 @@ void generateLevel() {
 		spawnIndex = getRandomInt(0, startingRoom->size - 1);
 		createKey(startingRoom->positionList[spawnIndex][0], startingRoom->positionList[spawnIndex][1]);
 		
+		spawnIndex = getRandomInt(0, startingRoom->size - 1);
+		createRagdoll(startingRoom->positionList[spawnIndex][0], startingRoom->positionList[spawnIndex][1]);
+		
 		printf("Spawning at %i, %i\n", player->x, player->y);
 	}
 
