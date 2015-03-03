@@ -364,7 +364,7 @@ int isTransitionInProgress() {
 int levelLogic() {
 	character *player = getPlayer();
 
-	if (isLevelComplete()) {
+	if (isLevelComplete() && player->itemLight) {
 		EXIT_WAVE_DIST = clipFloat(EXIT_WAVE_DIST + .5f, 0, 255);
 
 		if (!player->itemLight->sizeMod && isScreenFadedOut()) {
