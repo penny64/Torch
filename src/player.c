@@ -79,59 +79,58 @@ void playerInputLogic() {
 	}
 	
 	if (isTCODCharPressed(TCODK_LEFT)) {
-		PLAYER_ACTOR->vx = -1;
+		moveActor(PLAYER_ACTOR, -1, 0);
 	} else if (isTCODCharPressed(TCODK_RIGHT)) {
-		PLAYER_ACTOR->vx = 1;
+		moveActor(PLAYER_ACTOR, 1, 0);
 	}
 
 	if (isTCODCharPressed(TCODK_UP)) {
-		PLAYER_ACTOR->vy = -1;
+		moveActor(PLAYER_ACTOR, 0, -1);
 	} else if (isTCODCharPressed(TCODK_DOWN)) {
-		PLAYER_ACTOR->vy = 1;
+		moveActor(PLAYER_ACTOR, 0, 1);
 	}
 	
 	if (isCharPressed('1')) {
-		PLAYER_ACTOR->vx = -1;
-		PLAYER_ACTOR->vy = 1;
+		moveActor(PLAYER_ACTOR, -1, 1);
+		//PLAYER_ACTOR->vx = -1;
+		//PLAYER_ACTOR->vy = 1;
 	} else if (isCharPressed('2')) {
-		PLAYER_ACTOR->vy = 1;
+		moveActor(PLAYER_ACTOR, 0, 1);
+		//PLAYER_ACTOR->vy = 1;
 	} else if (isCharPressed('3')) {
-		PLAYER_ACTOR->vx = 1;
-		PLAYER_ACTOR->vy = 1;
+		moveActor(PLAYER_ACTOR, 1, 1);
+		//PLAYER_ACTOR->vx = 1;
+		//PLAYER_ACTOR->vy = 1;
 	} else if (isCharPressed('4')) {
-		PLAYER_ACTOR->vx = -1;
+		moveActor(PLAYER_ACTOR, -1, 0);
+		//PLAYER_ACTOR->vx = -1;
 	} else if (isCharPressed('6')) {
-		PLAYER_ACTOR->vx = 1;
+		//PLAYER_ACTOR->vx = 1;
+		moveActor(PLAYER_ACTOR, 1, 0);
 	} else if (isCharPressed('7')) {
-		PLAYER_ACTOR->vx = -1;
-		PLAYER_ACTOR->vy = -1;
+		moveActor(PLAYER_ACTOR, -1, -1);
 	} else if (isCharPressed('8')) {
-		PLAYER_ACTOR->vy = -1;
+		moveActor(PLAYER_ACTOR, 0, -1);
 	} else if (isCharPressed('9')) {
-		PLAYER_ACTOR->vx = 1;
-		PLAYER_ACTOR->vy = -1;
+		moveActor(PLAYER_ACTOR, 1, -1);
 	}
 
 	if (isCharPressed('b')) {
-		PLAYER_ACTOR->vx = -1;
-		PLAYER_ACTOR->vy = 1;
+		moveActor(PLAYER_ACTOR, -1, 1);
 	} else if (isCharPressed('j')) {
-		PLAYER_ACTOR->vy = 1;
+		moveActor(PLAYER_ACTOR, 0, 1);
 	} else if (isCharPressed('n')) {
-		PLAYER_ACTOR->vx = 1;
-		PLAYER_ACTOR->vy = 1;
+		moveActor(PLAYER_ACTOR, 1, 1);
 	} else if (isCharPressed('h')) {
-		PLAYER_ACTOR->vx = -1;
+		moveActor(PLAYER_ACTOR, -1, 0);
 	} else if (isCharPressed('l')) {
-		PLAYER_ACTOR->vx = 1;
+		moveActor(PLAYER_ACTOR, 1, 0);
 	} else if (isCharPressed('y')) {
-		PLAYER_ACTOR->vx = -1;
-		PLAYER_ACTOR->vy = -1;
+		moveActor(PLAYER_ACTOR, -1, -1);
 	} else if (isCharPressed('k')) {
-		PLAYER_ACTOR->vy = -1;
+		moveActor(PLAYER_ACTOR, 0, -1);
 	} else if (isCharPressed('u')) {
-		PLAYER_ACTOR->vx = 1;
-		PLAYER_ACTOR->vy = -1;
+		moveActor(PLAYER_ACTOR, 1, -1);
 	}
 	
 	if (isCharPressed(' ')) {
@@ -146,10 +145,10 @@ void playerInputLogic() {
 		PLAYER_ACTOR->hp = 0;
 	}
 	
-	if (PLAYER_ACTOR->vx || PLAYER_ACTOR->vy) {
+	/*if (PLAYER_ACTOR->vx || PLAYER_ACTOR->vy) {
 		if (!PLAYER_ACTOR->delay) {
 			PLAYER_ACTOR->delay = PLAYER_ACTOR->statSpeed;
 			PLAYER_ACTOR->turns = 1;
 		}
-	}
+	}*/
 }

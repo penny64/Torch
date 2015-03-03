@@ -341,4 +341,13 @@ void createKey(int x, int y) {
 
 void enableDoor(item *itm) {
 	blockPosition(itm->x, itm->y);
+	
+	light *lght = createDynamicLight(itm->x, itm->y, NULL);
+	itm->itemLight = lght;
+	lght->r_tint = 50;
+	lght->g_tint = 175;
+	lght->b_tint = 175;
+	lght->fuel = 99999;
+	lght->fuelMax = 99999;
+	lght->size = 3;
 }

@@ -140,6 +140,22 @@ void setDelay(character *actor, int time) {
 	actor->delay = time;
 }
 
+int getMovementCost(character *actor) {
+	if (actor->stanceFlags & IS_CRAWLING) {
+		return actor->statSpeed * 2;
+	}
+	
+	return actor->statSpeed;
+}
+
+void moveActor(character *actor, int vx, int vy) {
+	actor->vx = vx;
+	actor->vy = vy;
+	
+	actor->delay = getMovementCost(actor);
+	actor->turns = 1;
+}
+
 void pickUpItem(character *actor, item *itm) {
 	itm->owner = actor;
 
@@ -262,11 +278,7 @@ void _actorAi(character *actor) {
 	}
 	
 	if (actor->aiFlags & RANDOM_WALK) {
-		actor->vx += getRandomInt(-1, 1);
-		actor->vy += getRandomInt(-1, 1);
-		
-		actor->delay = actor->statSpeed;
-		actor->turns = 1;
+		moveActor(actor, getRandomInt(-1, 1), getRandomInt(-1, 1));
 	} else if (actor->aiFlags & WORM_WALK) {
 		//TODO: Potentially store AI info in a different struct,
 		//a linked list containing AI states per AI type

@@ -14,6 +14,8 @@
 
 
 int ATTRACT_TIME = 0, ATTRACT_TIME_MAX = 8;
+int GAME_DELAY = 0;
+int GAME_DELAY_MAX = 8;
 
 
 void setup() {
@@ -34,6 +36,7 @@ void setup() {
 }
 
 int main() {
+	character *player = NULL;
 	setup();
 
 	showIntro();
@@ -54,20 +57,30 @@ int main() {
 			continue;
 		}
 		
+		player = getPlayer();
+		
 		//While loop?
-		while (!getPlayer() || getPlayerMoveCount()) {
-			if ((!getPlayer() && !ATTRACT_TIME) || (getPlayer() && getPlayerMoveCount())) {
+		while (!player || (getPlayerMoveCount() && !GAME_DELAY)) {
+			if ((!player && !ATTRACT_TIME) || (player && getPlayerMoveCount())) {
 				actorLogic();
 				itemLogic();
 				lightLogic();
 			}
 			
-			if (!getPlayer()) {
+			if (!player) {
 				break;
+			} else {
+				if (player->nextStanceFlagsToAdd || player->nextStanceFlagsToRemove) {
+					GAME_DELAY = GAME_DELAY_MAX;
+				}
 			}
 		}
 		
-		if (getPlayer() == NULL) {
+		if (GAME_DELAY) {
+			GAME_DELAY --;
+		}
+		
+		if (!player) {
 			if (!ATTRACT_TIME) {
 				ATTRACT_TIME = ATTRACT_TIME_MAX;
 			} else {
@@ -79,7 +92,7 @@ int main() {
 		playerLogic();
 		uiLogic();
 
-        if (getPlayer() && levelLogic()) {
+        if (player && levelLogic()) {
             continue;
         }
 

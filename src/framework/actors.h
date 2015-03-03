@@ -66,4 +66,6 @@ void unsetStance(character*, unsigned int);
 void setDelay(character*, int);
 void setFutureStanceToAdd(character*, unsigned int);
 void setFutureStanceToRemove(character*, unsigned int);
+void moveActor(character *, int, int);
 struct item *actorGetItemWithFlag(character*, unsigned int);
+int getMovementCost(character*);
