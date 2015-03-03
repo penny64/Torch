@@ -289,7 +289,7 @@ void _actorLogic(character *actor) {
 		return;
 	}
 	
-	character *ptr = CHARACTERS;
+	character *player = getPlayer(), *ptr = CHARACTERS;
 	int hitActor = 0;
 	int nx = actor->x + actor->vx;
 	int ny = actor->y + actor->vy;
@@ -309,10 +309,22 @@ void _actorLogic(character *actor) {
 
 	if (actor->nextStanceFlagsToAdd) {
 		actor->stanceFlags |= actor->nextStanceFlagsToAdd;
+		
+		actor->nextStanceFlagsToAdd = 0x0;
 	}
 
 	if (actor->nextStanceFlagsToRemove) {
 		actor->stanceFlags ^= actor->nextStanceFlagsToRemove;
+		
+		if (actor->nextStanceFlagsToRemove & IS_STUNNED) {
+			if (actor == player) {
+				showMessage("%cYou regain composure.%c", 5);
+			} else {
+				showMessage("%cIt regains composure.%c", 5);
+			}
+		}
+		
+		actor->nextStanceFlagsToRemove = 0x0;
 	}
 	
 	while (ptr != NULL) {

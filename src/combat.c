@@ -94,6 +94,10 @@ int punch(character *attacker, character *target) {
 	int damageReadout;
 	float attackDamage, percentageAttackDamage;
 	
+	setStance(attacker, IS_PUNCHING);
+	setFutureStanceToRemove(attacker, IS_PUNCHING);
+	setDelay(attacker, 2);
+	
 	attackDamage = getRandomIntWithMean(lowerDamageValue, upperDamageValue, damageMean);
 	percentageAttackDamage = attackDamage / upperDamageValue;
 	

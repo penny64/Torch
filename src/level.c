@@ -246,7 +246,7 @@ void connectRooms(room *srcRoom, room *dstRoom) {
 int isRoomConnectedTo(room *srcRoom, room *dstRoom) {
 	int i;
 
-	for (i = 0; i <= srcRoom->numberOfConnectedRooms; i++) {
+	for (i = 0; i < srcRoom->numberOfConnectedRooms; i++) {
 		if (srcRoom->connectedRooms[i] == dstRoom->id) {
 			return 1;
 		}
@@ -258,7 +258,7 @@ int isRoomConnectedTo(room *srcRoom, room *dstRoom) {
 int isRoomConnectedToId(room *srcRoom, int dstRoomId) {
 	int i;
 
-	for (i = 0; i <= srcRoom->numberOfConnectedRooms; i++) {
+	for (i = 0; i < srcRoom->numberOfConnectedRooms; i++) {
 		if (srcRoom->connectedRooms[i] == dstRoomId) {
 			return 1;
 		}

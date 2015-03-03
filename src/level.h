@@ -45,6 +45,7 @@ int isLevelValid();
 int getRandomInt(int, int);
 int getLevel(void);
 int isRoomConnectedTo(room*, room*);
+int isRoomConnectedToId(room*, int);
 int *getExitLocation(void);
 float getExitWaveDistance(void);
 float *getEffectsMap(void);

@@ -55,10 +55,16 @@ int main() {
 		}
 		
 		//While loop?
-		if ((!getPlayer() && !ATTRACT_TIME) || (getPlayer() && getPlayerMoveCount())) {
-			actorLogic();
-			itemLogic();
-			lightLogic();
+		while (!getPlayer() || getPlayerMoveCount()) {
+			if ((!getPlayer() && !ATTRACT_TIME) || (getPlayer() && getPlayerMoveCount())) {
+				actorLogic();
+				itemLogic();
+				lightLogic();
+			}
+			
+			if (!getPlayer()) {
+				break;
+			}
 		}
 		
 		if (getPlayer() == NULL) {
