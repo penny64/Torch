@@ -626,7 +626,7 @@ int isLevelValid() {
 }
 
 void placeTunnels() {
-	int x, y, x1, y1, w_x, w_y, prev_w_x, prev_w_y, tunnelPlaced, mapUpdates, currentValue, neighborValue, lowestValue, index, lowestX, lowestY, invalid, randomRoomSize, dist;
+	int x, y, x1, y1, w_x, w_y, mapUpdates, currentValue, neighborValue, lowestValue, index, lowestX, lowestY, invalid, randomRoomSize, dist;
 	int numberOfFailedAttemptsToFindADestRoom, neighborCollision, banDoubleTunnels, srcRoomIndex, dstRoomIndex, startCount = 0, runCount = -1;
 	int doorPlaced, destDoorPlaced, ownsTunnels;//, openRoomList[MAX_ROOMS], closedRoomList[MAX_ROOMS], openListCount, closedListCount, inClosedList, inOpenList, i, ii, id;
 	room *srcRoom = NULL, *dstRoom = NULL;
@@ -762,8 +762,6 @@ void placeTunnels() {
 		index = TCOD_random_get_int(RANDOM, 0, startCount - 1);
 		w_x = START_POSITIONS[index][0];
 		w_y = START_POSITIONS[index][1];
-		prev_w_x = w_x;
-		prev_w_y = w_y;
 		
 		//printf("Starting at %i, %i VAL=%i rm=%i, sr=%i, dr=%i\n", w_x, w_y, DIJKSTRA_MAP[w_x][w_y], ROOM_MAP[w_x][w_y], srcRoom->id, dstRoom->id);
 
@@ -816,7 +814,6 @@ void placeTunnels() {
 			}
 		}
 
-		tunnelPlaced = 0;
 		doorPlaced = 0;
 		destDoorPlaced = 0;
 		
@@ -847,12 +844,8 @@ void placeTunnels() {
 				}
 			}
 
-			prev_w_x = w_x;
-			prev_w_y = w_y;
 			w_x = lowestX;
 			w_y = lowestY;
-
-			//printf("Walking to %i, %i (lowest=%i) (prev=%i, %i)\n", w_x, w_y, lowestValue, prev_w_x, prev_w_y);
 
 			randomRoomSize = 1;//clip(TCOD_random_get_int(RANDOM, minRoomSize, maxRoomSize), 1, 255);
 			
@@ -889,8 +882,6 @@ void placeTunnels() {
 					}
 					
 					TCOD_map_set_properties(LEVEL_MAP, w_x + x1, w_y + y1, 1, 1);
-
-					tunnelPlaced = 1;
 				}
 			}
 
@@ -917,10 +908,6 @@ void placeTunnels() {
 				}
 			}
 		}
-
-		//if (tunnelPlaced && dstRoom->flags & IS_TREASURE_ROOM) {
-		//	createDoor(prev_w_x, prev_w_y);
-		//}
 
 		if (ROOM_MAP[w_x][w_y] == dstRoom->id) {
 			printf("Connecting rooms: %i, %i\n", srcRoom->id, dstRoom->id);
