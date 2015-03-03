@@ -57,6 +57,7 @@ void considerKnockback(character *attacker, character *target, int attackDamage,
 		if (!(target->stanceFlags & IS_STUNNED)) {
 			//target->stanceFlags |= IS_STUNNED;
 			setStance(target, IS_STUNNED);
+			setFutureStanceToRemove(target, IS_STUNNED);
 			setDelay(target, 5);
 			
 			if (attacker == player) {

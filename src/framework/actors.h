@@ -40,7 +40,7 @@ struct character {
 	struct character *next, *prev;
 	struct light *itemLight;
 	struct item *inventory[4];
-	unsigned int aiFlags, traitFlags, stanceFlags;
+	unsigned int aiFlags, traitFlags, stanceFlags, nextStanceFlagsToAdd, nextStanceFlagsToRemove;
 	TCOD_color_t foreColor, backColor;
 	TCOD_console_t fov;
 };
@@ -63,4 +63,6 @@ void pickUpItem(character*, struct item*);
 void setStance(character*, unsigned int);
 void unsetStance(character*, unsigned int);
 void setDelay(character*, int);
+void setFutureStanceToAdd(character*, unsigned int);
+void setFutureStanceToRemove(character*, unsigned int);
 struct item *actorGetItemWithFlag(character*, unsigned int);

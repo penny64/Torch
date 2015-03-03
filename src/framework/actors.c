@@ -57,6 +57,8 @@ character *createActor(int x, int y) {
 	_c->foreColor = TCOD_color_RGB(255, 255 - RED_SHIFT, 255 - RED_SHIFT);
 	_c->backColor = TCOD_color_RGB(255, 0, 0);
 	_c->stanceFlags = IS_STANDING;
+	_c->nextStanceFlagsToAdd = 0x0;
+	_c->nextStanceFlagsToRemove = 0x0;
 	
 	if (CHARACTERS == NULL) {
 		CHARACTERS = _c;
@@ -123,6 +125,14 @@ void unsetStance(character *actor, unsigned int stance) {
 
 void setStance(character *actor, unsigned int stance) {
 	actor->stanceFlags |= stance;
+}
+
+void setFutureStanceToAdd(character *actor, unsigned int stances) {
+	actor->nextStanceFlagsToAdd |= stances;
+}
+
+void setFutureStanceToRemove(character *actor, unsigned int stances) {
+	actor->nextStanceFlagsToRemove |= stances;
 }
 
 void setDelay(character *actor, int time) {
@@ -296,6 +306,14 @@ void _actorLogic(character *actor) {
 	
 	actor->turns = 0;
 	actor->delay = 0;
+
+	if (actor->nextStanceFlagsToAdd) {
+		actor->stanceFlags |= actor->nextStanceFlagsToAdd;
+	}
+
+	if (actor->nextStanceFlagsToRemove) {
+		actor->stanceFlags ^= actor->nextStanceFlagsToRemove;
+	}
 	
 	while (ptr != NULL) {
 		if (ptr == actor || ptr->hp <= 0) {
