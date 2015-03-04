@@ -46,10 +46,6 @@ void fadeBackIn() {
 	FADE_BACK_IN = 1;
 }
 
-int getFrameNumber() {
-	return FRAME_NUMBER;
-}
-
 void graphicsLogic() {
 	character *player = getPlayer();
 	
