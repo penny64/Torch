@@ -1233,13 +1233,16 @@ void generateLevel() {
 
 			roomPtr = roomPtr->next;
 		}
-		player->x = startingRoom->centerX;
-		player->y = startingRoom->centerY;
+		
+		spawnIndex = getRandomInt(0, startingRoom->size - 1);
+		player->x = startingRoom->positionList[spawnIndex][0];
+		player->y = startingRoom->positionList[spawnIndex][1];
 		player->itemLight->x = player->x;
 		player->itemLight->y = player->y;
 		player->vx = 1;
 		
-		createWoodenSword(player->x, player->y - 1);
+		spawnIndex = getRandomInt(0, startingRoom->size - 1);
+		createWoodenSword(startingRoom->positionList[spawnIndex][0], startingRoom->positionList[spawnIndex][1]);
 		
 		spawnIndex = getRandomInt(0, startingRoom->size - 1);
 		createKey(startingRoom->positionList[spawnIndex][0], startingRoom->positionList[spawnIndex][1]);
@@ -1282,9 +1285,12 @@ void generateLevel() {
 
 			if (!TCOD_map_is_walkable(LEVEL_MAP, x, y)) {
 				if (TCOD_map_is_walkable(TUNNEL_WALLS, x, y)) {
-					drawCharBackEx(LEVEL_CONSOLE, x, y, TCOD_color_RGB(125, 16, 16), TCOD_BKGND_SET);
+					//drawChar(LEVEL_CONSOLE, x, y, 128, TCOD_color_RGB(125, 16, 16), TCOD_color_RGB(115, 6, 6));
+					//drawCharBackEx(LEVEL_CONSOLE, x, y, TCOD_color_RGB(125, 16, 16), TCOD_BKGND_SET);
+					drawChar(LEVEL_CONSOLE, x, y, 176, TCOD_color_RGB(255, 36, 36), TCOD_color_RGB(105, 26, 26));
 				} else {
-					drawCharBackEx(LEVEL_CONSOLE, x, y, TCOD_color_RGB(95, 8, 8), TCOD_BKGND_SET);
+					drawChar(LEVEL_CONSOLE, x, y, 177 + getRandomInt(0, 1), TCOD_color_RGB(175, 36, 36), TCOD_color_RGB(105, 26, 26));
+					//drawCharBackEx(LEVEL_CONSOLE, x, y, TCOD_color_RGB(95, 8, 8), TCOD_BKGND_SET);
 				}
 			} else {
 				colorMod = (int)(fogValue * 120);

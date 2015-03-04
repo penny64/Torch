@@ -192,7 +192,7 @@ int slash(character *attacker, character *target, item *weapon) {
 		return 1;
 	}
 	
-	if (getRandomInt(0, weaponDamage)) {
+	if (getRandomInt(0, weaponDamage) <= weaponDamage / 2) {
 		weapon->itemFlags |= IS_LODGED;
 		weapon->lodgedInActor = target;
 		attacker->stanceFlags |= IS_HOLDING_LODGED_WEAPON;

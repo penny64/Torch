@@ -42,6 +42,8 @@ character *createActor(int x, int y) {
 	_c = calloc(1, sizeof(character));
 	_c->x = x;
 	_c->y = y;
+	_c->hpMax = 10;
+	_c->hp = _c->hpMax;
 	_c->vx = 0;
 	_c->vy = 0;
 	_c->delay = 0;
@@ -507,19 +509,27 @@ void _drawActor(character *actor) {
 	
 	TCOD_color_t foreColor = actor->foreColor;
 	int chr = actor->chr;
+	float healthPercentage = (float)actor->hp / (float)actor->hpMax;
 	
-	if (isAnimateFrame()) {
+	if (getAnimateFrame() / 60.f >= .5) {
 		if (actor->stanceFlags & IS_STUCK_WITH_LODGED_WEAPON) {
 			foreColor.r = 255;
 			foreColor.g = 0;
 			foreColor.b = 0;
 			
 			chr = getItemLodgedInActor(actor)->chr;
-			
 		} else if (actor->stanceFlags & IS_CRAWLING && actor->stanceFlags & IS_STUNNED) {
 			chr = 25;
 		} else if (actor->stanceFlags & IS_STUNNED) {
 			chr = (int)'*';
+		}
+	}
+	
+	if (healthPercentage <= .75) {
+		if ((getAnimateFrame() % (int)(60 * ((healthPercentage / .75)))) == 0) {
+			foreColor.r = 255;
+			foreColor.g = 0;
+			foreColor.b = 0;
 		}
 	}
 	

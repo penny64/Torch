@@ -6,4 +6,4 @@ void graphicsLogic(void);
 void fadeBackIn(void);
 int isScreenFadedOut(void);
 int isScreenFadingBackIn(void);
-int isAnimateFrame(void);
+int getAnimateFrame(void);

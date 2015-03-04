@@ -38,7 +38,7 @@ enum {
 typedef struct character character;
 
 struct character {
-	int x, y, vx, vy, hp, delay, statSpeed, turns, chr, sightRange, numberOfItems;
+	int x, y, vx, vy, hp, hpMax, delay, statSpeed, turns, chr, sightRange, numberOfItems;
 	struct character *next, *prev;
 	struct light *itemLight;
 	struct item *inventory[4];

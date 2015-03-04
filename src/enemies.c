@@ -10,7 +10,8 @@
 void createBat(int x, int y) {
 	character *actor = createActor(x, y);
 	
-	actor->hp = 25;
+	actor->hp = 15;
+	actor->hpMax = 15;
 	actor->sightRange = 4;
 	actor->aiFlags = RANDOM_WALK | DROP_LIGHT_ON_DEATH;
 	actor->chr = (int)'^';
@@ -25,6 +26,7 @@ void createRagdoll(int x, int y) {
 	character *actor = createActor(x, y);
 	
 	actor->hp = 25;
+	actor->hpMax = 25;
 	actor->sightRange = 4;
 	actor->aiFlags = RANDOM_WALK;
 	actor->chr = (int)'&';
@@ -41,6 +43,7 @@ void createVoidWorm(int x, int y) {
 	character *actor = createActor(x, y);
 
 	actor->hp = 15;
+	actor->hpMax = 15;
 	actor->sightRange = 12;
 	actor->statSpeed = 8;
 	actor->aiFlags = IS_VOID_WORM | RANDOM_WALK | DROP_VOID_ON_DEATH | IS_IMMUNE_TO_DARKNESS;
@@ -58,6 +61,7 @@ void createVoidWormTail(int x, int y) {
 	character *actor = createActor(x, y);
 
 	actor->hp = 5;
+	actor->hpMax = 5;
 	actor->sightRange = 0;
 	actor->aiFlags = 0x0;
 	actor->chr = 177;
