@@ -849,8 +849,8 @@ void placeTunnels() {
 
 			randomRoomSize = 1;//clip(TCOD_random_get_int(RANDOM, minRoomSize, maxRoomSize), 1, 255);
 			
-			for (y1 = -16; y1 <= 16; y1++) {
-				for (x1 = -16; x1 <= 16; x1++) {
+			for (y1 = -2; y1 <= 2; y1++) {
+				for (x1 = -2; x1 <= 2; x1++) {
 					if ((w_x + x1 <= 2 || w_x + x1 >= WINDOW_WIDTH - 2 || w_y + y1 <= 2 || w_y + y1 >= WINDOW_HEIGHT - 2)) {
 						continue;
 					}
