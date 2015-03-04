@@ -34,7 +34,7 @@ void introLoop() {
 }
 
 int drawIntro() {
-	int colorIndex;
+	//int colorIndex;
 	inputLogic();
 
 	if (FADE_IN_TIMER < FADE_IN_TIMER_MAX) {
@@ -62,7 +62,7 @@ int drawIntro() {
 		}
 	}
 	
-	colorIndex = getRandomInt(0, 2);
+	//colorIndex = getRandomInt(0, 2);
 	
 	/*if (INTRO_MODE_TIME > 2) {
 		if (colorIndex == 1) {

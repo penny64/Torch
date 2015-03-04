@@ -5,6 +5,7 @@
 #include "framework/numbers.h"
 #include "lights.h"
 #include "player.h"
+#include "level.h"
 #include "ui.h"
 
 
@@ -148,6 +149,12 @@ int punch(character *attacker, character *target) {
 	
 	considerKnockback(attacker, target, attackDamage, percentageAttackDamage);
 	
+	if (target->stanceFlags & IS_STUCK_WITH_LODGED_WEAPON && getRandomInt(0, getItemLodgedInActor(target)->statDamage)) {
+		attackDamage *= 1.2;
+		
+		showMessage("%cYou punch the lodged sword!%c", 10);
+	}
+	
 	return performDamage(attacker, target, attackDamage, percentageAttackDamage);
 }
 
@@ -164,7 +171,6 @@ int slash(character *attacker, character *target, item *weapon) {
 	int lowerDamageValue = attackerStrength;
 	int upperDamageValue = (attackerStrength + 2) + attackerLevel + attackerLuck;
 	int damageMean = (upperDamageValue * (1.3 * targetOpenness)) + weaponDamage;
-	int damageReadout;
 	float attackDamage, percentageAttackDamage;
 	
 	setStance(attacker, IS_SWINGING);
@@ -217,7 +223,7 @@ int attack(character *attacker, character *target) {
 			printf("*FATAL* Weapon is lodged in target that we aren't attacking\n");
 		}
 		
-		return;
+		return 0;
 	}
 	
 	if (attackerWeapon->itemFlags & IS_SWORD) {
