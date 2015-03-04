@@ -41,8 +41,11 @@ item *createItem(int x, int y, char chr, TCOD_color_t foreColor, TCOD_color_t ba
 	_c->owner = NULL;
 	_c->prev = NULL;
 	_c->next = NULL;
+	_c->lodgedInActor = NULL;
 	_c->foreColor = foreColor;
 	_c->backColor = backColor;
+	_c->statDamage = 0;
+	_c->statSpeed = 0;
 	
 	if (ITEMS == NULL) {
 		ITEMS = _c;
@@ -119,7 +122,7 @@ void _itemLogic(item *itm) {
 void _drawItem(item *itm) {
 	TCOD_console_t itemConsole = getItemConsole();
 
-	if (itm->owner) {
+	if (itm->owner || itm->lodgedInActor) {
 		return;
 	}
 
@@ -156,6 +159,20 @@ void drawItems() {
 	}	
 }
 
+item *getItemLodgedInActor(character *actor) {
+	item *ptr = ITEMS;
+	
+	while (ptr) {
+		if (ptr->lodgedInActor == actor) {
+			return ptr;
+		}
+		
+		ptr = ptr->next;
+	}
+	
+	return NULL;
+}
+
 int getTotalNumberOfKeytorches() {
 	int count = 0;
 	item *ptr = ITEMS;
@@ -190,7 +207,7 @@ int getNumberOfLitKeytorches() {
 void itemHandleCharacterCollision(item *itm, character *actor) {
 	character *player = getPlayer();
 	
-	if (itm->owner) {
+	if (itm->owner || itm->lodgedInActor) {
 		return;
 	}
 
@@ -290,12 +307,12 @@ void createBonfireKeystone(int x, int y) {
 
 	light *lght = createDynamicLight(x, y, NULL);
 	itm->itemLight = lght;
-	lght->r_tint = 15;
-	lght->g_tint = 80;
-	lght->b_tint = 5;
+	lght->r_tint = 5;
+	lght->g_tint = 70;
+	lght->b_tint = 0;
 	lght->fuel = 0;
 	lght->fuelMax = 280;
-	lght->size = 7;
+	lght->size = 5;
 
 	blockPosition(itm->x, itm->y);
 }
@@ -337,6 +354,13 @@ void createDoor(int x, int y) {
 
 void createKey(int x, int y) {
 	createItem(x, y, '-', TCOD_color_RGB(30, 175, 175), TCOD_color_RGB(30, 75, 75), IS_KEY | CAN_PICK_UP);
+}
+
+void createWoodenSword(int x, int y) {
+	item *itm = createItem(x, y, '/', TCOD_color_RGB(210, 105, 30), TCOD_color_RGB(30, 30, 30), IS_WEAPON | IS_SWORD | CAN_PICK_UP);
+	
+	itm->statDamage = 3;
+	itm->statSpeed = 3;
 }
 
 void enableDoor(item *itm) {

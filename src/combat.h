@@ -2,3 +2,4 @@
 
 
 int punch(character*, character*);
+int attack(character*, character*);

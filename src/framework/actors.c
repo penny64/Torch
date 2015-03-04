@@ -77,8 +77,17 @@ character *createActor(int x, int y) {
 }
 
 void deleteActor(character *chr) {
+	item *lodgedItem = getItemLodgedInActor(chr);
+	
 	if (chr == getPlayer()) {
 		killPlayer();
+	}
+	
+	if (lodgedItem) {
+		lodgedItem->itemFlags ^= IS_LODGED;
+		lodgedItem->lodgedInActor = NULL;
+		lodgedItem->x = chr->x;
+		lodgedItem->y = chr->y;
 	}
 
 	if (chr->itemLight) {
@@ -141,19 +150,52 @@ void setDelay(character *actor, int time) {
 }
 
 int getMovementCost(character *actor) {
+	int cost = actor->statSpeed;
+	item *lodgedItem = getItemLodgedInActor(actor);
+	
 	if (actor->stanceFlags & IS_CRAWLING) {
-		return actor->statSpeed * 2;
+		cost *= 2;
 	}
 	
-	return actor->statSpeed;
+	if (lodgedItem) {
+		cost += lodgedItem->statDamage;
+	}
+	
+	return cost;
 }
 
 void moveActor(character *actor, int vx, int vy) {
+	if (actor->delay) {
+		return;
+	}
+	
 	actor->vx = vx;
 	actor->vy = vy;
 	
-	actor->delay = getMovementCost(actor);
-	actor->turns = 1;
+	setDelay(actor, getMovementCost(actor));
+}
+
+void removeItemFromInventory(character *actor, item *itm) {
+	int i, removeItemAtIndex = -1;
+	
+	itm->owner = NULL;
+	
+	for (i = 0; i < actor->numberOfItems; i ++) {
+		if (actor->inventory[i] == itm) {
+			actor->inventory[i] = NULL;
+			removeItemAtIndex = i;
+		} else if (removeItemAtIndex != -1) {
+			actor->inventory[i - 1] = actor->inventory[i];
+		}
+	}
+	
+	if (removeItemAtIndex == -1) {
+		printf("*FATAL* Could not find item for removal.\n");
+		
+		return;
+	}
+	
+	actor->numberOfItems --;
 }
 
 void pickUpItem(character *actor, item *itm) {
@@ -166,6 +208,20 @@ void pickUpItem(character *actor, item *itm) {
 		showMessage("%cPicked up item.%c", 10);
 	}
 }
+
+void dropItem(character *actor, item *itm) {
+	itm->x = actor->x;
+	itm->y = actor->y;
+	
+	removeItemFromInventory(actor, itm);
+	//actor->inventory[actor->numberOfItems] = itm;
+	//actor->numberOfItems ++;
+	
+	if (actor == getPlayer()) {
+		showMessage("%cDropped item.%c", 10);
+	}
+}
+
 item *actorGetItemWithFlag(character *actor, unsigned int flag) {
 	int i;
 
@@ -302,6 +358,7 @@ void _actorLogic(character *actor) {
 	}
 	
 	character *player = getPlayer(), *ptr = CHARACTERS;
+	item *weaponPtr = NULL, *actorWeapon = actorGetItemWithFlag(actor, IS_WEAPON);
 	int hitActor = 0;
 	int nx = actor->x + actor->vx;
 	int ny = actor->y + actor->vy;
@@ -334,6 +391,19 @@ void _actorLogic(character *actor) {
 			} else {
 				showMessage("%cIt regains composure.%c", 5);
 			}
+		} else if (actor->nextStanceFlagsToRemove & IS_HOLDING_LODGED_WEAPON) {
+			if (actor == player) {
+				showMessage("%cYou dislodge the weapon.%c", 5);
+			} else {
+				showMessage("%cSomething dislodges their weapon.%c", 5);
+			}
+		}
+		
+		if (actor->nextStanceFlagsToRemove & IS_STUCK_WITH_LODGED_WEAPON) {
+			weaponPtr = getItemLodgedInActor(actor);
+			
+			weaponPtr->itemFlags ^= IS_LODGED;
+			weaponPtr->lodgedInActor = NULL;
 		}
 		
 		actor->nextStanceFlagsToRemove = 0x0;
@@ -363,10 +433,30 @@ void _actorLogic(character *actor) {
 	}
 
 	if (hitActor) {
-		if (punch(actor, ptr)) {
+		if (attack(actor, ptr)) {
 			return;
 		}
+		
+		actor->vx = 0;
+		actor->vy = 0;
 	} else if (actor->vx || actor->vy) {
+		if (actor->stanceFlags & IS_STUCK_WITH_LODGED_WEAPON && getItemLodgedInActor(actor)->owner) {
+			printf("Cant move because of stuck weapon.\n");
+			
+			return;
+		}
+		
+		if (actor->stanceFlags & IS_HOLDING_LODGED_WEAPON) {
+			actor->stanceFlags ^= IS_HOLDING_LODGED_WEAPON;
+			dropItem(actor, actorWeapon);
+			
+			printf("Handle letting go of weapon!\n");
+			
+			showMessage("%cYou let go of the weapon.%c", 10);
+			
+			return;
+		}
+		
 		if (isPositionWalkable(nx, ny)) {
 			if (actor->aiFlags & IS_VOID_WORM) {
 				createVoidWormTail(actor->x, actor->y);
@@ -415,17 +505,25 @@ void _drawActor(character *actor) {
 		return;
 	}
 	
+	TCOD_color_t foreColor = actor->foreColor;
 	int chr = actor->chr;
 	
 	if (isAnimateFrame()) {
-		if (actor->stanceFlags & IS_CRAWLING && actor->stanceFlags & IS_STUNNED) {
+		if (actor->stanceFlags & IS_STUCK_WITH_LODGED_WEAPON) {
+			foreColor.r = 255;
+			foreColor.g = 0;
+			foreColor.b = 0;
+			
+			chr = getItemLodgedInActor(actor)->chr;
+			
+		} else if (actor->stanceFlags & IS_CRAWLING && actor->stanceFlags & IS_STUNNED) {
 			chr = 25;
 		} else if (actor->stanceFlags & IS_STUNNED) {
 			chr = (int)'*';
 		}
 	}
 	
-	drawChar(ACTOR_CONSOLE, actor->x, actor->y, chr, actor->foreColor, actor->backColor);
+	drawChar(ACTOR_CONSOLE, actor->x, actor->y, chr, foreColor, actor->backColor);
 }
 
 void drawActors() {

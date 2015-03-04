@@ -8,6 +8,12 @@
 #include "ui.h"
 
 
+/*int getRandomInt(int min, int max) {
+	TCOD_random_t random = TCOD_random_get_instance();
+	
+	return TCOD_random_get_int(random, min, max);
+}*/
+
 int getRandomIntWithMean(int min, int max, int mean) {
 	TCOD_random_t random = TCOD_random_get_instance();
 	
@@ -79,8 +85,40 @@ void considerKnockback(character *attacker, character *target, int attackDamage,
 	}
 }
 
-int punch(character *attacker, character *target) {
+int performDamage(character *attacker, character *target, float attackDamage, float percentageAttackDamage) {
 	character *player = getPlayer();
+	int damageReadout;
+	
+	if (attacker == player) {
+		if (percentageAttackDamage >= .75) {
+			showMessage("%cSolid hit.%c", 4);
+		}/* else if (percentageAttackDamage >= .5) {
+			showMessage("%cOK hit.%c", 4);
+		} else {
+			showMessage("%cClumsy!%c", 4);
+		}*/
+	}
+	
+	damageReadout = attackDamage + .5;
+	
+	printf("Hitting for: %i\n", damageReadout);
+	
+	target->hp -= damageReadout;
+	
+	if (target->hp <= 0) {
+		killActor(target);
+		
+		if (attacker == player) {
+			showMessage("%cSplat!%c", 7);
+		}
+
+		return 1;
+	}
+
+	return 0;
+}
+
+int punch(character *attacker, character *target) {
 	int attackerStrength = 5;
 	int attackerLevel = 3;
 	int attackerLuck = 2;
@@ -90,8 +128,7 @@ int punch(character *attacker, character *target) {
 	float targetOpenness = getTargetOpenness(target);
 	int lowerDamageValue = attackerStrength;
 	int upperDamageValue = (attackerStrength + 2) + attackerLevel + attackerLuck;
-	int damageMean = upperDamageValue * (1.3 * targetOpenness);
-	int damageReadout;
+	int damageMean = upperDamageValue * (1.3 * targetOpenness);;
 	float attackDamage, percentageAttackDamage;
 	
 	setStance(attacker, IS_PUNCHING);
@@ -107,34 +144,87 @@ int punch(character *attacker, character *target) {
 		attacker->itemLight->fuel -= 25;
 	}
 	
+	printf("lower=%i, upper=%i, perc=%f, actual=%f\n", lowerDamageValue, upperDamageValue, percentageAttackDamage, attackDamage);
+	
 	considerKnockback(attacker, target, attackDamage, percentageAttackDamage);
 	
-	if (attacker == player) {
-		if (percentageAttackDamage >= .75) {
-			showMessage("%cSolid hit.%c", 4);
-		}/* else if (percentageAttackDamage >= .5) {
-			showMessage("%cOK hit.%c", 4);
-		} else {
-			showMessage("%cClumsy!%c", 4);
-		}*/
-	}
+	return performDamage(attacker, target, attackDamage, percentageAttackDamage);
+}
+
+int slash(character *attacker, character *target, item *weapon) {
+	character *player = getPlayer();
+	int attackerStrength = 5;
+	int attackerLevel = 3;
+	int attackerLuck = 2;
+	int weaponDamage = getRandomIntWithMean(0, weapon->statDamage, weapon->statDamage + 2);
 	
-	damageReadout = attackDamage + .5;
+	attackerLuck = getRandomIntWithMean(0, attackerLuck, clip(attackerLuck - 1, 0, attackerLuck));
+	
+	float targetOpenness = getTargetOpenness(target);
+	int lowerDamageValue = attackerStrength;
+	int upperDamageValue = (attackerStrength + 2) + attackerLevel + attackerLuck;
+	int damageMean = (upperDamageValue * (1.3 * targetOpenness)) + weaponDamage;
+	int damageReadout;
+	float attackDamage, percentageAttackDamage;
+	
+	setStance(attacker, IS_SWINGING);
+	setFutureStanceToRemove(attacker, IS_SWINGING);
+	setDelay(attacker, weapon->statSpeed);
+	
+	attackDamage = getRandomIntWithMean(lowerDamageValue, upperDamageValue, damageMean);
+	percentageAttackDamage = attackDamage / upperDamageValue;
+	
+	if ((attacker->traitFlags & TORCH_ATTACK_PENALTY && attacker->itemLight)) {
+		attackDamage /= 2;
+
+		attacker->itemLight->fuel -= 25;
+	}
 	
 	printf("lower=%i, upper=%i, perc=%f, actual=%f\n", lowerDamageValue, upperDamageValue, percentageAttackDamage, attackDamage);
-	printf("Hitting for: %i\n", damageReadout);
 	
-	target->hp -= damageReadout;
-	
-	if (target->hp <= 0) {
-		killActor(target);
-		
-		if (attacker == player) {
-			showMessage("%cSplat!%c", 7);
-		}
-
+	if (performDamage(attacker, target, attackDamage, percentageAttackDamage)) {
 		return 1;
 	}
+	
+	if (getRandomInt(0, weaponDamage)) {
+		weapon->itemFlags |= IS_LODGED;
+		weapon->lodgedInActor = target;
+		attacker->stanceFlags |= IS_HOLDING_LODGED_WEAPON;
+		target->stanceFlags |= IS_STUCK_WITH_LODGED_WEAPON;
+		
+		if (attacker == player) {
+			showMessage("%cThe weapon becomes lodged!%c", 10);
+		}
+	}
+	
+	return 0;
+}
 
+int attack(character *attacker, character *target) {
+	item *attackerWeapon = actorGetItemWithFlag(attacker, IS_WEAPON);
+	
+	if (!attackerWeapon) {
+		return punch(attacker, target);
+	}
+	
+	if (attackerWeapon->itemFlags & IS_LODGED) {
+		if (target->stanceFlags & IS_STUCK_WITH_LODGED_WEAPON) {
+			setFutureStanceToRemove(attacker, IS_HOLDING_LODGED_WEAPON);
+			setFutureStanceToRemove(target, IS_STUCK_WITH_LODGED_WEAPON);
+			setDelay(attacker, attackerWeapon->statSpeed);
+			setDelay(target, attackerWeapon->statSpeed);
+		} else {
+			printf("*FATAL* Weapon is lodged in target that we aren't attacking\n");
+		}
+		
+		return;
+	}
+	
+	if (attackerWeapon->itemFlags & IS_SWORD) {
+		return slash(attacker, target, attackerWeapon);
+	}
+	
+	printf("Something terrible has happened.\n");
+	
 	return 0;
 }

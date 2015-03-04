@@ -16,16 +16,19 @@ enum {
 	NEEDS_KEY = 0x01 << 6,
 	IS_KEY = 0x01 << 7,
 	CAN_PICK_UP = 0x01 << 8,
+	IS_WEAPON = 0x01 << 9,
+	IS_SWORD = 0x01 << 10,
+	IS_LODGED = 0x01 << 11,
 } itemFlag_t;
 
 
 typedef struct item item;
 
 struct item {
-	int x, y, vx, vy, chr;
+	int x, y, vx, vy, statDamage, statSpeed, chr;
 	unsigned int itemFlags;
 	struct item *next, *prev;
-	struct character *owner;
+	struct character *owner, *lodgedInActor;
 	struct light *itemLight;
 	TCOD_color_t foreColor, backColor;
 };
@@ -40,6 +43,7 @@ void itemHandleCharacterCollision(item*, character*);
 int itemHandleCharacterTouch(item*, character*);
 TCOD_console_t getItemConsole(void);
 item *getItems(void);
+item *getItemLodgedInActor(character*);
 void drawItems(void);
 int getTotalNumberOfKeytorches(void);
 int getNumberOfLitKeytorches(void);
@@ -55,6 +59,7 @@ void createExit(int, int);
 void createSign(int, int, char*);
 void createDoor(int, int);
 void createKey(int, int);
+void createWoodenSword(int, int);
 void enableDoor(item*);
 
 #endif
