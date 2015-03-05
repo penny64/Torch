@@ -14,6 +14,7 @@ enum {
 	DROP_VOID_ON_DEATH = 0x01 << 4,
 	IS_VOID_WORM = 0x01 << 5,
 	IS_IMMUNE_TO_DARKNESS = 0x01 << 6,
+	TRACK_TARGET = 0x01 << 7,
 } aiFlag_t;
 
 enum {

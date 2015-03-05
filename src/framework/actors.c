@@ -330,6 +330,10 @@ int _checkIfPositionLit(character *actor) {
 	return 0;
 }
 
+void _actorAiTrack(character *actor) {
+	
+}
+
 void _actorAi(character *actor) {
 	if (actor->delay) {
 		return;
@@ -337,6 +341,8 @@ void _actorAi(character *actor) {
 	
 	if (actor->aiFlags & RANDOM_WALK) {
 		moveActor(actor, getRandomInt(-1, 1), getRandomInt(-1, 1));
+	} else if (actor->aiFlags & TRACK_TARGET) {
+		_actorAiTrack(actor);
 	} else if (actor->aiFlags & WORM_WALK) {
 		//TODO: Potentially store AI info in a different struct,
 		//a linked list containing AI states per AI type

@@ -112,7 +112,7 @@ room *createRoom(int id, int roomSize, unsigned int flags) {
 	rm->flags = flags;
 	rm->prev = NULL;
 	rm->next = NULL;
-	rm->connectedRooms = (int*)malloc(MAX_ROOMS * sizeof(int));
+	rm->connectedRooms = (int*)malloc((MAX_ROOMS + 1) * sizeof(int));
 
 	printf("FLAGS %i %i  size=%i\n", rm->flags, flags, roomSize);
 
