@@ -3,7 +3,7 @@
 #define FPS 60
 #define WINDOW_WIDTH 50
 #define WINDOW_HEIGHT 40
-#define WINDOW_TITLE "Torch and Darkness - flagsdev 2015"
+#define WINDOW_TITLE "Torch! - flagsdev 2015"
 
 #define RED_SHIFT 45
 

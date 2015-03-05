@@ -760,6 +760,9 @@ void placeTunnels() {
 		}
 		
 		index = TCOD_random_get_int(RANDOM, 0, startCount - 1);
+		
+		printf("Start index: %i\n", index);
+		
 		w_x = START_POSITIONS[index][0];
 		w_y = START_POSITIONS[index][1];
 		
@@ -817,10 +820,14 @@ void placeTunnels() {
 		doorPlaced = 0;
 		destDoorPlaced = 0;
 		
+		//printf("Start dij\n");
+		
 		while (DIJKSTRA_MAP[w_x][w_y]) {
 			lowestValue = DIJKSTRA_MAP[w_x][w_y];
 			lowestX = 0;
 			lowestY = 0;
+			
+			//printf("\tSub 1 START\n");
 			
 			for (y1 = -1; y1 <= 1; y1++) {
 				for (x1 = -1; x1 <= 1; x1++) {
@@ -831,6 +838,8 @@ void placeTunnels() {
 					if ((y1 == -1 && x1 == 1) || (y1 == -1 && x1 == -1) || (y1 == 1 && x1 == 1) || (y1 == 1 && x1 == -1)) {
 						continue;
 					}
+										
+					//printf("VAL=%i\n", DIJKSTRA_MAP[w_x + x1][w_y + y1]);
 					
 					if (DIJKSTRA_MAP[w_x + x1][w_y + y1] == -1) {
 						continue;
@@ -843,11 +852,15 @@ void placeTunnels() {
 					}
 				}
 			}
+			
+			//printf("\tSub 1 END\n");
 
 			w_x = lowestX;
 			w_y = lowestY;
 
 			randomRoomSize = 1;//clip(TCOD_random_get_int(RANDOM, minRoomSize, maxRoomSize), 1, 255);
+			
+			//printf("\tSub 2 START\n");
 			
 			for (y1 = -2; y1 <= 2; y1++) {
 				for (x1 = -2; x1 <= 2; x1++) {
@@ -884,6 +897,10 @@ void placeTunnels() {
 					TCOD_map_set_properties(LEVEL_MAP, w_x + x1, w_y + y1, 1, 1);
 				}
 			}
+			
+			//printf("\tSub 2 END\n");
+			
+			//printf("\tSub 3 START\n");
 
 			if (!destDoorPlaced) {
 				for (y1 = -1; y1 <= 1; y1++) {
@@ -891,7 +908,11 @@ void placeTunnels() {
 						if (!x1 && !y1) {
 							continue;
 						}
-
+						
+						if ((w_x + x1 <= 2 || w_x + x1 >= WINDOW_WIDTH - 2 || w_y + y1 <= 2 || w_y + y1 >= WINDOW_HEIGHT - 2)) {
+							continue;
+						}
+						
 						if (ROOM_MAP[w_x + x1][w_y + y1] == dstRoom->id) {
 							//createDoor(w_x, w_y);
 							addRoomDoorPosition(dstRoom, w_x, w_y);
@@ -907,12 +928,17 @@ void placeTunnels() {
 					}
 				}
 			}
+			
+			//printf("\tSub 3 END\n");
 		}
+		
+		//printf("End dij\n");
 
 		if (ROOM_MAP[w_x][w_y] == dstRoom->id) {
 			printf("Connecting rooms: %i, %i\n", srcRoom->id, dstRoom->id);
 
 			connectRooms(srcRoom, dstRoom);
+			//printf("Done\n");
 
 			//if (isLevelValid()) {
 			//	break;
