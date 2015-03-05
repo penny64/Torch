@@ -179,6 +179,8 @@ int slash(character *attacker, character *target, item *weapon) {
 	
 	attackDamage = getRandomIntWithMean(lowerDamageValue, upperDamageValue, damageMean);
 	percentageAttackDamage = attackDamage / upperDamageValue;
+
+	float attackDamageBeforeDefense = attackDamage;
 	
 	if ((attacker->traitFlags & TORCH_ATTACK_PENALTY && attacker->itemLight)) {
 		attackDamage /= 2;
@@ -192,7 +194,7 @@ int slash(character *attacker, character *target, item *weapon) {
 		return 1;
 	}
 	
-	if (getRandomInt(0, weaponDamage) <= weaponDamage / 2) {
+	if (attackDamageBeforeDefense <= upperDamageValue * .85 && getRandomFloat(0.f, 1.f) > (attackDamageBeforeDefense / (upperDamageValue * .85)) / (upperDamageValue * .85)) {
 		weapon->itemFlags |= IS_LODGED;
 		weapon->lodgedInActor = target;
 		attacker->stanceFlags |= IS_HOLDING_LODGED_WEAPON;
