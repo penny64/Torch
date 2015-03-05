@@ -120,9 +120,9 @@ int performDamage(character *attacker, character *target, float attackDamage, fl
 }
 
 int punch(character *attacker, character *target) {
-	int attackerStrength = 5;
-	int attackerLevel = 3;
-	int attackerLuck = 2;
+	int attackerStrength = getActorStrength(attacker);
+	int attackerLevel = getActorLevel(attacker);
+	int attackerLuck = getActorLuck(attacker);
 	
 	attackerLuck = getRandomIntWithMean(0, attackerLuck, clip(attackerLuck - 1, 0, attackerLuck));
 	
@@ -160,9 +160,9 @@ int punch(character *attacker, character *target) {
 
 int slash(character *attacker, character *target, item *weapon) {
 	character *player = getPlayer();
-	int attackerStrength = 5;
-	int attackerLevel = 3;
-	int attackerLuck = 2;
+	int attackerStrength = getActorStrength(attacker);
+	int attackerLevel = getActorLevel(attacker);
+	int attackerLuck = getActorLuck(attacker);
 	int weaponDamage = getRandomIntWithMean(0, weapon->statDamage, weapon->statDamage + 2);
 	
 	attackerLuck = getRandomIntWithMean(0, attackerLuck, clip(attackerLuck - 1, 0, attackerLuck));

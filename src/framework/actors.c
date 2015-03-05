@@ -47,7 +47,10 @@ character *createActor(int x, int y) {
 	_c->vx = 0;
 	_c->vy = 0;
 	_c->delay = 0;
+	_c->statLevel = 1;
+	_c->statLuck = 2;
 	_c->statSpeed = 1;
+	_c->statStrength = 3;
 	_c->sightRange = 16;
 	_c->numberOfItems = 0;
 	_c->prev = NULL;
@@ -164,6 +167,18 @@ int getMovementCost(character *actor) {
 	}
 	
 	return cost;
+}
+
+int getActorLevel(character *actor) {
+	return actor->statLevel;
+}
+
+int getActorLuck(character *actor) {
+	return actor->statLuck;
+}
+
+int getActorStrength(character *actor) {
+	return actor->statStrength;
 }
 
 void moveActor(character *actor, int vx, int vy) {
