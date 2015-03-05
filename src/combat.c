@@ -136,17 +136,21 @@ int punch(character *attacker, character *target) {
 	float attackDamage, percentageAttackDamage, movementDamageBonus = .0f;
 	
 	if (attacker->stanceFlags & IS_MOVING) {
-		movementDamageBonus = (10 - ((float)getActorSpeed(attacker))) / 10;
+		movementDamageBonus = (10.f - ((float)getActorSpeed(attacker))) / 10.f;
 		movementDamageBonus *= attackerStrength;
 		
 		printf("Extra movement damage: %f\n", movementDamageBonus);
 	}
 	
+	lowerDamageValue += (int)(movementDamageBonus + .5f);
+	upperDamageValue += (int)(movementDamageBonus + .5f);
+	damageMean += (int)(movementDamageBonus + .5f);
+	
 	setStance(attacker, IS_PUNCHING);
 	setFutureStanceToRemove(attacker, IS_PUNCHING);
 	setDelay(attacker, 2);
 	
-	attackDamage = getRandomIntWithMean(lowerDamageValue, upperDamageValue, damageMean + (int)(movementDamageBonus + .5f));
+	attackDamage = getRandomIntWithMean(lowerDamageValue, upperDamageValue, damageMean);
 	percentageAttackDamage = attackDamage / upperDamageValue;
 	
 	if ((attacker->traitFlags & TORCH_ATTACK_PENALTY && attacker->itemLight)) {
@@ -173,7 +177,7 @@ int slash(character *attacker, character *target, item *weapon) {
 	int attackerStrength = getActorStrength(attacker);
 	int attackerLevel = getActorLevel(attacker);
 	int attackerLuck = getActorLuck(attacker);
-	int weaponDamage = getRandomIntWithMean(0, weapon->statDamage, weapon->statDamage + 2);
+	int weaponDamage = getRandomIntWithMean(0, weapon->statDamage, weapon->statDamage + (2 + attackerLevel));
 	
 	attackerLuck = getRandomIntWithMean(0, attackerLuck, clip(attackerLuck - 1, 0, attackerLuck));
 	
@@ -181,7 +185,18 @@ int slash(character *attacker, character *target, item *weapon) {
 	int lowerDamageValue = attackerStrength;
 	int upperDamageValue = (attackerStrength + 2) + attackerLevel + attackerLuck;
 	int damageMean = (upperDamageValue * (1.3 * targetOpenness)) + weaponDamage;
-	float attackDamage, percentageAttackDamage;
+	float attackDamage, percentageAttackDamage, movementDamageBonus = .0f;
+	
+	if (attacker->stanceFlags & IS_MOVING) {
+		movementDamageBonus = (10.f - ((float)getActorSpeed(attacker))) / 10.f;
+		movementDamageBonus *= attackerStrength;
+		
+		printf("Extra movement damage: %f\n", movementDamageBonus);
+	}
+	
+	lowerDamageValue += (int)(movementDamageBonus + .5f);
+	upperDamageValue += (int)(movementDamageBonus + .5f);
+	damageMean += (int)(movementDamageBonus + .5f);
 	
 	setStance(attacker, IS_SWINGING);
 	setFutureStanceToRemove(attacker, IS_SWINGING);
