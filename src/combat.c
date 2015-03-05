@@ -59,9 +59,14 @@ void considerKnockback(character *attacker, character *target, int attackDamage,
 	character *player = getPlayer();
 	float targetHealth = target->hp;
 	float percentageOfTargetHealthAfterDamage = 1 - ((targetHealth - attackDamage) / targetHealth);
+	float forceRequirementToStun = .4;
 	
-	if (percentageOfTargetHealthAfterDamage >= .4) {
-		if (!(target->stanceFlags & IS_STUNNED)) {
+	if (attacker->stanceFlags & IS_MOVING) {
+		forceRequirementToStun = .2;
+	}
+	
+	if (percentageOfTargetHealthAfterDamage >= forceRequirementToStun) {
+		if (!(target->stanceFlags & IS_STUNNED) && target->stanceFlags & IS_ALIVE) {
 			//target->stanceFlags |= IS_STUNNED;
 			setStance(target, IS_STUNNED);
 			setFutureStanceToRemove(target, IS_STUNNED);
@@ -72,8 +77,6 @@ void considerKnockback(character *attacker, character *target, int attackDamage,
 			}
 		} else {
 			if (target->stanceFlags & IS_STANDING) {
-				//target->stanceFlags ^= IS_STANDING;
-				//target->stanceFlags |= IS_CRAWLING;
 				unsetStance(target, IS_STANDING);
 				setStance(target, IS_CRAWLING);
 				setDelay(target, 8);
@@ -129,14 +132,21 @@ int punch(character *attacker, character *target) {
 	float targetOpenness = getTargetOpenness(target);
 	int lowerDamageValue = attackerStrength;
 	int upperDamageValue = (attackerStrength + 2) + attackerLevel + attackerLuck;
-	int damageMean = upperDamageValue * (1.3 * targetOpenness);;
-	float attackDamage, percentageAttackDamage;
+	int damageMean = upperDamageValue * (1.3 * targetOpenness);
+	float attackDamage, percentageAttackDamage, movementDamageBonus = .0f;
+	
+	if (attacker->stanceFlags & IS_MOVING) {
+		movementDamageBonus = (10 - ((float)getActorSpeed(attacker))) / 10;
+		movementDamageBonus *= attackerStrength;
+		
+		printf("Extra movement damage: %f\n", movementDamageBonus);
+	}
 	
 	setStance(attacker, IS_PUNCHING);
 	setFutureStanceToRemove(attacker, IS_PUNCHING);
 	setDelay(attacker, 2);
 	
-	attackDamage = getRandomIntWithMean(lowerDamageValue, upperDamageValue, damageMean);
+	attackDamage = getRandomIntWithMean(lowerDamageValue, upperDamageValue, damageMean + (int)(movementDamageBonus + .5f));
 	percentageAttackDamage = attackDamage / upperDamageValue;
 	
 	if ((attacker->traitFlags & TORCH_ATTACK_PENALTY && attacker->itemLight)) {

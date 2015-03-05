@@ -133,6 +133,10 @@ void playerInputLogic() {
 		moveActor(PLAYER_ACTOR, 1, -1);
 	}
 	
+	if (isCharPressed('.') || isCharPressed('5')) {
+		setDelay(PLAYER_ACTOR, 1);
+	}
+	
 	if (isCharPressed(' ')) {
 		_handlePlantTorch();
 	} else if (isCharPressed('c')) {

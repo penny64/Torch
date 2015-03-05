@@ -15,6 +15,7 @@ enum {
 	IS_VOID_WORM = 0x01 << 5,
 	IS_IMMUNE_TO_DARKNESS = 0x01 << 6,
 	TRACK_TARGET = 0x01 << 7,
+	IS_ALIVE = 0x01 << 8,
 } aiFlag_t;
 
 enum {
@@ -34,17 +35,19 @@ enum {
 	IS_STUNNED = 0x01 << 6,
 	IS_PUNCHING = 0x01 << 7,
 	IS_STUCK_WITH_LODGED_WEAPON = 0x01 << 8,
+	IS_MOVING = 0x01 << 9,
 } stanceFlags_t;
 
 typedef struct character character;
 
 struct character {
-	int x, y, vx, vy, hp, hpMax, delay, statLevel, statLuck, statSpeed, statStrength, turns, chr, sightRange, numberOfItems;
+	int x, y, lastX, lastY, vx, vy, hp, hpMax, delay, statLevel, statLuck, statSpeed, statStrength, turns, chr, sightRange, numberOfItems;
 	struct character *next, *prev;
 	struct light *itemLight;
 	struct item *inventory[4];
 	unsigned int aiFlags, traitFlags, stanceFlags, nextStanceFlagsToAdd, nextStanceFlagsToRemove;
 	TCOD_color_t foreColor, backColor;
+	TCOD_path_t path;
 	TCOD_console_t fov;
 };
 
@@ -74,3 +77,4 @@ int getMovementCost(character*);
 int getActorLevel(character*);
 int getActorLuck(character*);
 int getActorStrength(character*);
+int getActorSpeed(character*);

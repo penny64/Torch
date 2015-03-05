@@ -42,6 +42,8 @@ character *createActor(int x, int y) {
 	_c = calloc(1, sizeof(character));
 	_c->x = x;
 	_c->y = y;
+	_c->lastX = x;
+	_c->lastY = y;
 	_c->hpMax = 10;
 	_c->hp = _c->hpMax;
 	_c->vx = 0;
@@ -58,6 +60,7 @@ character *createActor(int x, int y) {
 	_c->itemLight = createDynamicLight(_c->x, _c->y, _c);
 	_c->hp = 100;
 	_c->fov = copyLevelMap();
+	_c->path = TCOD_path_new_using_map(_c->fov, 1.41f);
 	_c->chr = (int)'@';
 	_c->foreColor = TCOD_color_RGB(255, 255 - RED_SHIFT, 255 - RED_SHIFT);
 	_c->backColor = TCOD_color_RGB(255, 0, 0);
@@ -181,6 +184,10 @@ int getActorStrength(character *actor) {
 	return actor->statStrength;
 }
 
+int getActorSpeed(character *actor) {
+	return actor->statSpeed;
+}
+
 void moveActor(character *actor, int vx, int vy) {
 	if (actor->delay) {
 		return;
@@ -190,6 +197,36 @@ void moveActor(character *actor, int vx, int vy) {
 	actor->vy = vy;
 	
 	setDelay(actor, getMovementCost(actor));
+}
+
+void walkActor(character *actor, int dx, int dy) {
+	int currentDx, currentDy;
+	
+	if (TCOD_path_size(actor->path)) {
+		TCOD_path_get_destination(actor->path, &currentDx, &currentDy);
+		
+		if (dx == currentDx && dy == currentDy) {
+			printf("Existing path.\n");
+			
+			return;
+		}
+	}
+	
+	printf("Path: %i, %i\n", currentDx, currentDy);
+	
+	if (!TCOD_path_compute(actor->path, actor->x, actor->y, dx, dy)) {
+		printf("Invalid path!\n");
+	}
+}
+
+void walkActorPath(character *actor) {
+	int nx, ny;
+	
+	if (TCOD_path_size(actor->path)) {
+		TCOD_path_walk(actor->path, &nx, &ny, true);
+		
+		moveActor(actor, nx - actor->x, ny - actor->y);
+	}
 }
 
 void removeItemFromInventory(character *actor, item *itm) {
@@ -346,7 +383,8 @@ int _checkIfPositionLit(character *actor) {
 }
 
 void _actorAiTrack(character *actor) {
-	
+	walkActor(actor, getPlayer()->x, getPlayer()->y);
+	walkActorPath(actor);
 }
 
 void _actorAi(character *actor) {
@@ -485,14 +523,31 @@ void _actorLogic(character *actor) {
 				createVoidWormTail(actor->x, actor->y);
 			}
 
+			actor->lastX = actor->x;
+			actor->lastY = actor->y;
 			actor->x = nx;
 			actor->y = ny;
+			setStance(actor, IS_MOVING);
 
 			if (actor->itemLight) {
 				actor->itemLight->fuel -= getLevel();
 			}
 
 			TCOD_map_compute_fov(actor->fov, actor->x, actor->y, actor->sightRange, 1, FOV_SHADOW);
+		} else {
+			if (actor->stanceFlags & IS_MOVING) {
+				unsetStance(actor, IS_MOVING);
+				
+				showMessage("%cYou stop moving.%c", 5);
+			}
+		}
+	} else {
+		if (actor->stanceFlags & IS_MOVING) {
+			if (actor == player) {
+				showMessage("%cYou stop moving.%c", 5);
+			}
+			
+			unsetStance(actor, IS_MOVING);
 		}
 	}
 

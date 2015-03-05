@@ -13,7 +13,7 @@ void createBat(int x, int y) {
 	actor->hp = 15;
 	actor->hpMax = 15;
 	actor->sightRange = 4;
-	actor->aiFlags = RANDOM_WALK | DROP_LIGHT_ON_DEATH;
+	actor->aiFlags = RANDOM_WALK | DROP_LIGHT_ON_DEATH | IS_ALIVE;
 	actor->chr = (int)'^';
 	actor->foreColor = TCOD_color_RGB(205, 25, 25);
 	actor->itemLight->r_tint = 125;
@@ -28,7 +28,8 @@ void createRagdoll(int x, int y) {
 	actor->hp = 25;
 	actor->hpMax = 25;
 	actor->sightRange = 4;
-	actor->aiFlags = RANDOM_WALK;
+	actor->statSpeed = 4;
+	actor->aiFlags = TRACK_TARGET | IS_ALIVE;
 	actor->chr = (int)'&';
 	actor->foreColor = TCOD_color_RGB(205, 205, 205);
 	actor->itemLight->r_tint = 50;
@@ -46,7 +47,7 @@ void createVoidWorm(int x, int y) {
 	actor->hpMax = 15;
 	actor->sightRange = 12;
 	actor->statSpeed = 8;
-	actor->aiFlags = IS_VOID_WORM | RANDOM_WALK | DROP_VOID_ON_DEATH | IS_IMMUNE_TO_DARKNESS;
+	actor->aiFlags = IS_VOID_WORM | RANDOM_WALK | DROP_VOID_ON_DEATH | IS_IMMUNE_TO_DARKNESS | IS_ALIVE;
 	actor->chr = 128;
 	actor->foreColor = TCOD_color_RGB(25, 205, 25);
 	actor->itemLight->r_tint = 125;
