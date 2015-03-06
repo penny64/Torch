@@ -584,8 +584,9 @@ void _drawActor(character *actor) {
 	}
 	
 	TCOD_color_t foreColor = actor->foreColor;
-	int chr = actor->chr;
+	int nx, ny, occupiedPosition = 0, chr = actor->chr;
 	float healthPercentage = (float)actor->hp / (float)actor->hpMax;
+	character *actorPtr = getActors();
 	
 	if (getAnimateFrame() / 60.f >= .5) {
 		if (actor->stanceFlags & IS_STUCK_WITH_LODGED_WEAPON) {
@@ -610,6 +611,25 @@ void _drawActor(character *actor) {
 	}
 	
 	drawChar(ACTOR_CONSOLE, actor->x, actor->y, chr, foreColor, actor->backColor);
+	
+	if (actor->vx || actor->vy) {
+		nx = actor->x + actor->vx;
+		ny = actor->y + actor->vy;
+		
+		while (actorPtr) {
+			if (actorPtr->x == nx && actorPtr->y == ny) {
+				occupiedPosition = 1;
+				
+				break;
+			}
+			
+			actorPtr = actorPtr->next;
+		}
+		
+		if (!occupiedPosition || getAnimateFrame() / 60.f >= .5) {
+			drawChar(ACTOR_CONSOLE, nx, ny, 176, foreColor, actor->backColor);
+		}
+	}
 }
 
 void drawActors() {

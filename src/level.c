@@ -1265,7 +1265,8 @@ void generateLevel() {
 		player->y = startingRoom->positionList[spawnIndex][1];
 		player->itemLight->x = player->x;
 		player->itemLight->y = player->y;
-		player->vx = 1;
+		
+		moveActor(player, 1, 0);
 		
 		spawnIndex = getRandomInt(0, startingRoom->size - 1);
 		createWoodenSword(startingRoom->positionList[spawnIndex][0], startingRoom->positionList[spawnIndex][1]);

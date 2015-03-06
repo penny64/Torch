@@ -80,6 +80,37 @@ void _drawTorchFuel() {
 	}
 }
 
+void _drawStance() {
+	int x = 0, y = WINDOW_HEIGHT - 1;
+	char *stanceText = NULL;
+	TCOD_color_t textColor = TCOD_color_RGB(255, 255, 255);
+	character *player = getPlayer();
+	
+	if (!player) {
+		return;
+	}
+	
+	item *weapon = actorGetItemWithFlag(player, IS_WEAPON);
+	
+	if (weapon) {
+		if (player->stanceFlags & IS_MOVING) {
+			stanceText = "%cRun.Slash%c";
+		} else if (player->stanceFlags & IS_STANDING) {
+			stanceText = "%cSlash%c";
+		}
+	} else {
+		if (player->stanceFlags & IS_MOVING) {
+			stanceText = "%cMoving%c";
+		} else if (player->stanceFlags & IS_STANDING) {
+			stanceText = "%cStanding%c";
+		}
+	}
+	
+	TCOD_console_set_color_control(TCOD_COLCTRL_1, textColor, TCOD_color_RGB(0, 0, 0));
+	
+	drawString(UI_CONSOLE, x, y, stanceText);
+}
+
 void showMessage(const char *text, int timeInTurns) {
 	DISPLAY_TEXT = text;
 	DISPLAY_TEXT_TIME = 0;
@@ -92,6 +123,7 @@ void drawUi() {
 	TCOD_console_clear(UI_CONSOLE);
 	
 	_drawTorchFuel();
+	_drawStance();
 	_drawMessage();
 }
 
