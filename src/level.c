@@ -299,6 +299,10 @@ TCOD_map_t getLevelMap() {
 	return LEVEL_MAP;
 }
 
+TCOD_map_t getTunnelMap() {
+	return TUNNEL_WALLS;
+}
+
 TCOD_map_t getSeenConsole() {
 	return SEEN_CONSOLE;
 }
@@ -977,10 +981,14 @@ void generatePuzzles() {
 		printf("Conned: %i\n", roomPtr->numberOfConnectedRooms);
 
 		if (roomPtr->numberOfConnectedRooms <= 2) {
-			roomPtr->flags = roomPtr->flags | IS_TREASURE_ROOM;
-			roomPtr->flags = roomPtr->flags | NEEDS_DOORS;
+			roomPtr->flags |= IS_TREASURE_ROOM;
+			roomPtr->flags |= NEEDS_DOORS;
 
 			treasureRooms ++;
+		}
+		
+		if (roomPtr->numberOfConnectedRooms == 1) {
+			roomPtr->flags |= IS_RARE_SPAWN;
 		}
 
 		roomPtr = roomPtr->next;
@@ -993,12 +1001,22 @@ void generatePuzzles() {
 			spawnIndex = getRandomInt(0, roomPtr->size - 1);
 
 			createBonfireKeystone(roomPtr->positionList[spawnIndex][0], roomPtr->positionList[spawnIndex][1]);
+			
+			spawnIndex = getRandomInt(0, roomPtr->size - 1);
+
+			createAllSeeingEye(roomPtr->positionList[spawnIndex][0], roomPtr->positionList[spawnIndex][1]);
 		}
 
 		if (roomPtr->flags & IS_TREASURE_ROOM) {
 			spawnIndex = getRandomInt(0, roomPtr->size - 1);
 
 			createTreasure(roomPtr->positionList[spawnIndex][0], roomPtr->positionList[spawnIndex][1]);
+		}
+		
+		if (roomPtr->flags & IS_RARE_SPAWN) {
+			spawnIndex = getRandomInt(0, roomPtr->size - 1);
+
+			createTorchHolder(roomPtr->positionList[spawnIndex][0], roomPtr->positionList[spawnIndex][1]);
 		}
 
 		roomPtr = roomPtr->next;

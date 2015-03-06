@@ -153,7 +153,7 @@ int punch(character *attacker, character *target) {
 	attackDamage = getRandomIntWithMean(lowerDamageValue, upperDamageValue, damageMean);
 	percentageAttackDamage = attackDamage / upperDamageValue;
 	
-	if ((attacker->traitFlags & TORCH_ATTACK_PENALTY && attacker->itemLight)) {
+	if ((attacker->traitFlags & TORCH_ATTACK_PENALTY && !actorGetItemWithFlag(attacker, IS_TORCH_HOLDER) && attacker->itemLight)) {
 		attackDamage /= 2;
 
 		attacker->itemLight->fuel -= 25;
@@ -207,7 +207,7 @@ int slash(character *attacker, character *target, item *weapon) {
 
 	float attackDamageBeforeDefense = attackDamage;
 	
-	if ((attacker->traitFlags & TORCH_ATTACK_PENALTY && attacker->itemLight)) {
+	if ((attacker->traitFlags & TORCH_ATTACK_PENALTY && !actorGetItemWithFlag(attacker, IS_TORCH_HOLDER) && attacker->itemLight)) {
 		attackDamage /= 2;
 
 		attacker->itemLight->fuel -= 25;

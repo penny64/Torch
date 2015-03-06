@@ -14,6 +14,8 @@
 TCOD_console_t ITEM_CONSOLE;
 item *ITEMS = NULL;
 
+void activateAllSeeingEye(item*);
+
 
 void itemSetup() {
 	ITEM_CONSOLE = TCOD_console_new(WINDOW_WIDTH, WINDOW_HEIGHT);
@@ -284,6 +286,10 @@ int itemHandleCharacterTouch(item *itm, character *actor) {
 				}
 			}
 		}
+		
+		if (itm->itemFlags & IS_ALLSEEING_EYE) {
+			activateAllSeeingEye(itm);
+		}
 	}
 	
 	return 0;
@@ -361,6 +367,47 @@ void createWoodenSword(int x, int y) {
 	
 	itm->statDamage = 3;
 	itm->statSpeed = 3;
+}
+
+void createTorchHolder(int x, int y) {
+	createItem(x, y, 'U', TCOD_color_RGB(50, 50, 50), TCOD_color_RGB(10, 10, 10), IS_TORCH_HOLDER | CAN_PICK_UP);
+}
+
+void activateAllSeeingEye(item *itm) {
+	int x, y;
+	TCOD_console_t seenConsole = getSeenConsole();
+	TCOD_map_t levelMap = getLevelMap();
+	TCOD_map_t tunnelMap = getTunnelMap();
+	
+	for (y = 0; y < WINDOW_HEIGHT; y ++) {
+		for (x = 0; x < WINDOW_WIDTH; x ++) {
+			if (TCOD_map_is_walkable(levelMap, x, y) || TCOD_map_is_walkable(tunnelMap, x, y)) {
+				drawCharBack(seenConsole, x, y, TCOD_color_RGB(255, 0, 255));
+			}
+		}
+	}
+	
+	itm->itemLight->fuel = 10;
+	itm->foreColor.r = 10;
+	itm->foreColor.g = 10;
+	//deleteDynamicLight(itm->itemLight);
+	//itm->itemLight = NULL;
+	itm->itemFlags ^= IS_ALLSEEING_EYE;
+}
+
+void createAllSeeingEye(int x, int y) {
+	item *itm = createItem(x, y, ' ', TCOD_color_RGB(175, 175, 30), TCOD_color_RGB(75, 75, 0), IS_ALLSEEING_EYE);
+	
+	blockPosition(itm->x, itm->y);
+	itm->chr = 207;
+	light *lght = createDynamicLight(x, y, NULL);
+	itm->itemLight = lght;
+	lght->size = 3;
+	lght->r_tint = 70;
+	lght->g_tint = 70;
+	lght->b_tint = 0;
+	lght->fuel = 999999;
+	lght->fuelMax = 999999;
 }
 
 void enableDoor(item *itm) {

@@ -8,6 +8,7 @@ enum {
 	IS_TORCH_ROOM = 0x01 << 1,
 	IS_EXIT_ROOM = 0x01 << 2,
 	NEEDS_DOORS = 0x01 << 3,
+	IS_RARE_SPAWN = 0x01 << 4,
 } roomFlag_t;
 
 typedef struct room room;
@@ -25,6 +26,7 @@ TCOD_console_t getShadowConsole(void);
 TCOD_console_t getFogConsole(void);
 TCOD_console_t getSeenConsole(void);
 TCOD_map_t getLevelMap(void);
+TCOD_map_t getTunnelMap(void);
 TCOD_map_t copyLevelMap(void);
 TCOD_noise_t getFogNoise(void);
 void levelSetup(void);

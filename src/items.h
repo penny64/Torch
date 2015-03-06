@@ -19,6 +19,8 @@ enum {
 	IS_WEAPON = 0x01 << 9,
 	IS_SWORD = 0x01 << 10,
 	IS_LODGED = 0x01 << 11,
+	IS_TORCH_HOLDER = 0x01 << 12,
+	IS_ALLSEEING_EYE = 0x01 << 13,
 } itemFlag_t;
 
 
@@ -59,7 +61,9 @@ void createExit(int, int);
 void createSign(int, int, char*);
 void createDoor(int, int);
 void createKey(int, int);
+void createTorchHolder(int, int);
 void createWoodenSword(int, int);
+void createAllSeeingEye(int, int);
 void enableDoor(item*);
 
 #endif
