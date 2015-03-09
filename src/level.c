@@ -98,6 +98,7 @@ void levelShutdown() {
 	TCOD_console_delete(FOG_CONSOLE);
 	TCOD_console_delete(SEEN_CONSOLE);
 	TCOD_map_delete(LEVEL_MAP);
+	TCOD_map_delete(LAVA_MAP);
 	TCOD_map_delete(TUNNEL_MAP);
 	TCOD_map_delete(TUNNEL_WALLS);
 	TCOD_noise_delete(FOG_NOISE);
@@ -116,7 +117,7 @@ room *createRoom(int id, int roomSize, unsigned int flags) {
 	rm->next = NULL;
 	rm->connectedRooms = (int*)malloc((MAX_ROOMS + 1) * sizeof(int));
 
-	printf("FLAGS %i %i  size=%i\n", rm->flags, flags, roomSize);
+	//printf("FLAGS %i %i  size=%i\n", rm->flags, flags, roomSize);
 
 	//TODO: Use memcpy in the future
 	rm->positionList = malloc(sizeof *rm->positionList * roomSize);
@@ -588,7 +589,7 @@ void findRooms() {
 
 			createRoom(ROOM_COUNT, oLen, 0x0);
 
-			printf("Found new room: %i (%i)\n", ROOM_COUNT, oLen);
+			//printf("Found new room: %i (%i)\n", ROOM_COUNT, oLen);
 		}
 	}
 
@@ -941,7 +942,7 @@ void placeTunnels() {
 		//printf("End dij\n");
 
 		if (ROOM_MAP[w_x][w_y] == dstRoom->id) {
-			printf("Connecting rooms: %i, %i\n", srcRoom->id, dstRoom->id);
+			//printf("Connecting rooms: %i, %i\n", srcRoom->id, dstRoom->id);
 
 			connectRooms(srcRoom, dstRoom);
 			//printf("Done\n");
@@ -1035,16 +1036,22 @@ void generatePuzzles() {
 				doorEnter[0] = roomPtr->doorPositions[doorEnterIndex][0];
 				doorEnter[1] = roomPtr->doorPositions[doorEnterIndex][1];
 				
+				if (!TCOD_map_is_walkable(LEVEL_MAP, doorEnter[0], doorEnter[1])) {
+					printf("Unit\n");
+				}
+				//TCOD_dijkstra_compute(lavaWalker, doorEnter[0], doorEnter[1]);
+				
 				for (doorExitIndex = doorEnterIndex + 1; doorExitIndex < roomPtr->numberOfDoorPositions; doorExitIndex ++) {
 					doorExit[0] = roomPtr->doorPositions[doorExitIndex][0];
 					doorExit[1] = roomPtr->doorPositions[doorExitIndex][1];
 					
-					TCOD_dijkstra_compute(lavaWalker, doorEnter[0], doorEnter[1]);
-					TCOD_dijkstra_path_set(lavaWalker, doorExit[0], doorExit[1]);
+					//TCOD_dijkstra_path_set(lavaWalker, doorExit[0], doorExit[1]);
 					
-					while (TCOD_dijkstra_path_walk(lavaWalker, &lavaWalkerX, &lavaWalkerY)) {
-						TCOD_map_set_properties(LAVA_MAP, lavaWalkerX, lavaWalkerY, 0, 0);
-					}
+					printf("From: %i, %i, to: %i, %i\n", doorEnter[0], doorEnter[1], doorExit[0], doorExit[1]);
+					
+					//while (TCOD_dijkstra_path_walk(lavaWalker, &lavaWalkerX, &lavaWalkerY)) {
+					//	TCOD_map_set_properties(LAVA_MAP, lavaWalkerX, lavaWalkerY, 0, 0);
+					//}
 				}
 			}
 		}

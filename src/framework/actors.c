@@ -39,6 +39,11 @@ void actorsShutdown() {
 character *createActor(int x, int y) {
 	character *_c, *_p_c;
 	
+	if (x < 0 || x > WINDOW_WIDTH || y < 0 || y > WINDOW_HEIGHT) {
+		printf("Something has went terribly wrong!\n");
+		return NULL;
+	}
+	
 	_c = calloc(1, sizeof(character));
 	_c->x = x;
 	_c->y = y;
@@ -200,7 +205,7 @@ void moveActor(character *actor, int vx, int vy) {
 }
 
 void walkActor(character *actor, int dx, int dy) {
-	int currentDx, currentDy;
+	int currentDx = -1, currentDy = -1;
 	
 	if (TCOD_path_size(actor->path)) {
 		TCOD_path_get_destination(actor->path, &currentDx, &currentDy);
@@ -294,6 +299,8 @@ void _resetActorForNewLevel(character *actor) {
 	}
 	
 	actor->fov = copyLevelMap();
+	TCOD_path_delete(actor->path);
+	actor->path = TCOD_path_new_using_map(actor->fov, 1.41f);
 
 	if (actor->itemLight) {
 		resetLight(actor->itemLight);
