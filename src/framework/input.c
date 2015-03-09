@@ -2,15 +2,17 @@
 #include "libtcod.h"
 
 
-static TCOD_key_t KEY;
+TCOD_key_t KEY;
+TCOD_mouse_t MOUSE;
+TCOD_event_t INPUT_EVENT;
 
 
 void startInput() {
-	TCOD_console_set_keyboard_repeat(10, 0);
+	TCOD_console_set_keyboard_repeat(100, 500);
 }
 
 void inputLogic() {
-	KEY = TCOD_console_check_for_keypress(TCOD_KEY_PRESSED);
+	INPUT_EVENT = TCOD_sys_check_for_event(TCOD_EVENT_KEY, &KEY, &MOUSE);
 }
 
 int isCharPressed(char char_char) {
@@ -22,6 +24,7 @@ int isCharPressed(char char_char) {
 }
 
 int isTCODCharPressed(int tcod_char) {
+	printf("Check for keypress\n");
 	if (tcod_char == KEY.vk) {
 		return 1;
 	}

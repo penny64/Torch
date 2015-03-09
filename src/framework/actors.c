@@ -398,6 +398,10 @@ int _checkIfPositionLit(character *actor) {
 }
 
 void _actorAiTrack(character *actor) {
+	if (!getPlayer()) {
+		return;
+	}
+
 	walkActor(actor, getPlayer()->x, getPlayer()->y);
 	walkActorPath(actor);
 }

@@ -117,7 +117,7 @@ room *createRoom(int id, int roomSize, unsigned int flags) {
 	rm->next = NULL;
 	rm->connectedRooms = (int*)malloc((MAX_ROOMS + 1) * sizeof(int));
 
-	//printf("FLAGS %i %i  size=%i\n", rm->flags, flags, roomSize);
+	printf("FLAGS %i %i  size=%i\n", rm->flags, flags, roomSize);
 
 	//TODO: Use memcpy in the future
 	rm->positionList = malloc(sizeof *rm->positionList * roomSize);
@@ -128,8 +128,10 @@ room *createRoom(int id, int roomSize, unsigned int flags) {
 			rm->positionList[i] = malloc(sizeof(int) * 2);
 		}
 	}
+
+	printf("\tCreated position list\n");
 	
-	rm->doorPositions = malloc(sizeof *rm->doorPositions * 12);
+	rm->doorPositions = malloc(sizeof *rm->doorPositions * roomSize);
 	if (rm->doorPositions)
 	{
 		for (i = 0; i < roomSize; i++)
@@ -137,6 +139,8 @@ room *createRoom(int id, int roomSize, unsigned int flags) {
 			rm->doorPositions[i] = malloc(sizeof(int) * 2);
 		}
 	}
+
+	printf("\tCreated door position list\n");
 
 	for (y = 0; y < WINDOW_HEIGHT; y ++) {
 		addPosition = 0;
@@ -174,6 +178,8 @@ room *createRoom(int id, int roomSize, unsigned int flags) {
 		ptr->next = rm;
 		rm->prev = ptr;
 	}
+
+	printf("Done!\n");
 
 	return rm;
 }
