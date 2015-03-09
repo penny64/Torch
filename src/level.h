@@ -9,6 +9,7 @@ enum {
 	IS_EXIT_ROOM = 0x01 << 2,
 	NEEDS_DOORS = 0x01 << 3,
 	IS_RARE_SPAWN = 0x01 << 4,
+	IS_LAVA_ROOM = 0x01 << 5,
 } roomFlag_t;
 
 typedef struct room room;

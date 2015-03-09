@@ -66,16 +66,17 @@ void considerKnockback(character *attacker, character *target, int attackDamage,
 	}
 	
 	if (percentageOfTargetHealthAfterDamage >= forceRequirementToStun) {
-		if (!(target->stanceFlags & IS_STUNNED) && target->stanceFlags & IS_ALIVE) {
-			//target->stanceFlags |= IS_STUNNED;
+		printf("Good!\n");
+		if (!(target->stanceFlags & IS_STUNNED) && target->aiFlags & IS_ALIVE) {
 			setStance(target, IS_STUNNED);
 			setFutureStanceToRemove(target, IS_STUNNED);
-			setDelay(target, 5);
+			setDelay(target, 10);
 			
 			if (attacker == player) {
 				showMessage("%cTarget stunned!%c", 4);
 			}
 		} else {
+			printf("NO!\n");
 			if (target->stanceFlags & IS_STANDING) {
 				unsetStance(target, IS_STANDING);
 				setStance(target, IS_CRAWLING);
@@ -228,6 +229,8 @@ int slash(character *attacker, character *target, item *weapon) {
 		if (attacker == player) {
 			showMessage("%cThe weapon becomes lodged!%c", 10);
 		}
+	} else if (attacker->stanceFlags & IS_MOVING) {
+		considerKnockback(attacker, target, attackDamage, percentageAttackDamage);
 	}
 	
 	return 0;

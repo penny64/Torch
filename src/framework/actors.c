@@ -537,16 +537,10 @@ void _actorLogic(character *actor) {
 		} else {
 			if (actor->stanceFlags & IS_MOVING) {
 				unsetStance(actor, IS_MOVING);
-				
-				showMessage("%cYou stop moving.%c", 5);
 			}
 		}
 	} else {
 		if (actor->stanceFlags & IS_MOVING) {
-			if (actor == player) {
-				showMessage("%cYou stop moving.%c", 5);
-			}
-			
 			unsetStance(actor, IS_MOVING);
 		}
 	}

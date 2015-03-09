@@ -20,6 +20,7 @@ TCOD_console_t SHADOW_CONSOLE;
 TCOD_console_t FOG_CONSOLE;
 TCOD_console_t SEEN_CONSOLE;
 TCOD_map_t LEVEL_MAP;
+TCOD_map_t LAVA_MAP;
 TCOD_map_t TUNNEL_MAP;
 TCOD_map_t TUNNEL_WALLS;
 TCOD_noise_t FOG_NOISE;
@@ -47,6 +48,7 @@ void levelSetup() {
 	SEEN_CONSOLE = TCOD_console_new(WINDOW_WIDTH, WINDOW_HEIGHT);
 	LIGHT_CONSOLE = TCOD_console_new(WINDOW_WIDTH, WINDOW_HEIGHT);
 	LEVEL_MAP = TCOD_map_new(WINDOW_WIDTH, WINDOW_HEIGHT);
+	LAVA_MAP = TCOD_map_new(WINDOW_WIDTH, WINDOW_HEIGHT);
 	TUNNEL_MAP = TCOD_map_new(WINDOW_WIDTH, WINDOW_HEIGHT);
 	TUNNEL_WALLS = TCOD_map_new(WINDOW_WIDTH, WINDOW_HEIGHT);
 	FOG_NOISE = TCOD_noise_new(2, TCOD_NOISE_DEFAULT_HURST, TCOD_NOISE_DEFAULT_LACUNARITY, NULL);
@@ -126,7 +128,7 @@ room *createRoom(int id, int roomSize, unsigned int flags) {
 		}
 	}
 	
-	rm->doorPositions = malloc(sizeof *rm->doorPositions * roomSize);
+	rm->doorPositions = malloc(sizeof *rm->doorPositions * 12);
 	if (rm->doorPositions)
 	{
 		for (i = 0; i < roomSize; i++)
@@ -961,8 +963,9 @@ void placeItemChest() {
 }
 
 void generatePuzzles() {
-	int spawnIndex, exitPlaced = 0, treasureRooms = 0;
+	int i, lavaWalkerX, lavaWalkerY, doorEnterIndex, doorExitIndex, doorEnter[2], doorExit[2], spawnIndex, exitPlaced = 0, treasureRooms = 0;
 	room *roomPtr = ROOMS;
+	TCOD_dijkstra_t lavaWalker = TCOD_dijkstra_new(LEVEL_MAP, 0.0f);
 
 	while (roomPtr) {
 		if (!exitPlaced && roomPtr->size <= 80) {
@@ -985,6 +988,10 @@ void generatePuzzles() {
 			roomPtr->flags |= NEEDS_DOORS;
 
 			treasureRooms ++;
+		}
+		
+		if (roomPtr->numberOfConnectedRooms == 3 && !(roomPtr->flags & IS_TORCH_ROOM)){
+			roomPtr->flags |= IS_LAVA_ROOM;
 		}
 		
 		if (roomPtr->numberOfConnectedRooms == 1) {
@@ -1017,6 +1024,29 @@ void generatePuzzles() {
 			spawnIndex = getRandomInt(0, roomPtr->size - 1);
 
 			createTorchHolder(roomPtr->positionList[spawnIndex][0], roomPtr->positionList[spawnIndex][1]);
+		}
+		
+		if (roomPtr->flags & IS_LAVA_ROOM) {
+			for (i = 0; i < roomPtr->size; i++) {
+				TCOD_map_set_properties(LAVA_MAP, roomPtr->positionList[i][0], roomPtr->positionList[i][1], 1, 1);
+			}
+			
+			for (doorEnterIndex = 0; doorEnterIndex < roomPtr->numberOfDoorPositions; doorEnterIndex ++) {
+				doorEnter[0] = roomPtr->doorPositions[doorEnterIndex][0];
+				doorEnter[1] = roomPtr->doorPositions[doorEnterIndex][1];
+				
+				for (doorExitIndex = doorEnterIndex + 1; doorExitIndex < roomPtr->numberOfDoorPositions; doorExitIndex ++) {
+					doorExit[0] = roomPtr->doorPositions[doorExitIndex][0];
+					doorExit[1] = roomPtr->doorPositions[doorExitIndex][1];
+					
+					TCOD_dijkstra_compute(lavaWalker, doorEnter[0], doorEnter[1]);
+					TCOD_dijkstra_path_set(lavaWalker, doorExit[0], doorExit[1]);
+					
+					while (TCOD_dijkstra_path_walk(lavaWalker, &lavaWalkerX, &lavaWalkerY)) {
+						TCOD_map_set_properties(LAVA_MAP, lavaWalkerX, lavaWalkerY, 0, 0);
+					}
+				}
+			}
 		}
 
 		roomPtr = roomPtr->next;
@@ -1147,6 +1177,10 @@ void colorRooms() {
 			b = 0;
 
 			bMod = 170;
+		} else if (roomPtr->flags & IS_LAVA_ROOM) {
+			r = 160;
+			g = 82;
+			b = 45;
 		} else if (roomPtr->flags & IS_TORCH_ROOM) {
 			r = 140 - RED_SHIFT;
 			g = 0;
@@ -1175,12 +1209,16 @@ void colorRooms() {
 			g = 25;
 			b = 25;
 		}
-
+		
 		for (i = 0; i < roomPtr->size; i ++) {
 			x = roomPtr->positionList[i][0];
 			y = roomPtr->positionList[i][1];
 
-			drawCharBackEx(LEVEL_CONSOLE, x, y, TCOD_color_RGB(clip(r + RED_SHIFT + getRandomInt(0, rMod), 0, 255), clip(g + getRandomInt(0, gMod), 0, 255), clip(b + getRandomInt(0, bMod), 0, 255)), TCOD_BKGND_SET);
+			if (TCOD_map_is_walkable(LAVA_MAP, x, y)) {
+				drawCharBackEx(LEVEL_CONSOLE, x, y, TCOD_color_RGB(0, 0, 255), TCOD_BKGND_SET);
+			} else {
+				drawCharBackEx(LEVEL_CONSOLE, x, y, TCOD_color_RGB(clip(r + RED_SHIFT + getRandomInt(0, rMod), 0, 255), clip(g + getRandomInt(0, gMod), 0, 255), clip(b + getRandomInt(0, bMod), 0, 255)), TCOD_BKGND_SET);
+			}
 		}
 
 		for (y = 2; y < WINDOW_HEIGHT - 2; y ++) {
@@ -1208,6 +1246,7 @@ void generateLevel() {
 	EXIT_WAVE_DIST = 0;
 
 	TCOD_map_clear(LEVEL_MAP, 0, 0);
+	TCOD_map_clear(LAVA_MAP, 0, 0);
 	TCOD_map_clear(TUNNEL_MAP, 0, 0);
 	TCOD_map_clear(TUNNEL_WALLS, 0, 0);
 	TCOD_console_clear(LEVEL_CONSOLE);
@@ -1337,7 +1376,7 @@ void generateLevel() {
 					drawChar(LEVEL_CONSOLE, x, y, 177 + getRandomInt(0, 1), TCOD_color_RGB(175, 36, 36), TCOD_color_RGB(105, 26, 26));
 					//drawCharBackEx(LEVEL_CONSOLE, x, y, TCOD_color_RGB(95, 8, 8), TCOD_BKGND_SET);
 				}
-			} else {
+			} else if (!TCOD_map_is_walkable(LAVA_MAP, x, y)) {
 				colorMod = (int)(fogValue * 120);
 				
 				if (!TCOD_random_get_int(RANDOM, 0, 4)) {
