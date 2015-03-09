@@ -114,18 +114,20 @@ void applyFov() {
 			actor = getActors();
 			lght = getDynamicLights();
 			
-			if (TCOD_map_is_walkable(lightMap, x, y)) {
-				isLit = 1;
-			}
-			
-			while (lght != NULL && !isLit) {
-				if (TCOD_map_is_walkable(lght->lightMap, x, y)) {
+			if (lightMap) {
+				if (TCOD_map_is_walkable(lightMap, x, y)) {
 					isLit = 1;
-					
-					break;
 				}
 				
-				lght = lght->next;
+				while (lght != NULL && !isLit) {
+					if (TCOD_map_is_walkable(lght->lightMap, x, y)) {
+						isLit = 1;
+						
+						break;
+					}
+					
+					lght = lght->next;
+				}
 			}
 			
 			while (actor != NULL) {

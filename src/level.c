@@ -538,16 +538,16 @@ void findRooms() {
 				for (x1 = -1; x1 <= 1; x1++) {
 					x = w_x + x1;
 					y = w_y + y1;
-
-					if (!TCOD_map_is_walkable(LEVEL_MAP, x, y)) {
-						continue;
-					}
 					
 					if ((y1 == -1 && x1 == 1) || (y1 == -1 && x1 == -1) || (y1 == 1 && x1 == 1) || (y1 == 1 && x1 == -1)) {
 						continue;
 					}
 
 					if (x <= 1 || x >= WINDOW_WIDTH - 2 || y <= 1 || y >= WINDOW_HEIGHT - 2) {
+						continue;
+					}
+					
+					if (!TCOD_map_is_walkable(LEVEL_MAP, x, y)) {
 						continue;
 					}
 
@@ -1036,10 +1036,7 @@ void generatePuzzles() {
 				doorEnter[0] = roomPtr->doorPositions[doorEnterIndex][0];
 				doorEnter[1] = roomPtr->doorPositions[doorEnterIndex][1];
 				
-				if (!TCOD_map_is_walkable(LEVEL_MAP, doorEnter[0], doorEnter[1])) {
-					printf("Unit\n");
-				}
-				//TCOD_dijkstra_compute(lavaWalker, doorEnter[0], doorEnter[1]);
+				TCOD_dijkstra_compute(lavaWalker, doorEnter[0], doorEnter[1]);
 				
 				for (doorExitIndex = doorEnterIndex + 1; doorExitIndex < roomPtr->numberOfDoorPositions; doorExitIndex ++) {
 					doorExit[0] = roomPtr->doorPositions[doorExitIndex][0];

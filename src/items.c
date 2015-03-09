@@ -97,7 +97,6 @@ void deleteAllOwnerlessItems() {
 
 void deleteItem(item *itm) {
 	if (itm->itemLight) {
-		printf("Deleting item\n");
 		deleteDynamicLight(itm->itemLight);
 	}
 	

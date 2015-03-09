@@ -166,7 +166,7 @@ void refreshAllLights() {
 }
 
 void startLights() {
-	//LIGHT_MAP = TCOD_map_new(WINDOW_WIDTH, WINDOW_HEIGHT);
+	LIGHT_MAP = TCOD_map_new(WINDOW_WIDTH, WINDOW_HEIGHT);
 	DYNAMIC_LIGHT_CONSOLE = TCOD_console_new(WINDOW_WIDTH, WINDOW_HEIGHT);
 
 	printf("STARTING UP LIGHTS...\n");
@@ -306,6 +306,10 @@ void _drawDynamicLight(light *lght) {
 	character *player = getPlayer();
 	TCOD_map_t levelMap = getLevelMap();
 	
+	if (!lght->lightMap) {
+		return;
+	}
+	
 	TCOD_map_clear(lght->lightMap, 0, 0);
 	
 	if (!lght->fuel) {
@@ -314,6 +318,10 @@ void _drawDynamicLight(light *lght) {
 	
 	for (y = lght->y - 32; y < lght->y + 32; y++) {
 		for (x = lght->x - 32; x < lght->x + 32; x++) {
+			if (x < 0 || x >= WINDOW_WIDTH || y < 0 || y >= WINDOW_HEIGHT) {
+				continue;
+			}
+			
 			if (TCOD_map_is_in_fov(lght->fov, x, y)) {
 				if (lght->fuel < lght->size) {
 					penalty = lght->size - lght->fuel;
@@ -382,13 +390,9 @@ void drawDynamicLights() {
 
 int isPositionLit(int x, int y) {
 	light *lght = DYNAMIC_LIGHTS;
-			
-	if (TCOD_map_is_walkable(LIGHT_MAP, x, y)) {
-		return 1;
-	}
 	
 	while (lght != NULL) {
-		if (TCOD_map_is_walkable(lght->lightMap, x, y)) {
+		if (lght->lightMap && TCOD_map_is_walkable(lght->lightMap, x, y)) {
 			return 1;
 		}
 		

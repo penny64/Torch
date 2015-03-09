@@ -207,6 +207,12 @@ void moveActor(character *actor, int vx, int vy) {
 void walkActor(character *actor, int dx, int dy) {
 	int currentDx = -1, currentDy = -1;
 	
+	if (!isPositionWalkable(dx, dy)) {
+		printf("Invalid pathing destination: %i, %i\n", dx, dy);
+		
+		return;
+	}
+	
 	if (TCOD_path_size(actor->path)) {
 		TCOD_path_get_destination(actor->path, &currentDx, &currentDy);
 		
@@ -216,8 +222,6 @@ void walkActor(character *actor, int dx, int dy) {
 			return;
 		}
 	}
-	
-	printf("Path: %i, %i\n", currentDx, currentDy);
 	
 	if (!TCOD_path_compute(actor->path, actor->x, actor->y, dx, dy)) {
 		printf("Invalid path!\n");
@@ -299,7 +303,11 @@ void _resetActorForNewLevel(character *actor) {
 	}
 	
 	actor->fov = copyLevelMap();
-	TCOD_path_delete(actor->path);
+	
+	if (actor->path) {
+		TCOD_path_delete(actor->path);
+	}
+	
 	actor->path = TCOD_path_new_using_map(actor->fov, 1.41f);
 
 	if (actor->itemLight) {
