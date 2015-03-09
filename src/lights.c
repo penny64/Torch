@@ -91,7 +91,10 @@ void lightsShutdown() {
 		next = ptr->next;
 		
 		TCOD_map_delete(ptr->fov);
-		TCOD_map_delete(ptr->lightMap);
+		
+		if (ptr->lightMap) {
+			TCOD_map_delete(ptr->lightMap);
+		}
 		
 		free(ptr);
 		

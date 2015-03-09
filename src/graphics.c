@@ -119,7 +119,7 @@ void applyFov() {
 					isLit = 1;
 				}
 				
-				while (lght != NULL && !isLit) {
+				while (lght != NULL && lght->lightMap && !isLit) {
 					if (TCOD_map_is_walkable(lght->lightMap, x, y)) {
 						isLit = 1;
 						
