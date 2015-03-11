@@ -1,5 +1,6 @@
 #include "input.h"
 #include "libtcod.h"
+#include "stdio.h"
 
 
 TCOD_key_t KEY;
@@ -16,6 +17,10 @@ void inputLogic() {
 }
 
 int isCharPressed(char char_char) {
+	if (INPUT_EVENT != TCOD_EVENT_KEY_PRESS) {
+		return 0;
+	}
+	
 	if (char_char == KEY.c) {
 		return 1;
 	}
@@ -24,7 +29,10 @@ int isCharPressed(char char_char) {
 }
 
 int isTCODCharPressed(int tcod_char) {
-	printf("Check for keypress\n");
+	if (INPUT_EVENT != TCOD_EVENT_KEY_PRESS) {
+		return 0;
+	}
+	
 	if (tcod_char == KEY.vk) {
 		return 1;
 	}
