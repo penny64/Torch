@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <math.h>
 
 #include "numbers.h"
 
@@ -8,8 +9,8 @@ int distance(int x1, int y1, int x2, int y2) {
 }
 
 float distanceFloat(float x1, float y1, float x2, float y2) {
-	long x_dist = labs(x2 - x1);
-	long y_dist = labs(y2 - y1);
+	long x_dist = fabs(x2 - x1);
+	long y_dist = fabs(y2 - y1);
 
 	if (x_dist > y_dist) {
 		return (float) (y_dist + (x_dist - y_dist));

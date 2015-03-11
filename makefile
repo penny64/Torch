@@ -1,4 +1,4 @@
-CC     = gcc
+CC     = clang
 CFLAGS = -Wall -Iinclude
 OFILES = src/framework/numbers.o src/framework/draw.o src/framework/logging.o src/framework/display.o src/framework/actors.o src/framework/input.o src/level.o src/graphics.o src/items.o src/lights.o src/player.o src/enemies.o src/combat.o src/intro.o src/ui.o src/main.o
 LDFLAGS = -Wl,-rpath,. -L. -ltcod
