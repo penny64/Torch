@@ -676,7 +676,7 @@ void placeTunnels() {
 				
 				roomDistance = distance(srcRoom->centerX, srcRoom->centerY, tempDestRoom->centerX, tempDestRoom->centerY);
 
-				if (roomDistance < 99 && roomDistance < minDistanceToDestRoom) {
+				if (roomDistance < minDistanceToDestRoom) {
 					minDistanceToDestRoom = roomDistance;
 					dstRoom = tempDestRoom;
 				}
@@ -708,7 +708,7 @@ void placeTunnels() {
 			printf("CRASH: No dst room\n");
 		}
 		
-		if (srcRoom->flags & NEEDS_DOORS || dstRoom->flags & NEEDS_DOORS) {
+		if (minDistanceToDestRoom > 13) {
 			randomRoomSize = 1; //No longer random
 		} else {
 			randomRoomSize = 1;
@@ -1009,21 +1009,19 @@ void generatePuzzles() {
 			EXIT_LOCATION[1] = roomPtr->positionList[spawnIndex][1];
 			exitPlaced = 1;
 		}
-
-		if (roomPtr->size >= 45 && roomPtr->size <= 80) {
-			roomPtr->flags |= IS_TORCH_ROOM;
-		}
 		
 		printf("Conned: %i\n", roomPtr->numberOfConnectedRooms);
 
-		if (treasureRooms < 2 && roomPtr->numberOfConnectedRooms <= 2) {
+		if (treasureRooms < 2 && roomPtr->numberOfConnectedRooms <= 2 && roomPtr->size < 45) {
 			roomPtr->flags |= IS_TREASURE_ROOM;
 			roomPtr->flags |= NEEDS_DOORS;
 
 			treasureRooms ++;
+		} else if (roomPtr->size >= 45 && roomPtr->size <= 80) {
+			roomPtr->flags |= IS_TORCH_ROOM;
 		}
 		
-		if (roomPtr->numberOfConnectedRooms == 3 && !(roomPtr->flags & IS_TORCH_ROOM)){
+		if (roomPtr->size >= 35 && roomPtr->numberOfConnectedRooms >= 2 && !(roomPtr->flags & IS_TORCH_ROOM)){
 			roomPtr->flags |= IS_LAVA_ROOM;
 		}
 		
@@ -1038,7 +1036,7 @@ void generatePuzzles() {
 			START_LOCATION[0] = roomPtr->positionList[spawnIndex][0];
 			START_LOCATION[1] = roomPtr->positionList[spawnIndex][1];
 			STARTING_ROOM = roomPtr;
-			printf("FOUND START ROOM!\n");
+
 			startPlaced = 1;
 		}
 
