@@ -428,14 +428,9 @@ void carve(int x, int y) {
 					}
 					
 					TCOD_map_set_properties(LEVEL_MAP, x + x1, y + y1, 1, 1);
-					//drawCharBackEx(LEVEL_CONSOLE, x, y, TCOD_color_RGB(155 + RED_SHIFT, 255, 155), TCOD_BKGND_SET);
 				}
 			}
 		}
-		
-		//if (!i && !TCOD_random_get_int(RANDOM, 0, 3)) {
-		//	createTreasure(x, y);
-		//}
 		
 		while (TCOD_map_is_walkable(LEVEL_MAP, x, y)) {
 			xMod = TCOD_random_get_int(RANDOM, -1, 1);
@@ -487,7 +482,6 @@ void smooth() {
 				
 				if (count == 4) {
 					TCOD_map_set_properties(LEVEL_MAP, x, y, 1, 1);
-					//drawCharBackEx(LEVEL_CONSOLE, x, y, TCOD_color_RGB(35 + RED_SHIFT, 155, 205), TCOD_BKGND_SET);
 				}
 			}
 		}
@@ -641,8 +635,8 @@ int isLevelValid() {
 void placeTunnels() {
 	int x, y, x1, y1, w_x, w_y, mapUpdates, currentValue, neighborValue, lowestValue, index, lowestX, lowestY, invalid, randomRoomSize, dist;
 	int numberOfFailedAttemptsToFindADestRoom, neighborCollision, banDoubleTunnels, srcRoomIndex, dstRoomIndex, startCount = 0, runCount = -1;
-	int doorPlaced, destDoorPlaced, ownsTunnels;//, openRoomList[MAX_ROOMS], closedRoomList[MAX_ROOMS], openListCount, closedListCount, inClosedList, inOpenList, i, ii, id;
-	room *srcRoom = NULL, *dstRoom = NULL;
+	int doorPlaced, destDoorPlaced, ownsTunnels, roomDistance, minDistanceToDestRoom;//, openRoomList[MAX_ROOMS], closedRoomList[MAX_ROOMS], openListCount, closedListCount, inClosedList, inOpenList, i, ii, id;
+	room *srcRoom = NULL, *dstRoom = NULL, *tempDestRoom = NULL;
 	
 	ROOM_COUNT = ROOM_COUNT_MAX;
 	
@@ -664,19 +658,32 @@ void placeTunnels() {
 		dstRoomIndex = -1;
 
 		while (1) {
+			//Select random room
 			srcRoomIndex = getRandomInt(1, ROOM_COUNT_MAX);
 			srcRoom = getRoomViaId(srcRoomIndex);
 			numberOfFailedAttemptsToFindADestRoom = 0;
+			minDistanceToDestRoom = 999;
 
 			while (dstRoomIndex == -1 || isRoomConnectedToId(srcRoom, dstRoomIndex)) {
 				dstRoomIndex = getRandomInt(1, ROOM_COUNT_MAX);
-				dstRoom = getRoomViaId(dstRoomIndex);
-
-				if (numberOfFailedAttemptsToFindADestRoom < 5) {
-					numberOfFailedAttemptsToFindADestRoom ++;
-				} else {
-					break;
+				tempDestRoom = getRoomViaId(dstRoomIndex);
+				
+				if (isRoomConnectedTo(srcRoom, tempDestRoom)) {
+					continue;
 				}
+				
+				roomDistance = distance(srcRoom->centerX, srcRoom->centerY, tempDestRoom->x, tempDestRoom->y);
+				
+				if (roomDistance < minDistanceToDestRoom) {
+					minDistanceToDestRoom = roomDistance;
+					dstRoom = tempDestRoom;
+				}
+
+				//if (numberOfFailedAttemptsToFindADestRoom < 5) {
+				//	numberOfFailedAttemptsToFindADestRoom ++;
+				//} else {
+				//	break;
+				//}
 			}
 
 			if (numberOfFailedAttemptsToFindADestRoom == 5) {
