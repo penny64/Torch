@@ -23,11 +23,18 @@ enum {
 	IS_ALLSEEING_EYE = 0x01 << 13,
 } itemFlag_t;
 
+enum {
+	RARITY_NONE = 0,
+	RARITY_LOW = 1,
+	RARITY_MEDIUM = 2,
+	RARITY_HIGH = 3,
+} itemRarityFlag_t;
+
 
 typedef struct item item;
 
 struct item {
-	int x, y, vx, vy, statDamage, statSpeed, chr;
+	int x, y, vx, vy, statDamage, statSpeed, chr, itemRarity;
 	unsigned int itemFlags;
 	struct item *next, *prev;
 	struct character *owner, *lodgedInActor;
@@ -38,7 +45,7 @@ struct item {
 void itemSetup(void);
 void itemsShutdown(void);
 void itemLogic(void);
-item *createItem(int, int, char, TCOD_color_t, TCOD_color_t, unsigned int);
+item *createItem(int, int, float, char, TCOD_color_t, TCOD_color_t, unsigned int);
 void deleteItem(item*);
 void assignFlag(item*, unsigned int);
 void itemHandleCharacterCollision(item*, character*);
@@ -46,6 +53,7 @@ int itemHandleCharacterTouch(item*, character*);
 TCOD_console_t getItemConsole(void);
 item *getItems(void);
 item *getItemLodgedInActor(character*);
+item *spawnItemWithRarity(int, int, float, float);
 void drawItems(void);
 int getTotalNumberOfKeytorches(void);
 int getNumberOfLitKeytorches(void);
