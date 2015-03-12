@@ -640,6 +640,7 @@ void placeTunnels() {
 	room *srcRoom = NULL, *dstRoom = NULL, *tempDestRoom = NULL;
 	
 	ROOM_COUNT = ROOM_COUNT_MAX;
+	int maxHallSize = 2;
 	
 	while (1) {
 		runCount ++;
@@ -707,6 +708,12 @@ void placeTunnels() {
 			printf("CRASH: No dst room\n");
 		}
 		
+		if (srcRoom->flags & NEEDS_DOORS || dstRoom->flags & NEEDS_DOORS) {
+			randomRoomSize = 1; //No longer random
+		} else {
+			randomRoomSize = 1;
+		}
+		
 		if (srcRoom->flags & IS_TREASURE_ROOM || dstRoom->flags & IS_TREASURE_ROOM) {
 			banDoubleTunnels = 1;
 		}
@@ -730,9 +737,9 @@ void placeTunnels() {
 				invalid = 0;
 				neighborCollision = 0;
 				
-				for (y1 = -1; y1 <= 1; y1++) {
-					for (x1 = -1; x1 <= 1; x1++) {
-						if ((y1 == -1 && x1 == 1) || (y1 == -1 && x1 == -1) || (y1 == 1 && x1 == 1) || (y1 == 1 && x1 == -1)) {
+				for (y1 = -maxHallSize; y1 <= maxHallSize; y1++) {
+					for (x1 = -maxHallSize; x1 <= maxHallSize; x1++) {
+						if (x + x1 < 0 || x + x1 >= WINDOW_WIDTH || y + y1 < 0 || y + y1 >= WINDOW_HEIGHT) {
 							continue;
 						}
 						
@@ -771,15 +778,23 @@ void placeTunnels() {
 					}
 				}
 				
-				if (neighborCollision) {
-					DIJKSTRA_MAP[x][y] = -1;
-				} else {
-					if (ROOM_MAP[x][y] == dstRoom->id || TUNNEL_ROOM_MAP[x][y] == dstRoom->id) {
-						DIJKSTRA_MAP[x][y] = 0;
-					} else if ((ROOM_MAP[x][y] && ROOM_MAP[x][y] != dstRoom->id && ROOM_MAP[x][y] != srcRoom->id) || TCOD_map_is_walkable(TUNNEL_MAP, x, y)) {
-						DIJKSTRA_MAP[x][y] = -1;
-					} else {
-						DIJKSTRA_MAP[x][y] = 99;
+				for (y1 = -randomRoomSize; y1 <= randomRoomSize; y1++) {
+					for (x1 = -randomRoomSize; x1 <= randomRoomSize; x1++) {
+						if (x + x1 < 0 || x + x1 >= WINDOW_WIDTH || y + y1 < 0 || y + y1 >= WINDOW_HEIGHT) {
+							continue;
+						}
+						
+						if (neighborCollision) {
+							DIJKSTRA_MAP[x + x1][y + y1] = -1;
+						} else {
+							if (ROOM_MAP[x + x1][y + y1] == dstRoom->id || TUNNEL_ROOM_MAP[x + x1][y + y1] == dstRoom->id) {
+								DIJKSTRA_MAP[x + x1][y] = 0;
+							} else if ((ROOM_MAP[x + x1][y + y1] && ROOM_MAP[x + x1][y + y1] != dstRoom->id && ROOM_MAP[x + x1][y + y1] != srcRoom->id) || TCOD_map_is_walkable(TUNNEL_MAP, x + x1, y + y1)) {
+								DIJKSTRA_MAP[x + x1][y + y1] = -1;
+							} else {
+								DIJKSTRA_MAP[x + x1][y + y1] = 99;
+							}
+						}
 					}
 				}
 			}
@@ -883,13 +898,11 @@ void placeTunnels() {
 
 			w_x = lowestX;
 			w_y = lowestY;
-
-			randomRoomSize = 1;//clip(TCOD_random_get_int(RANDOM, minRoomSize, maxRoomSize), 1, 255);
 			
 			//printf("\tSub 2 START\n");
 			
-			for (y1 = -2; y1 <= 2; y1++) {
-				for (x1 = -2; x1 <= 2; x1++) {
+			for (y1 = -maxHallSize; y1 <= maxHallSize; y1++) {
+				for (x1 = -maxHallSize; x1 <= maxHallSize; x1++) {
 					if ((w_x + x1 <= 2 || w_x + x1 >= WINDOW_WIDTH - 2 || w_y + y1 <= 2 || w_y + y1 >= WINDOW_HEIGHT - 2)) {
 						continue;
 					}
