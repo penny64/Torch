@@ -1024,6 +1024,7 @@ void generatePuzzles() {
 
 			START_LOCATION[0] = roomPtr->positionList[spawnIndex][0];
 			START_LOCATION[1] = roomPtr->positionList[spawnIndex][1];
+			STARTING_ROOM = roomPtr;
 			printf("FOUND START ROOM!\n");
 			startPlaced = 1;
 		}
@@ -1270,7 +1271,7 @@ void generateLevel() {
 	int x, y, i, ii, spawnIndex, foundPlot, plotDist, plotPoints[MAX_ROOMS][2];
 	float fogValue, colorMod;
 	float p[2];
-	room *roomPtr, *STARTING_ROOM = NULL;
+	room *roomPtr;
 	TCOD_noise_t fog = getFogNoise();
 	TCOD_console_t dynamicLightConsole = getDynamicLightConsole();
 	character *player = getPlayer();
@@ -1335,6 +1336,12 @@ void generateLevel() {
 	drawDynamicLights();
 	colorRooms();
 	
+	if (!STARTING_ROOM) {
+		printf("Failed!\n");
+		
+		return;
+	}
+	
 	if (player) {
 		printf("1\n");
 		player->x = START_LOCATION[0];
@@ -1342,10 +1349,16 @@ void generateLevel() {
 		player->itemLight->x = player->x;
 		player->itemLight->y = player->y;
 		
+		printf("1a\n");
+		
 		moveActor(player, 1, 0);
+		
+		printf("1b\n");
 		
 		spawnIndex = getRandomInt(0, STARTING_ROOM->size - 1);
 		createWoodenSword(STARTING_ROOM->positionList[spawnIndex][0], STARTING_ROOM->positionList[spawnIndex][1]);
+		
+		printf("1c\n");
 		
 		spawnIndex = getRandomInt(0, STARTING_ROOM->size - 1);
 		createKey(STARTING_ROOM->positionList[spawnIndex][0], STARTING_ROOM->positionList[spawnIndex][1]);
