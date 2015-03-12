@@ -1,7 +1,7 @@
 CC     = clang
-CFLAGS = -Wall -Iinclude
+CFLAGS = -Wall -Iinclude -I/usr/local/include/
 OFILES = src/framework/numbers.o src/framework/draw.o src/framework/logging.o src/framework/display.o src/framework/actors.o src/framework/input.o src/level.o src/graphics.o src/items.o src/lights.o src/player.o src/enemies.o src/combat.o src/intro.o src/ui.o src/main.o
-LDFLAGS = -Wl,-rpath,. -L. -ltcod
+LDFLAGS = -Wl,-rpath,. -Llib -L. -ltcod
 DEBUGLDFLAGS = -Wl,-rpath,. -L. -ltcod_debug
 
 all: cgame
