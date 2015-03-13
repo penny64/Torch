@@ -13,8 +13,11 @@
 
 TCOD_console_t ITEM_CONSOLE;
 item *ITEMS = NULL;
+itemCard *ITEM_CARDS = NULL;
 
 void activateAllSeeingEye(item*);
+void createAllItemCards(void);
+item *getNewestItem(void);
 
 
 void itemSetup() {
@@ -22,17 +25,34 @@ void itemSetup() {
 
 	TCOD_console_set_default_background(ITEM_CONSOLE, TCOD_color_RGB(255, 0, 255));
 	TCOD_console_set_key_color(ITEM_CONSOLE, TCOD_color_RGB(255, 0, 255));
+	
+	createAllItemCards();
 }
 
 TCOD_console_t getItemConsole() {
 	return ITEM_CONSOLE;
 }
 
+void createAllItemCards() {
+	createItemCard(&createTreasure, RARITY_MEDIUM);
+	createItemCard(&createKey, RARITY_KEY);
+}
+
 item *getItems() {
 	return ITEMS;
 }
 
-item *createItem(int x, int y, float rarity, char chr, TCOD_color_t foreColor, TCOD_color_t backColor, unsigned int flags) {
+item *getNewestItem() {
+	item *_c = ITEMS;
+	
+	while (_c->next) {
+		_c = _c->next;
+	}
+	
+	return _c;
+}
+
+item *createItem(int x, int y, char chr, TCOD_color_t foreColor, TCOD_color_t backColor, unsigned int flags) {
 	item *_c, *_p_c;
 	
 	_c = calloc(1, sizeof(item));
@@ -48,7 +68,6 @@ item *createItem(int x, int y, float rarity, char chr, TCOD_color_t foreColor, T
 	_c->backColor = backColor;
 	_c->statDamage = 0;
 	_c->statSpeed = 0;
-	_c->rarity = rarity;
 	
 	if (ITEMS == NULL) {
 		ITEMS = _c;
@@ -63,6 +82,29 @@ item *createItem(int x, int y, float rarity, char chr, TCOD_color_t foreColor, T
 		_c->prev = _p_c;
 	}
 
+	return _c;
+}
+
+itemCard *createItemCard(void (*createItem)(int, int), int rarity) {
+	itemCard *_c, *_p_c;
+	
+	_c = calloc(1, sizeof(itemCard));
+	_c->createItem = createItem;
+	_c->rarity = rarity;
+	
+	if (ITEM_CARDS == NULL) {
+		ITEM_CARDS = _c;
+	} else {
+		_p_c = ITEM_CARDS;
+		
+		while (_p_c->next) {
+			_p_c = _p_c->next;
+		}
+		
+		_p_c->next = _c;
+		_c->prev = _p_c;
+	}
+	
 	return _c;
 }
 
@@ -296,18 +338,32 @@ int itemHandleCharacterTouch(item *itm, character *actor) {
 }
 
 
-item *spawnItemWithRarity(int x, int y, float minRarity float maxRarity) {
-	int listLength = 0;
-	item *itemList[255];
-
-
+item *spawnItemWithRarity(int x, int y, int minRarity, int maxRarity) {
+	int i, listLength = 0;
+	itemCard *itemList[255];
+	itemCard *itemCardPtr = ITEM_CARDS;
+	
+	while (itemCardPtr) {
+		if (minRarity <= itemCardPtr->rarity <= maxRarity) {
+			for (i = 0; i < itemCardPtr->rarity; i ++) {
+				itemList[listLength] = itemCardPtr;
+				listLength ++;
+			}
+		}
+		
+		itemCardPtr = itemCardPtr->next;
+	}
+	
+	itemList[getRandomInt(0, listLength - 1)]->createItem(x, y);
+	
+	return getNewestItem();
 }
 
 
 //Item list
 
 void createBonfire(int x, int y) {
-	item *itm = createItem(x, y, RARITY_NONE, '!', TCOD_color_RGB(255, 255, 155), TCOD_color_RGB(55, 0, 55), 0x0);
+	item *itm = createItem(x, y, '!', TCOD_color_RGB(255, 255, 155), TCOD_color_RGB(55, 0, 55), 0x0);
 
 	light *lght = createDynamicLight(x, y, NULL);
 	itm->itemLight = lght;
@@ -320,7 +376,7 @@ void createBonfire(int x, int y) {
 }
 
 void createBonfireKeystone(int x, int y) {
-	item *itm = createItem(x, y, RARITY_NONE, '!', TCOD_color_RGB(15, 15, 15), TCOD_color_RGB(55, 55, 55), IS_FUEL_SOURCE | IS_KEYTORCH);
+	item *itm = createItem(x, y, '!', TCOD_color_RGB(15, 15, 15), TCOD_color_RGB(55, 55, 55), IS_FUEL_SOURCE | IS_KEYTORCH);
 
 	light *lght = createDynamicLight(x, y, NULL);
 	itm->itemLight = lght;
@@ -335,7 +391,7 @@ void createBonfireKeystone(int x, int y) {
 }
 
 void createUnkindledBonfire(int x, int y) {
-	item *itm = createItem(x, y, RARITY_NONE, '!', TCOD_color_RGB(55, 55, 15), TCOD_color_RGB(55, 0, 55), IS_FUEL_SOURCE);
+	item *itm = createItem(x, y, '!', TCOD_color_RGB(55, 55, 15), TCOD_color_RGB(55, 0, 55), IS_FUEL_SOURCE);
 	light *lght = createDynamicLight(x, y, NULL);
 	itm->itemLight = lght;
 	lght->fuel = 0;
@@ -349,39 +405,39 @@ void createPlantedTorch(int x, int y, light *lght) {
 	lght->x = x;
 	lght->y = y;
 
-	item *itm = createItem(x, y, RARITY_NONE, 'i', TCOD_color_RGB(255, 255, 155), TCOD_color_RGB(55, 0, 55), IS_TORCH);
+	item *itm = createItem(x, y, 'i', TCOD_color_RGB(255, 255, 155), TCOD_color_RGB(55, 0, 55), IS_TORCH);
 	itm->itemLight = lght;
 }
 
 void createTreasure(int x, int y) {
-	createItem(x, y, RARITY_LOW, '*', TCOD_color_RGB(255, 255, 0), TCOD_color_RGB(55, 0, 55), 0x0);
+	createItem(x, y, '*', TCOD_color_RGB(255, 255, 0), TCOD_color_RGB(55, 0, 55), 0x0);
 }
 
 void createSign(int x, int y, char *text) {
-	createItem(x, y, RARITY_NONE, 'D', TCOD_color_RGB(255, 255, 0), TCOD_color_RGB(55, 0, 55), 0x0);
+	createItem(x, y, 'D', TCOD_color_RGB(255, 255, 0), TCOD_color_RGB(55, 0, 55), 0x0);
 }
 
 void createExit(int x, int y) {
-	createItem(x, y, RARITY_NONE, '>', TCOD_color_RGB(200, 200, 150), TCOD_color_RGB(50, 50, 25), IS_EXIT);
+	createItem(x, y, '>', TCOD_color_RGB(200, 200, 150), TCOD_color_RGB(50, 50, 25), IS_EXIT);
 }
 
 void createDoor(int x, int y) {
-	createItem(x, y, RARITY_NONE, '#', TCOD_color_RGB(50, 175, 175), TCOD_color_RGB(50, 75, 75), IS_DOOR | NEEDS_KEY);
+	createItem(x, y, '#', TCOD_color_RGB(50, 175, 175), TCOD_color_RGB(50, 75, 75), IS_DOOR | NEEDS_KEY);
 }
 
 void createKey(int x, int y) {
-	createItem(x, y, RARITY_NONE, '-', TCOD_color_RGB(30, 175, 175), TCOD_color_RGB(30, 75, 75), IS_KEY | CAN_PICK_UP);
+	createItem(x, y, '-', TCOD_color_RGB(30, 175, 175), TCOD_color_RGB(30, 75, 75), IS_KEY | CAN_PICK_UP);
 }
 
 void createWoodenSword(int x, int y) {
-	item *itm = createItem(x, y, RARITY_LOW, '/', TCOD_color_RGB(210, 105, 30), TCOD_color_RGB(30, 30, 30), IS_WEAPON | IS_SWORD | CAN_PICK_UP);
+	item *itm = createItem(x, y, '/', TCOD_color_RGB(210, 105, 30), TCOD_color_RGB(30, 30, 30), IS_WEAPON | IS_SWORD | CAN_PICK_UP);
 	
 	itm->statDamage = 3;
 	itm->statSpeed = 3;
 }
 
 void createTorchHolder(int x, int y) {
-	createItem(x, y, RARITY_MEDIUM, 'U', TCOD_color_RGB(50, 50, 50), TCOD_color_RGB(10, 10, 10), IS_TORCH_HOLDER | CAN_PICK_UP);
+	createItem(x, y, 'U', TCOD_color_RGB(50, 50, 50), TCOD_color_RGB(10, 10, 10), IS_TORCH_HOLDER | CAN_PICK_UP);
 }
 
 void activateAllSeeingEye(item *itm) {
@@ -407,7 +463,7 @@ void activateAllSeeingEye(item *itm) {
 }
 
 void createAllSeeingEye(int x, int y) {
-	item *itm = createItem(x, y, RARITY_HIGH, ' ', TCOD_color_RGB(175, 175, 30), TCOD_color_RGB(75, 75, 0), IS_ALLSEEING_EYE);
+	item *itm = createItem(x, y, ' ', TCOD_color_RGB(175, 175, 30), TCOD_color_RGB(75, 75, 0), IS_ALLSEEING_EYE);
 	
 	blockPosition(itm->x, itm->y);
 	itm->chr = 207;

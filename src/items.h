@@ -28,13 +28,14 @@ enum {
 	RARITY_LOW = 1,
 	RARITY_MEDIUM = 2,
 	RARITY_HIGH = 3,
+	RARITY_KEY = 4,
 } itemRarityFlag_t;
 
 
 typedef struct item item;
 
 struct item {
-	int x, y, vx, vy, statDamage, statSpeed, chr, itemRarity;
+	int x, y, vx, vy, statDamage, statSpeed, chr;
 	unsigned int itemFlags;
 	struct item *next, *prev;
 	struct character *owner, *lodgedInActor;
@@ -42,10 +43,19 @@ struct item {
 	TCOD_color_t foreColor, backColor;
 };
 
+typedef struct itemCard itemCard;
+
+struct itemCard {
+	int rarity;
+	struct itemCard *next, *prev;
+	void (*createItem)(int, int);
+};
+
 void itemSetup(void);
 void itemsShutdown(void);
 void itemLogic(void);
-item *createItem(int, int, float, char, TCOD_color_t, TCOD_color_t, unsigned int);
+item *createItem(int, int, char, TCOD_color_t, TCOD_color_t, unsigned int);
+itemCard *createItemCard(void (*)(int, int), int);
 void deleteItem(item*);
 void assignFlag(item*, unsigned int);
 void itemHandleCharacterCollision(item*, character*);
@@ -53,7 +63,7 @@ int itemHandleCharacterTouch(item*, character*);
 TCOD_console_t getItemConsole(void);
 item *getItems(void);
 item *getItemLodgedInActor(character*);
-item *spawnItemWithRarity(int, int, float, float);
+item *spawnItemWithRarity(int, int, int, int);
 void drawItems(void);
 int getTotalNumberOfKeytorches(void);
 int getNumberOfLitKeytorches(void);

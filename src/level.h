@@ -57,3 +57,4 @@ float *getEffectsMap(void);
 float getRandomFloat(float, float);
 room *createRoom(int, int, unsigned int);
 room *getRoomViaId(int);
+room *getRoomWithFlags(unsigned int);

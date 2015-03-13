@@ -201,6 +201,22 @@ room *getRoomViaId(int id) {
 	return NULL;
 }
 
+room *getRoomWithFlags(unsigned int flags) {
+	room *roomPtr = ROOMS;
+			
+	while (roomPtr) {
+		if (roomPtr->flags & flags) {
+			return roomPtr;
+		}
+		
+		roomPtr = roomPtr->next;
+	}
+	
+	printf("FATAL: Failed to return room with flags %i\n", flags);
+	
+	return NULL;
+}
+
 void deleteRoom(room *rm) {
 	if (rm == ROOMS) {
 		ROOMS = rm->next;
@@ -255,6 +271,10 @@ void connectRooms(room *srcRoom, room *dstRoom) {
 
 int isRoomConnectedTo(room *srcRoom, room *dstRoom) {
 	int i;
+	
+	if (srcRoom->id == dstRoom->id) {
+		return 1;
+	}
 
 	for (i = 0; i < srcRoom->numberOfConnectedRooms; i++) {
 		if (srcRoom->connectedRooms[i] == dstRoom->id) {
@@ -267,6 +287,10 @@ int isRoomConnectedTo(room *srcRoom, room *dstRoom) {
 
 int isRoomConnectedToId(room *srcRoom, int dstRoomId) {
 	int i;
+	
+	if (srcRoom->id == dstRoomId) {
+		return 1;
+	}
 
 	for (i = 0; i < srcRoom->numberOfConnectedRooms; i++) {
 		if (srcRoom->connectedRooms[i] == dstRoomId) {
@@ -655,7 +679,7 @@ void placeTunnels() {
 	room *srcRoom = NULL, *dstRoom = NULL, *tempDestRoom = NULL;
 	
 	ROOM_COUNT = ROOM_COUNT_MAX;
-	int maxHallSize = 2;
+	int maxHallSize = 1;
 	maxHallDistance = 16;
 	
 	while (1) {
@@ -685,9 +709,7 @@ void placeTunnels() {
 			while (!dstRoom && numberOfFailedAttemptsToFindADestRoom <= ROOM_COUNT_MAX) {
 				dstRoomIndex = getRandomInt(1, ROOM_COUNT_MAX);
 
-				printf("TEST 1A\n");
 				tempDestRoom = getRoomViaId(dstRoomIndex);
-				printf("TEST 1B\n");
 				
 				if (isRoomConnectedTo(srcRoom, tempDestRoom)) {
 					numberOfFailedAttemptsToFindADestRoom ++;
@@ -827,7 +849,11 @@ void placeTunnels() {
 			}
 		}
 		
-		index = TCOD_random_get_int(RANDOM, 0, startCount - 1);
+		if (startCount > 0) {
+			index = TCOD_random_get_int(RANDOM, 0, startCount - 1);
+		} else {
+			index = TCOD_random_get_int(RANDOM, 0, 0);
+		}
 		
 		printf("Start index: %i\n", index);
 		
@@ -1023,6 +1049,61 @@ void placeItemChest() {
 
 }
 
+void generateKeys() {
+	int i, ii, spawnIndex, invalid, openList[MAX_CONNECTED_ROOMS], closedList[MAX_CONNECTED_ROOMS];
+	int openListIndex = 0, connectedRoomsIndex = 0;
+	room *lastRoomPtr = NULL, *roomPtr = getRoomWithFlags(IS_START_ROOM);
+	
+	if (!roomPtr) {
+		printf("*FATAL* No start room found.\n");
+		
+		return;
+	}
+
+	openList[openListIndex] = roomPtr->id;
+	openListIndex ++;
+	
+	while (openListIndex) {
+		openListIndex --;
+		lastRoomPtr = roomPtr;
+		roomPtr = getRoomViaId(openList[openListIndex]);
+		closedList[connectedRoomsIndex] = roomPtr->id;
+		connectedRoomsIndex ++;
+		
+		if (roomPtr->flags & NEEDS_DOORS) {
+			spawnIndex = getRandomInt(0, lastRoomPtr->size - 1);
+			spawnItemWithRarity(lastRoomPtr->positionList[spawnIndex][0], lastRoomPtr->positionList[spawnIndex][1], RARITY_KEY, RARITY_KEY);
+		}
+
+		for (i = 0; i < roomPtr->numberOfConnectedRooms; i++) {
+			invalid = 0;
+			
+			for (ii = 0; ii < connectedRoomsIndex; ii++) {
+				if (roomPtr->connectedRooms[i] == closedList[ii]) {
+					invalid = 1;
+					
+					break;
+				}
+			}
+
+			if (!invalid) {
+				for (ii = 0; ii < openListIndex; ii++) {
+					if (roomPtr->connectedRooms[i] == openList[ii]) {
+						invalid = 1;
+
+						break;
+					}
+				}
+			}
+
+			if (!invalid) {
+				openList[openListIndex] = roomPtr->connectedRooms[i];
+				openListIndex ++;
+			}
+		}
+	}
+}
+
 void generatePuzzles() {
 	int i, invalidStartRoom, lavaWalkerX, lavaWalkerY, doorEnterIndex, doorExitIndex, doorEnter[2], doorExit[2], spawnIndex, exitPlaced = 0, startPlaced = 0, treasureRooms = 0;
 	room *roomPtr = ROOMS;
@@ -1038,21 +1119,22 @@ void generatePuzzles() {
 			exitPlaced = 1;
 		}
 		
-		printf("Conned: %i\n", roomPtr->numberOfConnectedRooms);
+		printf("Conned: %i, size: %i\n", roomPtr->numberOfConnectedRooms, roomPtr->size);
 
-		if (treasureRooms < 2 && roomPtr->numberOfConnectedRooms <= 2 && roomPtr->size < 45) {
+		if (treasureRooms < 2 && roomPtr->numberOfConnectedRooms <= 2 && roomPtr->size >= 20 && roomPtr->size < 45) {
 			roomPtr->flags |= IS_TREASURE_ROOM;
 			roomPtr->flags |= NEEDS_DOORS;
 
 			treasureRooms ++;
-		} else if (roomPtr->size >= 45 && roomPtr->size <= 80) {
+		} else if (roomPtr->size >= 45 && roomPtr->size <= 65) {
 			roomPtr->flags |= IS_TORCH_ROOM;
-		} else if (roomPtr->size >= 80) {
-			roomPtr->flags |= IS_PUZZLE_ROOM;
-		}
-		
-		if (roomPtr->size >= 35 && roomPtr->numberOfConnectedRooms >= 2 && !(roomPtr->flags & IS_TORCH_ROOM)){
-			roomPtr->flags |= IS_LAVA_ROOM;
+		} else if (roomPtr->size > 65 && roomPtr->size < 85) {
+			if (roomPtr->numberOfConnectedRooms == 2) {
+				roomPtr->flags |= IS_LAVA_ROOM;
+				printf("WHOA!\n");
+			} else {
+				roomPtr->flags |= NEEDS_DOORS;
+			}
 		}
 		
 		if (roomPtr->numberOfConnectedRooms == 1) {
@@ -1103,7 +1185,7 @@ void generatePuzzles() {
 		if (roomPtr->flags & IS_RARE_SPAWN) {
 			spawnIndex = getRandomInt(0, roomPtr->size - 1);
 
-			spawnItemWithRarity(roomPtr->positionList[spawnIndex][0], roomPtr->positionList[spawnIndex][1], .25, .55);
+			spawnItemWithRarity(roomPtr->positionList[spawnIndex][0], roomPtr->positionList[spawnIndex][1], RARITY_MEDIUM, RARITY_MEDIUM);
 		}
 		
 		if (roomPtr->flags & IS_LAVA_ROOM) {
@@ -1135,6 +1217,7 @@ void generatePuzzles() {
 		roomPtr = roomPtr->next;
 	}
 
+	generateKeys();
 	placeItemChest();
 }
 
@@ -1320,7 +1403,6 @@ void generateLevel() {
 	int x, y, i, ii, spawnIndex, foundPlot, plotDist, plotPoints[MAX_ROOMS][2];
 	float fogValue, colorMod;
 	float p[2];
-	room *roomPtr;
 	TCOD_noise_t fog = getFogNoise();
 	TCOD_console_t dynamicLightConsole = getDynamicLightConsole();
 	character *player = getPlayer();
@@ -1401,19 +1483,6 @@ void generateLevel() {
 		printf("1a\n");
 		
 		moveActor(player, 1, 0);
-		
-		printf("1b\n");
-		
-		spawnIndex = getRandomInt(0, STARTING_ROOM->size - 1);
-		createWoodenSword(STARTING_ROOM->positionList[spawnIndex][0], STARTING_ROOM->positionList[spawnIndex][1]);
-		
-		printf("1c\n");
-		
-		spawnIndex = getRandomInt(0, STARTING_ROOM->size - 1);
-		createKey(STARTING_ROOM->positionList[spawnIndex][0], STARTING_ROOM->positionList[spawnIndex][1]);
-		
-		spawnIndex = getRandomInt(0, STARTING_ROOM->size - 1);
-		createRagdoll(STARTING_ROOM->positionList[spawnIndex][0], STARTING_ROOM->positionList[spawnIndex][1]);
 	}
 
 	printf("2\n");
