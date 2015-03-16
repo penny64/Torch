@@ -1368,8 +1368,8 @@ void colorRooms() {
 			g = 35;
 			b = 30;
 			rMod = 120;
-			gMod = 30;
-			bMod = 30;
+			gMod = 60;
+			bMod = 60;
 		} else {
 			r = 205;
 			g = 25;

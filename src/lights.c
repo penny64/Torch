@@ -341,7 +341,7 @@ void _drawDynamicLight(light *lght) {
 				}
 
 				if (isPositionWalkable(x, y)) {
-					distMod -= getRandomFloat(0, 1);
+					distMod -= getRandomFloat(0, .5);
 				}
 				
 				if (distMod < 0) {
