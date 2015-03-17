@@ -59,6 +59,7 @@ light *createDynamicLight(int x, int y, character *actor) {
 	_c->b_tint = 35;
 	_c->fuelMax = 70;
 	_c->fuel = _c->fuelMax;
+	_c->noTint = 0;
 	_c->owner = actor;
 	_c->size = 8;
 	_c->sizeMod = 1.f;
@@ -352,22 +353,28 @@ void _drawDynamicLight(light *lght) {
 				
 				alpha = (distMod / (float) lght->size);
 				alpha *= lght->sizeMod;
-				
-				if (!TCOD_map_is_walkable(levelMap, x, y)) {
-					r_tint = 55 + RED_SHIFT;
-					g_tint = 55;
-					b_tint = 55;
-					
-					if (alpha > .45) {
-						alpha = .45;
-					}
-				} else {
-					r_tint = lght->r_tint + RED_SHIFT;
-					g_tint = lght->g_tint;
-					b_tint = lght->b_tint;
 
-					if (alpha > .75) {
-						alpha = .75;
+				if (lght->noTint) {
+					r_tint = 1;
+					g_tint = 1;
+					b_tint = 1;
+				} else {
+					if (!TCOD_map_is_walkable(levelMap, x, y)) {
+						r_tint = 55 + RED_SHIFT;
+						g_tint = 55;
+						b_tint = 55;
+
+						if (alpha > .45) {
+							alpha = .45;
+						}
+					} else {
+						r_tint = lght->r_tint + RED_SHIFT;
+						g_tint = lght->g_tint;
+						b_tint = lght->b_tint;
+
+						if (alpha > .75) {
+							alpha = .75;
+						}
 					}
 				}
 				

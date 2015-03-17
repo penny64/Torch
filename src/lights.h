@@ -6,7 +6,7 @@
 typedef struct light light;
 
 struct light {
-	int x, y, fuel, fuelMax, size, r_tint, g_tint, b_tint;
+	int x, y, fuel, fuelMax, size, r_tint, g_tint, b_tint, noTint;
 	float sizeMod;
 	struct light *next, *prev;
 	struct character *owner;
