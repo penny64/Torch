@@ -1122,7 +1122,8 @@ void generateKeys() {
 }
 
 void generatePuzzles() {
-	int i, invalidStartRoom, lavaWalkerX, lavaWalkerY, doorEnterIndex, doorExitIndex, doorEnter[2], doorExit[2], spawnIndex, exitPlaced = 0, startPlaced = 0, treasureRooms = 0;
+	int i, invalidStartRoom, lavaWalkerX, lavaWalkerY, doorEnterIndex, doorExitIndex, doorEnter[2], doorExit[2];
+	int spawnIndex, exitPlaced = 0, startPlaced = 0, treasureRooms = 0, placedAllSeeingEye = 0;
 	room *roomPtr = ROOMS;
 	item *itemPtr;
 	TCOD_dijkstra_t lavaWalker = TCOD_dijkstra_new(LEVEL_MAP, 0.0f);
@@ -1190,8 +1191,10 @@ void generatePuzzles() {
 		if (roomPtr->flags & IS_TORCH_ROOM) {
 			createAndPlaceItemInRoom(roomPtr, &createBonfireKeystone);
 
-			if (getRandomFloat(0, 1) > .5) {
+			if (getRandomFloat(0, 1) > .5 && !placedAllSeeingEye) {
 				createAndPlaceItemInRoom(roomPtr, &createAllSeeingEye);
+
+				placedAllSeeingEye += 1;
 			}
 		}
 

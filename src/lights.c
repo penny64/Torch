@@ -59,6 +59,7 @@ light *createDynamicLight(int x, int y, character *actor) {
 	_c->b_tint = 35;
 	_c->fuelMax = 70;
 	_c->fuel = _c->fuelMax;
+	_c->brightness = .45;
 	_c->noTint = 0;
 	_c->owner = actor;
 	_c->size = 8;
@@ -372,9 +373,7 @@ void _drawDynamicLight(light *lght) {
 						g_tint = lght->g_tint;
 						b_tint = lght->b_tint;
 
-						if (alpha > .75) {
-							alpha = .75;
-						}
+						alpha = clipFloat(alpha, 0, lght->brightness);
 					}
 				}
 				

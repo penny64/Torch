@@ -20,10 +20,10 @@ static struct character *PLAYER_ACTOR = NULL;
 void createPlayer() {
 	PLAYER_ACTOR = createActor(0, 0);
 	
-	/*PLAYER_ACTOR->itemLight->r_tint = 85;
-	PLAYER_ACTOR->itemLight->g_tint = 80;
-	PLAYER_ACTOR->itemLight->b_tint = 80;*/
-	PLAYER_ACTOR->itemLight->noTint = 1;
+	PLAYER_ACTOR->itemLight->r_tint = 25;
+	PLAYER_ACTOR->itemLight->g_tint = 20;
+	PLAYER_ACTOR->itemLight->b_tint = 20;
+	PLAYER_ACTOR->itemLight->brightness = .35;
 	PLAYER_ACTOR->itemLight->size = 6;
 	PLAYER_ACTOR->itemLight->fuelMax = 350;
 	PLAYER_ACTOR->itemLight->fuel = PLAYER_ACTOR->itemLight->fuelMax;

@@ -447,15 +447,18 @@ void createTorchHolder(int x, int y) {
 void activateAllSeeingEye(item *itm) {
 	int x, y;
 	TCOD_console_t seenConsole = getSeenConsole();
-	TCOD_map_t levelMap = getLevelMap();
-	TCOD_map_t tunnelMap = getTunnelMap();
-	
-	for (y = 0; y < WINDOW_HEIGHT; y ++) {
-		for (x = 0; x < WINDOW_WIDTH; x ++) {
-			if (TCOD_map_is_walkable(levelMap, x, y) || TCOD_map_is_walkable(tunnelMap, x, y)) {
-				drawCharBack(seenConsole, x, y, TCOD_color_RGB(255, 0, 255));
-			}
+	item *itmPtr = getItems();
+
+	while (itmPtr) {
+		if (itmPtr->owner) {
+			itmPtr = itmPtr->next;
+
+			continue;
 		}
+
+		drawCharBack(seenConsole, itmPtr->x, itmPtr->y, TCOD_color_RGB(255, 0, 255));
+
+		itmPtr = itmPtr->next;
 	}
 	
 	itm->itemLight->fuel = 10;
