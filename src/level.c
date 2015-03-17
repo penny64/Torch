@@ -109,16 +109,20 @@ room *createRoom(int id, int roomSize, unsigned int flags) {
 	room *ptr, *rm = calloc(1, sizeof(room));
 	int i, x, y, addPosition, positionIndex = 0, xAvg = 0, yAvg = 0, xAvgLen = 0, yAvgLen = 0;
 
+	if (roomSize == 0) {
+		printf("*FATAL* Invalid room: Empty\n");
+	}
+
 	rm->id = id;
 	rm->size = roomSize;
 	rm->numberOfConnectedRooms = 0;
 	rm->numberOfDoorPositions = 0;
+	rm->numberOfOccupiedSpawnPositions = 0;
 	rm->flags = flags;
 	rm->prev = NULL;
 	rm->next = NULL;
 	rm->connectedRooms = (int*)malloc((MAX_ROOMS + 1) * sizeof(int));
-
-	printf("FLAGS %i %i  size=%i\n", rm->flags, flags, roomSize);
+	rm->spawnPositions = malloc(sizeof(int) * roomSize);
 
 	//TODO: Use memcpy in the future
 	rm->positionList = malloc(sizeof *rm->positionList * roomSize);
@@ -129,8 +133,6 @@ room *createRoom(int id, int roomSize, unsigned int flags) {
 			rm->positionList[i] = malloc(sizeof(int) * 2);
 		}
 	}
-
-	printf("\tCreated position list\n");
 	
 	rm->doorPositions = malloc(sizeof *rm->doorPositions * roomSize);
 	if (rm->doorPositions)
@@ -140,8 +142,6 @@ room *createRoom(int id, int roomSize, unsigned int flags) {
 			rm->doorPositions[i] = malloc(sizeof(int) * 2);
 		}
 	}
-
-	printf("\tCreated door position list\n");
 
 	for (y = 0; y < WINDOW_HEIGHT; y ++) {
 		addPosition = 0;
@@ -179,8 +179,6 @@ room *createRoom(int id, int roomSize, unsigned int flags) {
 		ptr->next = rm;
 		rm->prev = ptr;
 	}
-
-	printf("Done!\n");
 
 	return rm;
 }
@@ -267,6 +265,45 @@ void connectRooms(room *srcRoom, room *dstRoom) {
 		
 		dstRoom->numberOfConnectedRooms ++;
 	}
+}
+
+int *getNewSpawnPosition(room *srcRoom) {
+	int pos[2], i, spawnIndex, invalid = 1;
+
+	while (invalid) {
+		spawnIndex = getRandomInt(0, clip(srcRoom->size - 1, 0, 9999));
+		invalid = 0;
+
+		for (i = 0; i < srcRoom->numberOfOccupiedSpawnPositions; i ++) {
+			if (srcRoom->spawnPositions[i] == spawnIndex) {
+				invalid = 1;
+
+				break;
+			}
+		}
+
+		printf("Make sure we aren't running out of positions here\n");
+	}
+
+	srcRoom->spawnPositions[srcRoom->numberOfOccupiedSpawnPositions] = spawnIndex;
+	srcRoom->numberOfOccupiedSpawnPositions ++;
+	pos[0] = srcRoom->positionList[spawnIndex][0];
+	pos[1] = srcRoom->positionList[spawnIndex][1];
+
+	return pos;
+}
+
+void placeItemInRoom(room *srcRoom, item *itm) {
+	int *pos = getNewSpawnPosition(srcRoom);
+
+	itm->x = pos[0];
+	itm->y = pos[1];
+}
+
+void createAndPlaceItemInRoom(room *srcRoom, void (*createItem)(int, int)) {
+	int *pos = getNewSpawnPosition(srcRoom);
+
+	createItem(pos[0], pos[1]);
 }
 
 int isRoomConnectedTo(room *srcRoom, room *dstRoom) {
@@ -661,8 +698,6 @@ int isLevelValid() {
 				openListIndex ++;
 			}
 		}
-
-		printf("Connected rooms: %i\n", connectedRoomsIndex);
 	}
 	
 	if (connectedRoomsIndex == ROOM_COUNT_MAX) {
@@ -730,8 +765,6 @@ void placeTunnels() {
 			if (!dstRoom) {
 				if (srcRoomIndex == ROOM_COUNT_MAX) {
 					srcRoomIndex = 0;
-
-					printf("Looping 1: %i\n", maxHallDistance);
 				}
 
 				maxHallDistance += 2;
@@ -745,8 +778,6 @@ void placeTunnels() {
 			
 			break;
 		}
-
-		printf("In a loop 2\n");
 
 		if (srcRoom == NULL) {
 			printf("CRASH: No src room\n");
@@ -852,10 +883,8 @@ void placeTunnels() {
 		if (startCount > 0) {
 			index = TCOD_random_get_int(RANDOM, 0, startCount - 1);
 		} else {
-			index = TCOD_random_get_int(RANDOM, 0, 0);
+			index = 0;
 		}
-		
-		printf("Start index: %i\n", index);
 		
 		w_x = START_POSITIONS[index][0];
 		w_y = START_POSITIONS[index][1];
@@ -869,7 +898,7 @@ void placeTunnels() {
 
 			for (y = 2; y < WINDOW_HEIGHT - 1; y++) {
 				for (x = 2; x < WINDOW_WIDTH - 1; x++) {
-					lowestValue = 99;
+					lowestValue = 999;
 					currentValue = DIJKSTRA_MAP[x][y];
 
 					if (currentValue <= 0) {
@@ -1006,7 +1035,6 @@ void placeTunnels() {
 						}
 						
 						if (ROOM_MAP[w_x + x1][w_y + y1] == dstRoom->id) {
-							//createDoor(w_x, w_y);
 							addRoomDoorPosition(dstRoom, w_x, w_y);
 
 							destDoorPlaced = 1;
@@ -1020,25 +1048,14 @@ void placeTunnels() {
 					}
 				}
 			}
-			
-			//printf("\tSub 3 END\n");
 		}
-		
-		//printf("End dij\n");
 
 		if (ROOM_MAP[w_x][w_y] == dstRoom->id) {
-			//printf("Connecting rooms: %i, %i\n", srcRoom->id, dstRoom->id);
-
 			connectRooms(srcRoom, dstRoom);
-			//printf("Done\n");
 
 			if (isLevelValid()) {
 				break;
 			}
-			//if (srcRoom->numberOfConnectedRooms == ROOM_COUNT_MAX) {
-			//	printf("LEVEL VALID.... LETS GO\n");
-			//	break;
-			//}
 		} else {
 			printf("A possible bad path...?\n");
 		}
@@ -1071,7 +1088,7 @@ void generateKeys() {
 		connectedRoomsIndex ++;
 		
 		if (roomPtr->flags & NEEDS_DOORS) {
-			spawnIndex = getRandomInt(0, lastRoomPtr->size - 1);
+			spawnIndex = clip(getRandomInt(0, lastRoomPtr->size - 1), 0, 9999);
 			spawnItemWithRarity(lastRoomPtr->positionList[spawnIndex][0], lastRoomPtr->positionList[spawnIndex][1], RARITY_KEY, RARITY_KEY);
 		}
 
@@ -1107,12 +1124,13 @@ void generateKeys() {
 void generatePuzzles() {
 	int i, invalidStartRoom, lavaWalkerX, lavaWalkerY, doorEnterIndex, doorExitIndex, doorEnter[2], doorExit[2], spawnIndex, exitPlaced = 0, startPlaced = 0, treasureRooms = 0;
 	room *roomPtr = ROOMS;
+	item *itemPtr;
 	TCOD_dijkstra_t lavaWalker = TCOD_dijkstra_new(LEVEL_MAP, 0.0f);
 
 	while (roomPtr) {
 		if (!exitPlaced && roomPtr->size <= 80) {
 			roomPtr->flags |= IS_EXIT_ROOM;
-			spawnIndex = getRandomInt(0, roomPtr->size - 1);
+			spawnIndex = clip(getRandomInt(0, roomPtr->size - 1), 0, 9999);
 
 			EXIT_LOCATION[0] = roomPtr->positionList[spawnIndex][0];
 			EXIT_LOCATION[1] = roomPtr->positionList[spawnIndex][1];
@@ -1131,7 +1149,6 @@ void generatePuzzles() {
 		} else if (roomPtr->size > 65 && roomPtr->size < 85) {
 			if (roomPtr->numberOfConnectedRooms == 2) {
 				roomPtr->flags |= IS_LAVA_ROOM;
-				printf("WHOA!\n");
 			} else {
 				roomPtr->flags |= NEEDS_DOORS;
 			}
@@ -1160,7 +1177,7 @@ void generatePuzzles() {
 
 			if (!invalidStartRoom) {
 				roomPtr->flags |= IS_START_ROOM;
-				spawnIndex = getRandomInt(0, roomPtr->size - 1);
+				spawnIndex = clip(getRandomInt(0, roomPtr->size - 1), 0, 9999);
 
 				START_LOCATION[0] = roomPtr->positionList[spawnIndex][0];
 				START_LOCATION[1] = roomPtr->positionList[spawnIndex][1];
@@ -1171,19 +1188,21 @@ void generatePuzzles() {
 		}
 
 		if (roomPtr->flags & IS_TORCH_ROOM) {
-			spawnIndex = getRandomInt(0, roomPtr->size - 1);
+			createAndPlaceItemInRoom(roomPtr, &createBonfireKeystone);
 
-			createBonfireKeystone(roomPtr->positionList[spawnIndex][0], roomPtr->positionList[spawnIndex][1]);
+			if (getRandomFloat(0, 1) > .5) {
+				createAndPlaceItemInRoom(roomPtr, &createAllSeeingEye);
+			}
 		}
 
 		if (roomPtr->flags & IS_TREASURE_ROOM) {
-			spawnIndex = getRandomInt(0, roomPtr->size - 1);
+			spawnIndex = clip(getRandomInt(0, roomPtr->size - 1), 0, 9999);
 
 			createTreasure(roomPtr->positionList[spawnIndex][0], roomPtr->positionList[spawnIndex][1]);
 		}
 		
 		if (roomPtr->flags & IS_RARE_SPAWN) {
-			spawnIndex = getRandomInt(0, roomPtr->size - 1);
+			spawnIndex = clip(getRandomInt(0, roomPtr->size - 1), 0, 9999);
 
 			spawnItemWithRarity(roomPtr->positionList[spawnIndex][0], roomPtr->positionList[spawnIndex][1], RARITY_MEDIUM, RARITY_MEDIUM);
 		}
@@ -1232,7 +1251,7 @@ void spawnEnemies() {
 	}
 
 	while (roomPtr) {
-		spawnIndex = getRandomInt(0, roomPtr->size - 1);
+		spawnIndex = clip(getRandomInt(0, roomPtr->size - 1), 0, 9999);
 		x = roomPtr->positionList[spawnIndex][0];
 		y = roomPtr->positionList[spawnIndex][1];
 
@@ -1371,9 +1390,13 @@ void colorRooms() {
 			gMod = 60;
 			bMod = 60;
 		} else {
-			r = 205;
-			g = 25;
-			b = 25;
+			r = 0;
+			g = 0;
+			b = 0;
+
+			rMod = 30 - RED_SHIFT;
+			gMod = 30;
+			bMod = 30;
 		}
 		
 		for (i = 0; i < roomPtr->size; i ++) {
@@ -1474,18 +1497,13 @@ void generateLevel() {
 	}
 	
 	if (player) {
-		printf("1\n");
 		player->x = START_LOCATION[0];
 		player->y = START_LOCATION[1];
 		player->itemLight->x = player->x;
 		player->itemLight->y = player->y;
 		
-		printf("1a\n");
-		
 		moveActor(player, 1, 0);
 	}
-
-	printf("2\n");
 
 	if (player) {
 		if (LEVEL_NUMBER == 1) {
@@ -1493,12 +1511,10 @@ void generateLevel() {
 			//createVoidWorm(player->x + 1, player->y + 1);
 			//showMessage("%cSomething watches from the shadows...%c", 10);
 		} else {
-			spawnIndex = getRandomInt(0, STARTING_ROOM->size - 1);
+			spawnIndex = clip(getRandomInt(0, STARTING_ROOM->size - 1), 0, 9999);
 			createBonfire(START_LOCATION[0] + 1, START_LOCATION[1]);
 		}
 	}
-
-	printf("3\n");
 
 	resetAllActorsForNewLevel();
 	refreshAllLights();

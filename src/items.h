@@ -62,6 +62,7 @@ void itemHandleCharacterCollision(item*, character*);
 int itemHandleCharacterTouch(item*, character*);
 TCOD_console_t getItemConsole(void);
 item *getItems(void);
+item *getNewestItem(void);
 item *getItemLodgedInActor(character*);
 item *spawnItemWithRarity(int, int, int, int);
 void drawItems(void);

@@ -54,6 +54,10 @@ item *getNewestItem() {
 
 item *createItem(int x, int y, char chr, TCOD_color_t foreColor, TCOD_color_t backColor, unsigned int flags) {
 	item *_c, *_p_c;
+
+	if (x <= 0 || y <= 0) {
+		printf("*FATAL* Item placed OOB\n");
+	}
 	
 	_c = calloc(1, sizeof(item));
 	_c->x = x;

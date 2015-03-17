@@ -9,12 +9,6 @@
 #include "ui.h"
 
 
-/*int getRandomInt(int min, int max) {
-	TCOD_random_t random = TCOD_random_get_instance();
-	
-	return TCOD_random_get_int(random, min, max);
-}*/
-
 int getRandomIntWithMean(int min, int max, int mean) {
 	TCOD_random_t random = TCOD_random_get_instance();
 	

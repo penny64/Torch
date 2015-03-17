@@ -82,6 +82,17 @@ light *createDynamicLight(int x, int y, character *actor) {
 	return _c;
 }
 
+void startLights() {
+	LIGHT_MAP = TCOD_map_new(WINDOW_WIDTH, WINDOW_HEIGHT);
+	DYNAMIC_LIGHT_CONSOLE = TCOD_console_new(WINDOW_WIDTH, WINDOW_HEIGHT);
+
+	printf("Starting up lights...\n");
+
+	TCOD_console_set_default_background(DYNAMIC_LIGHT_CONSOLE, TCOD_color_RGB(0, 0, 0));
+	TCOD_console_set_key_color(DYNAMIC_LIGHT_CONSOLE, TCOD_color_RGB(255, 0, 255));
+	TCOD_console_clear(DYNAMIC_LIGHT_CONSOLE);
+}
+
 void lightsShutdown() {
 	light *next, *ptr = DYNAMIC_LIGHTS;
 	
@@ -166,17 +177,6 @@ void refreshAllLights() {
 		
 		ptr = ptr->next;
 	}
-}
-
-void startLights() {
-	LIGHT_MAP = TCOD_map_new(WINDOW_WIDTH, WINDOW_HEIGHT);
-	DYNAMIC_LIGHT_CONSOLE = TCOD_console_new(WINDOW_WIDTH, WINDOW_HEIGHT);
-
-	printf("STARTING UP LIGHTS...\n");
-	
-	TCOD_console_set_default_background(DYNAMIC_LIGHT_CONSOLE, TCOD_color_RGB(0, 0, 0));
-	TCOD_console_set_key_color(DYNAMIC_LIGHT_CONSOLE, TCOD_color_RGB(255, 0, 255));
-    TCOD_console_clear(DYNAMIC_LIGHT_CONSOLE);
 }
 
 void _drawLight(light *lght) {

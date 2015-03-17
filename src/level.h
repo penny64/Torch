@@ -1,4 +1,5 @@
 #include "libtcod.h"
+#include "items.h"
 #define MAX_ROOMS 4
 #define MAX_CONNECTED_ROOMS 5
 
@@ -17,7 +18,8 @@ enum {
 typedef struct room room;
 
 struct room {
-	int id, centerX, centerY, numberOfDoorPositions, numberOfConnectedRooms, size, *connectedRooms, **positionList, **doorPositions;
+	int id, centerX, centerY, size, numberOfDoorPositions, numberOfConnectedRooms, numberOfOccupiedSpawnPositions;
+	int *connectedRooms, *spawnPositions, **positionList, **doorPositions;
 	unsigned int flags;
 	struct room *next, *prev;
 };
@@ -42,6 +44,8 @@ void transitionIsComplete(void);
 void setLevel(int);
 void blockPosition(int, int);
 void unblockPosition(int, int);
+void placeItemInRoom(room*, item*);
+void createAndPlaceItemInRoom(room*, void(*)(int, int));
 int levelLogic(void);
 int isPositionWalkable(int, int);
 int isLevelComplete(void);

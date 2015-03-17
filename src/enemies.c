@@ -69,7 +69,7 @@ void createVoidWormTail(int x, int y) {
 	actor->foreColor = TCOD_color_RGB(15, 100, 15);
 	//deleteDynamicLight(actor->itemLight);
 	//actor->itemLight = NULL;
-	actor->stanceFlags = IS_STANDING;
+	actor->stanceFlags = IS_CRAWLING;
 	actor->itemLight->r_tint = 0;
 	actor->itemLight->g_tint = 35;
 	actor->itemLight->b_tint = 0;
