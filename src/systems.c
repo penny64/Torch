@@ -20,6 +20,8 @@ unsigned int createSystemHandler(World *world, unsigned int entityMask, void (*c
 			SYSTEMS->entityMask[systemId] = entityMask;
 			SYSTEMS->callback[systemId] = callback;
 
+			printf("Created new system ID=%i\n", systemId);
+
 			return systemId;
 		}
 	}

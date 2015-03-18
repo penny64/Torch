@@ -13,6 +13,7 @@
 #include "actors.h"
 #include "draw.h"
 #include "../enemies.h"
+#include "../entities.h"
 
 
 TCOD_console_t ACTOR_CONSOLE;
@@ -51,6 +52,7 @@ character *createActor(int x, int y) {
 	}
 	
 	_c = calloc(1, sizeof(character));
+	_c->entityId = createEntity(getWorld());
 	_c->x = x;
 	_c->y = y;
 	_c->lastX = x;

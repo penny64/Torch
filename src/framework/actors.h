@@ -45,7 +45,7 @@ struct character {
 	struct character *next, *prev;
 	struct light *itemLight;
 	struct item *inventory[4];
-	unsigned int aiFlags, traitFlags, stanceFlags, nextStanceFlagsToAdd, nextStanceFlagsToRemove;
+	unsigned int entityId, aiFlags, traitFlags, stanceFlags, nextStanceFlagsToAdd, nextStanceFlagsToRemove;
 	TCOD_color_t foreColor, backColor;
 	TCOD_path_t path;
 	TCOD_console_t fov;

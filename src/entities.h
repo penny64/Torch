@@ -8,7 +8,7 @@
 typedef struct {
 	unsigned int mask[MAX_ENTITIES];
 
-	Spell spell[MAX_ENTITIES];
+	SpellComponent spell[MAX_ENTITIES];
 } World;
 
 #endif

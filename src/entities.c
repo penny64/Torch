@@ -1,3 +1,5 @@
+#include <stdio.h>
+
 #include "entities.h"
 
 World *WORLD = NULL;
@@ -15,7 +17,9 @@ unsigned int createEntity(World *world) {
 	unsigned int entityId;
 
 	for (entityId = 0; entityId < MAX_ENTITIES; entityId ++) {
-		if (world->mask[entityId] & COMPONENT_NONE) {
+		if (world->mask[entityId] == COMPONENT_NONE) {
+			printf("Created new entity ID=%i\n", entityId);
+
 			return entityId;
 		}
 	}
