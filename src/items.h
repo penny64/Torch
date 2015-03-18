@@ -21,6 +21,7 @@ enum {
 	IS_LODGED = 0x01 << 11,
 	IS_TORCH_HOLDER = 0x01 << 12,
 	IS_ALLSEEING_EYE = 0x01 << 13,
+	IGNORE_ALLSEEING_EYE = 0x01 << 14,
 } itemFlag_t;
 
 enum {

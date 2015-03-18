@@ -474,7 +474,7 @@ void carve(int x, int y) {
 
 	TCOD_map_t existingLevel = copyLevelMap();
 	
-	for (i = 0; i < TCOD_random_get_int(RANDOM, 9, 12 + getRandomInt(5, 44)); i++) {
+	for (i = 0; i < TCOD_random_get_int(RANDOM, 9, 12 + getRandomInt(5, 30)); i++) {
 		for (ii = 0; ii <= 0; ii++) { //Useless
 			for (y1 = -1 - ii; y1 <= 1 + ii; y1++) {
 				for (x1 = -1 - ii; x1 <= 1 + ii; x1++) {
@@ -1144,6 +1144,8 @@ void generatePuzzles() {
 	item *itemPtr;
 	TCOD_dijkstra_t lavaWalker = TCOD_dijkstra_new(LEVEL_MAP, 0.0f);
 
+	STARTING_ROOM = NULL;
+
 	while (roomPtr) {
 		if (!exitPlaced && roomPtr->size <= 80) {
 			roomPtr->flags |= IS_EXIT_ROOM;
@@ -1204,8 +1206,10 @@ void generatePuzzles() {
 
 		if (roomPtr->flags & IS_TORCH_ROOM) {
 			createAndPlaceItemInRoom(roomPtr, &createBonfireKeystone);
+		}
 
-			if (getRandomFloat(0, 1) > .5 && !placedAllSeeingEye) {
+		if (!placedAllSeeingEye) {
+			if (roomPtr->size <= 15 && getRandomFloat(0, 1) >= .6) {
 				createAndPlaceItemInRoom(roomPtr, &createAllSeeingEye);
 
 				placedAllSeeingEye += 1;
@@ -1374,11 +1378,9 @@ void colorRooms() {
 		bMod = 0;
 
 		if (roomPtr->flags & IS_TREASURE_ROOM) {
-			r = 255;
-			g = 255;
-			b = 0;
-
-			bMod = 170;
+			r = 120;
+			g = 101;
+			b = 23;
 		} else if (roomPtr->flags & IS_LAVA_ROOM) {
 			r = 160;
 			g = 82;

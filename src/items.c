@@ -36,6 +36,8 @@ TCOD_console_t getItemConsole() {
 
 void createAllItemCards() {
 	createItemCard(&createTreasure, RARITY_MEDIUM);
+	createItemCard(&createWoodenSword, RARITY_MEDIUM);
+	createItemCard(&createTorchHolder, RARITY_HIGH);
 	createItemCard(&createKey, RARITY_KEY);
 }
 
@@ -352,7 +354,7 @@ item *spawnItemWithRarity(int x, int y, int minRarity, int maxRarity) {
 	
 	while (itemCardPtr) {
 		if (minRarity <= itemCardPtr->rarity <= maxRarity) {
-			for (i = 0; i < itemCardPtr->rarity; i ++) {
+			for (i = 0; i < (RARITY_HIGH + 1) - itemCardPtr->rarity; i ++) {
 				itemList[listLength] = itemCardPtr;
 				listLength ++;
 			}
@@ -429,7 +431,7 @@ void createExit(int x, int y) {
 }
 
 void createDoor(int x, int y) {
-	createItem(x, y, '#', TCOD_color_RGB(50, 175, 175), TCOD_color_RGB(50, 75, 75), IS_DOOR | NEEDS_KEY);
+	createItem(x, y, '#', TCOD_color_RGB(50, 175, 175), TCOD_color_RGB(50, 75, 75), IS_DOOR | IGNORE_ALLSEEING_EYE | NEEDS_KEY);
 }
 
 void createKey(int x, int y) {
@@ -453,7 +455,7 @@ void activateAllSeeingEye(item *itm) {
 	item *itmPtr = getItems();
 
 	while (itmPtr) {
-		if (itmPtr->owner) {
+		if (itmPtr->owner || itmPtr->itemFlags & IGNORE_ALLSEEING_EYE) {
 			itmPtr = itmPtr->next;
 
 			continue;
