@@ -7,6 +7,10 @@ void startEntities() {
 	WORLD = calloc(sizeof(World*), MAX_ENTITIES);
 }
 
+World *getWorld() {
+	return WORLD;
+}
+
 unsigned int createEntity(World *world) {
 	unsigned int entityId;
 

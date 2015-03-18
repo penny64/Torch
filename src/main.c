@@ -6,6 +6,7 @@
 #include "framework/input.h"
 #include "systems.h"
 #include "entities.h"
+#include "spells.h"
 #include "graphics.h"
 #include "lights.h"
 #include "player.h"
@@ -34,6 +35,7 @@ void setup() {
 	levelSetup();
 	startEntities();
 	startSystems();
+	startSpells();
 
 	//Attract screen
 	generateLevel();

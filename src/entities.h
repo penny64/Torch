@@ -6,7 +6,7 @@
 #define ENTITE_H
 
 typedef struct {
-	int mask[MAX_ENTITIES];
+	unsigned int mask[MAX_ENTITIES];
 
 	Spell spell[MAX_ENTITIES];
 } World;
@@ -15,3 +15,4 @@ typedef struct {
 
 void startEntities(void);
 unsigned int createEntity(World*);
+World *getWorld(void);

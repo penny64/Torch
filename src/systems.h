@@ -6,12 +6,13 @@
 #define SYSTEM_H
 
 typedef struct {
-	unsigned int entityMask;
-	void (*callback)(World*);
+	unsigned int entityMask[MAX_SYSTEMS];
+	void (*callback[MAX_SYSTEMS])(World*, unsigned int);
 } System;
 
 #endif
 
 
 void startSystems(void);
-void createSystem(unsigned int, void (*)(World*));
+void tickSystems(World*);
+unsigned int createSystemHandler(World*, unsigned int, void (*)(World*, unsigned int));
