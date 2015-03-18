@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <assert.h>
 
 #include "libtcod.h"
 #include "framework/display.h"
@@ -57,6 +58,8 @@ item *createItem(int x, int y, char chr, TCOD_color_t foreColor, TCOD_color_t ba
 
 	if (x <= 0 || y <= 0) {
 		printf("*FATAL* Item placed OOB\n");
+
+		assert(x > 0 && y > 0);
 	}
 	
 	_c = calloc(1, sizeof(item));

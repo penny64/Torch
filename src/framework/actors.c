@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <assert.h>
 
 #include "../graphics.h"
 #include "../level.h" //Will fix this later
@@ -39,9 +40,14 @@ void actorsShutdown() {
 character *createActor(int x, int y) {
 	character *_c, *_p_c;
 	
-	if (x < 0 || x > WINDOW_WIDTH || y < 0 || y > WINDOW_HEIGHT) {
+	if (x <= 0 || x > WINDOW_WIDTH || y <= 0 || y > WINDOW_HEIGHT) {
 		printf("Something has went terribly wrong!\n");
-		return NULL;
+
+		if (x <= 0 || y <= 0) {
+			printf("*FATAL* Actor placed OOB\n");
+
+			assert(x > 0 && y > 0);
+		}
 	}
 	
 	_c = calloc(1, sizeof(character));

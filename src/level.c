@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <assert.h>
 
 #include "framework/display.h"
 #include "framework/numbers.h"
@@ -267,12 +268,25 @@ void connectRooms(room *srcRoom, room *dstRoom) {
 	}
 }
 
-int *getNewSpawnPosition(room *srcRoom) {
-	int pos[2], i, spawnIndex, invalid = 1;
+void getNewSpawnPosition(room *srcRoom, int coordArray[2]) {
+	int i, x, y, spawnIndex, invalid = 1;
 
 	while (invalid) {
 		spawnIndex = getRandomInt(0, clip(srcRoom->size - 1, 0, 9999));
+
+		if (!srcRoom->size) {
+			printf("*FATAL* Room is too small.\n");
+
+			assert(!srcRoom->size);
+		}
+
+		x = srcRoom->positionList[spawnIndex][0];
+		y = srcRoom->positionList[spawnIndex][1];
 		invalid = 0;
+
+		if (!isPositionWalkable(x, y)) {
+			continue;
+		}
 
 		for (i = 0; i < srcRoom->numberOfOccupiedSpawnPositions; i ++) {
 			if (srcRoom->spawnPositions[i] == spawnIndex) {
@@ -287,21 +301,23 @@ int *getNewSpawnPosition(room *srcRoom) {
 
 	srcRoom->spawnPositions[srcRoom->numberOfOccupiedSpawnPositions] = spawnIndex;
 	srcRoom->numberOfOccupiedSpawnPositions ++;
-	pos[0] = srcRoom->positionList[spawnIndex][0];
-	pos[1] = srcRoom->positionList[spawnIndex][1];
-
-	return pos;
+	coordArray[0] = x;
+	coordArray[1] = y;
 }
 
 void placeItemInRoom(room *srcRoom, item *itm) {
-	int *pos = getNewSpawnPosition(srcRoom);
+	int pos[2];
+
+	getNewSpawnPosition(srcRoom, &pos);
 
 	itm->x = pos[0];
 	itm->y = pos[1];
 }
 
 void createAndPlaceItemInRoom(room *srcRoom, void (*createItem)(int, int)) {
-	int *pos = getNewSpawnPosition(srcRoom);
+	int pos[2];
+
+	getNewSpawnPosition(srcRoom, &pos);
 
 	createItem(pos[0], pos[1]);
 }
@@ -1123,7 +1139,7 @@ void generateKeys() {
 
 void generatePuzzles() {
 	int i, invalidStartRoom, lavaWalkerX, lavaWalkerY, doorEnterIndex, doorExitIndex, doorEnter[2], doorExit[2];
-	int spawnIndex, exitPlaced = 0, startPlaced = 0, treasureRooms = 0, placedAllSeeingEye = 0;
+	int spawnPosition[2], exitPlaced = 0, startPlaced = 0, treasureRooms = 0, placedAllSeeingEye = 0;
 	room *roomPtr = ROOMS;
 	item *itemPtr;
 	TCOD_dijkstra_t lavaWalker = TCOD_dijkstra_new(LEVEL_MAP, 0.0f);
@@ -1131,10 +1147,9 @@ void generatePuzzles() {
 	while (roomPtr) {
 		if (!exitPlaced && roomPtr->size <= 80) {
 			roomPtr->flags |= IS_EXIT_ROOM;
-			spawnIndex = clip(getRandomInt(0, roomPtr->size - 1), 0, 9999);
 
-			EXIT_LOCATION[0] = roomPtr->positionList[spawnIndex][0];
-			EXIT_LOCATION[1] = roomPtr->positionList[spawnIndex][1];
+			getNewSpawnPosition(roomPtr, &EXIT_LOCATION);
+
 			exitPlaced = 1;
 		}
 		
@@ -1178,10 +1193,9 @@ void generatePuzzles() {
 
 			if (!invalidStartRoom) {
 				roomPtr->flags |= IS_START_ROOM;
-				spawnIndex = clip(getRandomInt(0, roomPtr->size - 1), 0, 9999);
 
-				START_LOCATION[0] = roomPtr->positionList[spawnIndex][0];
-				START_LOCATION[1] = roomPtr->positionList[spawnIndex][1];
+				getNewSpawnPosition(roomPtr, &START_LOCATION);
+
 				STARTING_ROOM = roomPtr;
 
 				startPlaced = 1;
@@ -1199,15 +1213,15 @@ void generatePuzzles() {
 		}
 
 		if (roomPtr->flags & IS_TREASURE_ROOM) {
-			spawnIndex = clip(getRandomInt(0, roomPtr->size - 1), 0, 9999);
+			getNewSpawnPosition(roomPtr, &spawnPosition);
 
-			createTreasure(roomPtr->positionList[spawnIndex][0], roomPtr->positionList[spawnIndex][1]);
+			createTreasure(spawnPosition[0], spawnPosition[1]);
 		}
 		
 		if (roomPtr->flags & IS_RARE_SPAWN) {
-			spawnIndex = clip(getRandomInt(0, roomPtr->size - 1), 0, 9999);
+			getNewSpawnPosition(roomPtr, &spawnPosition);
 
-			spawnItemWithRarity(roomPtr->positionList[spawnIndex][0], roomPtr->positionList[spawnIndex][1], RARITY_MEDIUM, RARITY_MEDIUM);
+			spawnItemWithRarity(spawnPosition[0], spawnPosition[1], RARITY_MEDIUM, RARITY_MEDIUM);
 		}
 		
 		if (roomPtr->flags & IS_LAVA_ROOM) {
@@ -1244,7 +1258,7 @@ void generatePuzzles() {
 }
 
 void spawnEnemies() {
-	int x, y, spawnIndex, maxNumberOfVoidWorms, numberOfVoidWorms = 0;
+	int spawnPosition[2], maxNumberOfVoidWorms, numberOfVoidWorms = 0;
 	room *roomPtr = ROOMS;
 
 	if (LEVEL_NUMBER >= 2) {
@@ -1254,14 +1268,14 @@ void spawnEnemies() {
 	}
 
 	while (roomPtr) {
-		spawnIndex = clip(getRandomInt(0, roomPtr->size - 1), 0, 9999);
-		x = roomPtr->positionList[spawnIndex][0];
-		y = roomPtr->positionList[spawnIndex][1];
-
 		if (roomPtr->flags & IS_TREASURE_ROOM) {
-			createBat(x, y);
+			getNewSpawnPosition(roomPtr, &spawnPosition);
+
+			createBat(spawnPosition[0], spawnPosition[1]);
 		} else if (numberOfVoidWorms < maxNumberOfVoidWorms) {
-			createVoidWorm(x, y);
+			getNewSpawnPosition(roomPtr, &spawnPosition);
+
+			createVoidWorm(spawnPosition[0], spawnPosition[1]);
 
 			numberOfVoidWorms ++;
 		} else if (roomPtr->flags & IS_EXIT_ROOM) {
@@ -1386,20 +1400,27 @@ void colorRooms() {
 			gMod = 70;
 			bMod = 70;
 		} else if (roomPtr->numberOfConnectedRooms >= 3) {
-			r = 205;
-			g = 35;
-			b = 30;
-			rMod = 120;
+			if (roomPtr->size <= 30) {
+				r = 0 - RED_SHIFT;
+				g = 255;
+				b = 255;
+			} else {
+				r = 235 - RED_SHIFT;
+				g = 235;
+				b = 235;
+			}
+
+			rMod = 60;
 			gMod = 60;
 			bMod = 60;
 		} else {
-			r = 0;
-			g = 0;
-			b = 0;
+			r = 120;
+			g = 120;
+			b = 120;
 
-			rMod = 30 - RED_SHIFT;
-			gMod = 30;
-			bMod = 30;
+			rMod = 15;
+			gMod = 15;
+			bMod = 15;
 		}
 		
 		for (i = 0; i < roomPtr->size; i ++) {
