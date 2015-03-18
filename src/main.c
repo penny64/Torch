@@ -4,6 +4,8 @@
 #include "framework/actors.h"
 #include "framework/display.h"
 #include "framework/input.h"
+#include "systems.h"
+#include "entities.h"
 #include "graphics.h"
 #include "lights.h"
 #include "player.h"
@@ -30,6 +32,8 @@ void setup() {
 	itemSetup();
 	//createPlayer();
 	levelSetup();
+	startEntities();
+	startSystems();
 
 	//Attract screen
 	generateLevel();

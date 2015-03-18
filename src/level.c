@@ -268,7 +268,7 @@ void connectRooms(room *srcRoom, room *dstRoom) {
 	}
 }
 
-void getNewSpawnPosition(room *srcRoom, int coordArray[2]) {
+void getNewSpawnPosition(room *srcRoom, int coordArray[]) {
 	int i, x, y, spawnIndex, invalid = 1;
 
 	while (invalid) {
@@ -308,7 +308,7 @@ void getNewSpawnPosition(room *srcRoom, int coordArray[2]) {
 void placeItemInRoom(room *srcRoom, item *itm) {
 	int pos[2];
 
-	getNewSpawnPosition(srcRoom, &pos);
+	getNewSpawnPosition(srcRoom, pos);
 
 	itm->x = pos[0];
 	itm->y = pos[1];
@@ -317,7 +317,7 @@ void placeItemInRoom(room *srcRoom, item *itm) {
 void createAndPlaceItemInRoom(room *srcRoom, void (*createItem)(int, int)) {
 	int pos[2];
 
-	getNewSpawnPosition(srcRoom, &pos);
+	getNewSpawnPosition(srcRoom, pos);
 
 	createItem(pos[0], pos[1]);
 }
@@ -1150,7 +1150,7 @@ void generatePuzzles() {
 		if (!exitPlaced && roomPtr->size <= 80) {
 			roomPtr->flags |= IS_EXIT_ROOM;
 
-			getNewSpawnPosition(roomPtr, &EXIT_LOCATION);
+			getNewSpawnPosition(roomPtr, EXIT_LOCATION);
 
 			exitPlaced = 1;
 		}
@@ -1196,7 +1196,7 @@ void generatePuzzles() {
 			if (!invalidStartRoom) {
 				roomPtr->flags |= IS_START_ROOM;
 
-				getNewSpawnPosition(roomPtr, &START_LOCATION);
+				getNewSpawnPosition(roomPtr, START_LOCATION);
 
 				STARTING_ROOM = roomPtr;
 
@@ -1217,13 +1217,13 @@ void generatePuzzles() {
 		}
 
 		if (roomPtr->flags & IS_TREASURE_ROOM) {
-			getNewSpawnPosition(roomPtr, &spawnPosition);
+			getNewSpawnPosition(roomPtr, spawnPosition);
 
 			createTreasure(spawnPosition[0], spawnPosition[1]);
 		}
 		
 		if (roomPtr->flags & IS_RARE_SPAWN) {
-			getNewSpawnPosition(roomPtr, &spawnPosition);
+			getNewSpawnPosition(roomPtr, spawnPosition);
 
 			spawnItemWithRarity(spawnPosition[0], spawnPosition[1], RARITY_MEDIUM, RARITY_MEDIUM);
 		}
@@ -1273,11 +1273,11 @@ void spawnEnemies() {
 
 	while (roomPtr) {
 		if (roomPtr->flags & IS_TREASURE_ROOM) {
-			getNewSpawnPosition(roomPtr, &spawnPosition);
+			getNewSpawnPosition(roomPtr, spawnPosition);
 
 			createBat(spawnPosition[0], spawnPosition[1]);
 		} else if (numberOfVoidWorms < maxNumberOfVoidWorms) {
-			getNewSpawnPosition(roomPtr, &spawnPosition);
+			getNewSpawnPosition(roomPtr, spawnPosition);
 
 			createVoidWorm(spawnPosition[0], spawnPosition[1]);
 

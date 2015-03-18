@@ -450,7 +450,6 @@ void createTorchHolder(int x, int y) {
 }
 
 void activateAllSeeingEye(item *itm) {
-	int x, y;
 	TCOD_console_t seenConsole = getSeenConsole();
 	item *itmPtr = getItems();
 
