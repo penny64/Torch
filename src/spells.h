@@ -8,6 +8,8 @@ typedef struct {
 	unsigned int spellMask;
 } Spell;
 
+Spell SPELL_FIREBALL;
+
 #endif
 
 
