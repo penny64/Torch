@@ -353,8 +353,8 @@ item *spawnItemWithRarity(int x, int y, int minRarity, int maxRarity) {
 	itemCard *itemCardPtr = ITEM_CARDS;
 	
 	while (itemCardPtr) {
-		if (minRarity <= itemCardPtr->rarity <= maxRarity) {
-			for (i = 0; i < (RARITY_HIGH + 1) - itemCardPtr->rarity; i ++) {
+		if (itemCardPtr->rarity >= minRarity && itemCardPtr->rarity <= maxRarity) {
+			for (i = 0; i < 7 - itemCardPtr->rarity; i ++) {
 				itemList[listLength] = itemCardPtr;
 				listLength ++;
 			}
@@ -362,7 +362,13 @@ item *spawnItemWithRarity(int x, int y, int minRarity, int maxRarity) {
 		
 		itemCardPtr = itemCardPtr->next;
 	}
-	
+
+	if (!listLength) {
+		printf("Was looking for item of rarity %i, %i\n", minRarity, maxRarity);
+
+		assert(listLength);
+	}
+
 	itemList[getRandomInt(0, listLength - 1)]->createItem(x, y);
 	
 	return getNewestItem();

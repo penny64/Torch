@@ -1389,15 +1389,15 @@ void colorRooms() {
 		gMod = 0;
 		bMod = 0;
 
-		if (roomPtr->flags & IS_TREASURE_ROOM) {
+		if (roomPtr->flags & IS_TREASURE_ROOM) { //CHECKED
 			r = 120;
 			g = 101;
 			b = 23;
-		} else if (roomPtr->flags & IS_LAVA_ROOM) {
+		} else if (roomPtr->flags & IS_LAVA_ROOM) { //CHECKED
 			r = 160;
 			g = 82;
 			b = 45;
-		} else if (roomPtr->flags & IS_TORCH_ROOM) {
+		} else if (roomPtr->flags & IS_TORCH_ROOM) { //CHECKED
 			r = 140 - RED_SHIFT;
 			g = 0;
 			b = 140;
@@ -1405,20 +1405,20 @@ void colorRooms() {
 			rMod = 70;
 			gMod = 70;
 			bMod = 170;
-		} else if (roomPtr->flags & IS_EXIT_ROOM) {
-			r = 10;
-			g = 10;
-			b = 10;
+		} else if (roomPtr->flags & IS_EXIT_ROOM) { //CHECKED
+			r = 245;
+			g = 245;
+			b = 245;
 
-			rMod = 250;
-			gMod = 70;
-			bMod = 70;
+			rMod = 10;
+			gMod = 10;
+			bMod = 10;
 		} else if (roomPtr->numberOfConnectedRooms >= 3) {
-			if (roomPtr->size <= 30) {
+			if (roomPtr->size <= 30) { //CHECKED
 				r = 0 - RED_SHIFT;
 				g = 255;
 				b = 255;
-			} else {
+			} else { //CHECKED
 				r = 235 - RED_SHIFT;
 				g = 235;
 				b = 235;
@@ -1427,7 +1427,7 @@ void colorRooms() {
 			rMod = 60;
 			gMod = 60;
 			bMod = 60;
-		} else {
+		} else { //CHCKED
 			r = 120;
 			g = 120;
 			b = 120;
