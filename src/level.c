@@ -305,6 +305,41 @@ void getNewSpawnPosition(room *srcRoom, int coordArray[]) {
 	coordArray[1] = y;
 }
 
+void claimSpawnPositionInRoom(room *srcRoom, int x, int y) {
+	int i, spawnIndex = -1, invalid = 0;
+
+	for (i = 0; i < srcRoom->size; i ++) {
+		if (srcRoom->positionList[i][0] == x && srcRoom->positionList[i][1] == y) {
+			spawnIndex = i;
+
+			break;
+		}
+	}
+
+	if (spawnIndex == -1) {
+		printf("*FATAL* Could not claim spawn position: Position not found.\n");
+
+		assert(spawnIndex > -1);
+	}
+
+	for (i = 0; i < srcRoom->numberOfOccupiedSpawnPositions; i ++) {
+		if (srcRoom->spawnPositions[i] == spawnIndex) {
+			invalid = 1;
+
+			break;
+		}
+	}
+
+	if (invalid) {
+		printf("*FATAL* Could not claim spawn position: Position already claimed.\n");
+
+		assert(!invalid);
+	}
+
+	srcRoom->spawnPositions[srcRoom->numberOfOccupiedSpawnPositions] = spawnIndex;
+	srcRoom->numberOfOccupiedSpawnPositions ++;
+}
+
 void placeItemInRoom(room *srcRoom, item *itm) {
 	int pos[2];
 
@@ -594,6 +629,12 @@ void findRooms() {
 					continue;
 				}
 
+				if (!x && !y) {
+					printf("Cannot start at origin 0, 0 (pre ERROR)\n");
+
+					assert(x > 0 && y > 0);
+				}
+
 				openList[0][0] = x;
 				openList[0][1] = y;
 				oLen ++;
@@ -640,10 +681,10 @@ void findRooms() {
 					if (!(y1 == 0 && x1 == 0)) {
 						openList[oLen][0] = x;
 						openList[oLen][1] = y;
+						oLen ++;
 					}
 
 					CLOSED_MAP[x][y] = 1;
-					oLen ++;
 					added ++;
 				}
 			}
@@ -655,6 +696,12 @@ void findRooms() {
 			for (i = 0; i < oLen; i++) {
 				x = openList[i][0];
 				y = openList[i][1];
+
+				if (!x && !y) {
+					printf("Cannot start at origin 0, 0 (post ERROR)\n");
+
+					assert(x > 0 && y > 0);
+				}
 
 				ROOM_MAP[x][y] = ROOM_COUNT;
 			}
@@ -1090,10 +1137,6 @@ void placeTunnels() {
 	}
 }
 
-void placeItemChest() {
-
-}
-
 void generateKeys() {
 	int i, ii, spawnIndex, invalid, openList[MAX_CONNECTED_ROOMS], closedList[MAX_CONNECTED_ROOMS];
 	int openListIndex = 0, connectedRoomsIndex = 0;
@@ -1150,23 +1193,12 @@ void generateKeys() {
 }
 
 void generatePuzzles() {
-	int i, invalidStartRoom, lavaWalkerX, lavaWalkerY, doorEnterIndex, doorExitIndex, doorEnter[2], doorExit[2];
-	int spawnPosition[2], exitPlaced = 0, startPlaced = 0, treasureRooms = 0, placedAllSeeingEye = 0;
+	int treasureRooms = 0;
 	room *roomPtr = ROOMS;
-	item *itemPtr;
-	TCOD_dijkstra_t lavaWalker = TCOD_dijkstra_new(LEVEL_MAP, 0.0f);
 
 	STARTING_ROOM = NULL;
 
 	while (roomPtr) {
-		if (!exitPlaced && roomPtr->size <= 80) {
-			roomPtr->flags |= IS_EXIT_ROOM;
-
-			getNewSpawnPosition(roomPtr, EXIT_LOCATION);
-
-			exitPlaced = 1;
-		}
-		
 		printf("Conned: %i, size: %i\n", roomPtr->numberOfConnectedRooms, roomPtr->size);
 
 		if (treasureRooms < 2 && roomPtr->numberOfConnectedRooms <= 2 && roomPtr->size >= 20 && roomPtr->size < 45) {
@@ -1190,11 +1222,25 @@ void generatePuzzles() {
 
 		roomPtr = roomPtr->next;
 	}
+}
 
-	roomPtr = ROOMS;
+void placeItems() {
+	int i, invalidStartRoom, lavaWalkerX, lavaWalkerY, doorEnterIndex, doorExitIndex, exitPlaced = 0, startPlaced = 0, placedAllSeeingEye = 0;
+	int spawnPosition[2], doorEnter[2], doorExit[2];
+	item *itemPtr;
+	TCOD_dijkstra_t lavaWalker = TCOD_dijkstra_new(LEVEL_MAP, 0.0f);
+	room *roomPtr = ROOMS;
 
 	while (roomPtr) {
 		invalidStartRoom = 0;
+
+		if (!exitPlaced && roomPtr->size <= 80) {
+			roomPtr->flags |= IS_EXIT_ROOM;
+
+			getNewSpawnPosition(roomPtr, EXIT_LOCATION);
+
+			exitPlaced = 1;
+		}
 
 		if (!startPlaced && !(roomPtr->flags & NEEDS_DOORS)) {
 			for (i = 0; i < roomPtr->numberOfConnectedRooms; i++) {
@@ -1233,32 +1279,32 @@ void generatePuzzles() {
 
 			createTreasure(spawnPosition[0], spawnPosition[1]);
 		}
-		
+
 		if (roomPtr->flags & IS_RARE_SPAWN) {
 			getNewSpawnPosition(roomPtr, spawnPosition);
 
 			spawnItemWithRarity(spawnPosition[0], spawnPosition[1], RARITY_MEDIUM, RARITY_MEDIUM);
 		}
-		
+
 		if (roomPtr->flags & IS_LAVA_ROOM) {
 			for (i = 0; i < roomPtr->size; i++) {
 				TCOD_map_set_properties(LAVA_MAP, roomPtr->positionList[i][0], roomPtr->positionList[i][1], 1, 1);
 			}
-			
+
 			for (doorEnterIndex = 0; doorEnterIndex < roomPtr->numberOfDoorPositions; doorEnterIndex ++) {
 				doorEnter[0] = roomPtr->doorPositions[doorEnterIndex][0];
 				doorEnter[1] = roomPtr->doorPositions[doorEnterIndex][1];
-				
+
 				TCOD_dijkstra_compute(lavaWalker, doorEnter[0], doorEnter[1]);
-				
+
 				for (doorExitIndex = doorEnterIndex + 1; doorExitIndex < roomPtr->numberOfDoorPositions; doorExitIndex ++) {
 					doorExit[0] = roomPtr->doorPositions[doorExitIndex][0];
 					doorExit[1] = roomPtr->doorPositions[doorExitIndex][1];
-					
+
 					//TCOD_dijkstra_path_set(lavaWalker, doorExit[0], doorExit[1]);
-					
+
 					printf("From: %i, %i, to: %i, %i\n", doorEnter[0], doorEnter[1], doorExit[0], doorExit[1]);
-					
+
 					//while (TCOD_dijkstra_path_walk(lavaWalker, &lavaWalkerX, &lavaWalkerY)) {
 					//	TCOD_map_set_properties(LAVA_MAP, lavaWalkerX, lavaWalkerY, 0, 0);
 					//}
@@ -1270,7 +1316,59 @@ void generatePuzzles() {
 	}
 
 	generateKeys();
-	placeItemChest();
+}
+
+void decorateRooms() {
+	int i, x, y, nx, ny, x1, y1, isNextToWall;
+	room *roomPtr = ROOMS;
+
+	while (roomPtr) {
+		if (roomPtr->flags & IS_TORCH_ROOM) {
+			for (i = 0; i < roomPtr->size; i ++) {
+				x = roomPtr->positionList[i][0];
+				y = roomPtr->positionList[i][1];
+
+				isNextToWall = 0;
+
+				for (x1 = -1; x1 <= 1; x1 ++) {
+					for (y1 = -1; y1 <= 1; y1 ++) {
+						if (x + x1 < 0 || x + x1 >= WINDOW_WIDTH || y + y1 < 0 || y + y1 >= WINDOW_HEIGHT) {
+							continue;
+						}
+
+						if (TCOD_map_is_walkable(TUNNEL_MAP, x + x1, y + y1)) {
+							continue;
+						}
+
+						if ((y1 == -1 && x1 == 1) || (y1 == -1 && x1 == -1) || (y1 == 1 && x1 == 1) || (y1 == 1 && x1 == -1)) {
+							continue;
+						}
+
+						nx = x + x1;
+						ny = y + y1;
+
+						if (!isPositionWalkable(nx, ny)) {
+							isNextToWall = 1;
+
+							break;
+						}
+					}
+
+					if (isNextToWall) {
+						break;
+					}
+				}
+
+				if (isNextToWall) {
+					claimSpawnPositionInRoom(roomPtr, x, y);
+					
+					createWoodenSword(x, y);
+				}
+			}
+		}
+
+		roomPtr = roomPtr->next;
+	}
 }
 
 void spawnEnemies() {
@@ -1442,7 +1540,7 @@ void colorRooms() {
 			y = roomPtr->positionList[i][1];
 
 			if (TCOD_map_is_walkable(LAVA_MAP, x, y)) {
-				drawCharBackEx(LEVEL_CONSOLE, x, y, TCOD_color_RGB(0, 0, 255), TCOD_BKGND_SET);
+				drawCharBackEx(LEVEL_CONSOLE, x, y, TCOD_color_RGB(90, 90, 255), TCOD_BKGND_SET);
 			} else {
 				drawCharBackEx(LEVEL_CONSOLE, x, y, TCOD_color_RGB(clip(r + RED_SHIFT + getRandomInt(0, rMod), 0, 255), clip(g + getRandomInt(0, gMod), 0, 255), clip(b + getRandomInt(0, bMod), 0, 255)), TCOD_BKGND_SET);
 			}
@@ -1517,10 +1615,12 @@ void generateLevel() {
 
 	smooth();
 	findRooms();
-	spawnEnemies();
 
 	placeTunnels();
 	generatePuzzles();
+	decorateRooms();
+	placeItems();
+	spawnEnemies();
 	//cleanUpDoors();
 	activateDoors();
 
