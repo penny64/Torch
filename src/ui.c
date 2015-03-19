@@ -91,8 +91,10 @@ void _drawStance() {
 	}
 	
 	item *weapon = actorGetItemWithFlag(player, IS_WEAPON);
-	
-	if (weapon) {
+
+	if (player->stanceFlags & IS_CASTING) {
+		stanceText = "%cCasting%c";
+	} else if (weapon) {
 		if (player->stanceFlags & IS_MOVING) {
 			stanceText = "%cRun.Slash%c";
 		} else if (player->stanceFlags & IS_STANDING) {

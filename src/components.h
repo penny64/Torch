@@ -1,6 +1,7 @@
 #define MAX_SPELLS 10
 
 #include "framework/actors.h"
+//#include "entities.h"
 
 
 #ifndef COMPON_H
@@ -20,9 +21,9 @@ typedef enum {
 } SpellTraits;
 
 typedef struct {
-	void (*castSpell[MAX_SPELLS])(character*, character*);
+	void (*castSpell[MAX_SPELLS])(struct World*, unsigned int, unsigned int);
 	unsigned int spellTraits[MAX_SPELLS];
-	int spellCount, activeSpell;
+	int spellCount, activeSpell, castDelay[MAX_SPELLS];
 } SpellComponent;
 
 #endif

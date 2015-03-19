@@ -636,6 +636,8 @@ void _drawActor(character *actor) {
 			chr = 25;
 		} else if (actor->stanceFlags & IS_STUNNED) {
 			chr = (int)'*';
+		} else if (actor->stanceFlags & IS_CASTING) {
+			chr = (int)'!';
 		}
 	}
 	

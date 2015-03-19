@@ -9,9 +9,9 @@
 
 void spellHandler(World*, unsigned int);
 void spellInputHandler(World*, unsigned int);
-void fireball(character*, character*);
+void fireball(World*, unsigned int, unsigned int);
 
-Spell SPELL_FIREBALL = {&fireball, SPELL_IS_FLAME};
+Spell SPELL_FIREBALL = {&fireball, SPELL_IS_FLAME, DELAY_SHORT};
 
 
 void startSpells() {
@@ -44,19 +44,25 @@ void addSpell(World *world, unsigned int entityId, Spell spell) {
 
 	spellComponent->castSpell[spellComponent->spellCount] = spell.castSpell;
 	spellComponent->spellTraits[spellComponent->spellCount] = spell.spellMask;
+	spellComponent->castDelay[spellComponent->spellCount] = spell.castDelay;
 }
 
 
 void castSpell(World *world, unsigned int entityId) {
 	SpellComponent *spellComponent = &world->spell[entityId];
-	character *owner = getActorViaId(entityId);
-	character *target = getActorViaId(entityId);
+	unsigned int owner = entityId;
+	unsigned int target = entityId;
 
-	spellComponent->castSpell[spellComponent->activeSpell](owner, target);
+	spellComponent->castSpell[spellComponent->activeSpell](world, owner, target);
 }
 
 //Spells
 
-void fireball(character *owner, character *target) {
-	printf("Boom!\n");
+void fireball(World *world, unsigned int ownerId, unsigned int targetId) {
+	character *owner = getActorViaId(ownerId);
+	SpellComponent *spellComponent = &world->spell[ownerId];
+
+	setStance(owner, IS_CASTING);
+	setFutureStanceToRemove(owner, IS_CASTING);
+	setDelay(owner, spellComponent->castDelay[spellComponent->spellCount]);
 }

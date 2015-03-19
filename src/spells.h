@@ -3,9 +3,14 @@
 #ifndef SPELLS_H
 #define SPELLS_H
 
+enum {
+	DELAY_SHORT = 5,
+} delayFlag_t;
+
 typedef struct {
 	void (*castSpell)(character*, character*);
 	unsigned int spellMask;
+	int castDelay;
 } Spell;
 
 Spell SPELL_FIREBALL;
