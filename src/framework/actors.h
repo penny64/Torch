@@ -55,6 +55,7 @@ struct character {
 
 character *createActor(int, int);
 character *getActors(void);
+character *getActorViaId(unsigned int);
 TCOD_console_t getActorConsole(void);
 void resetAllActorsForNewLevel();
 void actorLogic(void);

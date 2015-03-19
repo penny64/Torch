@@ -14,4 +14,6 @@ Spell SPELL_FIREBALL;
 
 
 void startSpells(void);
+void registerSpellSystem(World*, unsigned int);
+void castSpell(World*, unsigned int);
 void addSpell(World*, unsigned int, Spell);

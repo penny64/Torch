@@ -15,4 +15,5 @@ typedef struct {
 
 void startSystems(void);
 void tickSystems(World*);
+void tickSystemsWithMask(World*, unsigned int);
 unsigned int createSystemHandler(World*, unsigned int, void (*)(World*, unsigned int));

@@ -31,6 +31,7 @@ void createPlayer() {
 	PLAYER_ACTOR->itemLight->fuel = PLAYER_ACTOR->itemLight->fuelMax;
 	PLAYER_ACTOR->traitFlags = TORCH_ATTACK_PENALTY;
 
+	registerSpellSystem(getWorld(), PLAYER_ACTOR->entityId);
 	addSpell(getWorld(), PLAYER_ACTOR->entityId, SPELL_FIREBALL);
 	
 	printf("Created player.\n");

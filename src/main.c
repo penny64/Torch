@@ -49,6 +49,7 @@ int main() {
 	
 	while (!TCOD_console_is_window_closed()) {
 		inputLogic();
+		tickSystemsWithMask(getWorld(), COMPONENT_INPUT);
 		playerInputLogic();
 
 		if (isTCODCharPressed(TCODK_ESCAPE)) {
@@ -68,6 +69,7 @@ int main() {
 		//While loop?
 		while (!player || (getPlayerMoveCount() && !GAME_DELAY)) {
 			if ((!player && !ATTRACT_TIME) || (player && getPlayerMoveCount())) {
+				tickSystemsWithMask(getWorld(), COMPONENT_TICK);
 				actorLogic();
 				itemLogic();
 				lightLogic();

@@ -727,6 +727,7 @@ void placeTunnels() {
 	int x, y, x1, y1, w_x, w_y, mapUpdates, currentValue, neighborValue, lowestValue, index, lowestX, lowestY, invalid, randomRoomSize, dist;
 	int numberOfFailedAttemptsToFindADestRoom, neighborCollision, banDoubleTunnels, srcRoomIndex, dstRoomIndex, startCount = 0, runCount = -1;
 	int doorPlaced, destDoorPlaced, ownsTunnels, roomDistance, minDistanceToDestRoom, maxHallDistance;//, openRoomList[MAX_ROOMS], closedRoomList[MAX_ROOMS], openListCount, closedListCount, inClosedList, inOpenList, i, ii, id;
+	int exitEarly;
 	room *srcRoom = NULL, *dstRoom = NULL, *tempDestRoom = NULL;
 	
 	ROOM_COUNT = ROOM_COUNT_MAX;
@@ -754,6 +755,7 @@ void placeTunnels() {
 			srcRoomIndex ++;
 			srcRoom = getRoomViaId(srcRoomIndex);
 			dstRoom = NULL;
+			exitEarly = 0;
 			minDistanceToDestRoom = 999;
 			numberOfFailedAttemptsToFindADestRoom = 0;
 
@@ -1030,8 +1032,18 @@ void placeTunnels() {
 							doorPlaced = 1;
 						}
 					}
+
+					if (ROOM_MAP[w_x + x1][w_y + y1] == dstRoom->id) {
+						exitEarly = 1;
+
+						break;
+					}
 					
 					TCOD_map_set_properties(LEVEL_MAP, w_x + x1, w_y + y1, 1, 1);
+				}
+
+				if (exitEarly) {
+					break;
 				}
 			}
 			
@@ -1066,7 +1078,7 @@ void placeTunnels() {
 			}
 		}
 
-		if (ROOM_MAP[w_x][w_y] == dstRoom->id) {
+		if (ROOM_MAP[w_x][w_y] == dstRoom->id || exitEarly) {
 			connectRooms(srcRoom, dstRoom);
 
 			if (isLevelValid()) {

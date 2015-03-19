@@ -149,6 +149,22 @@ void deleteEnemies() {
 	}
 }
 
+character *getActorViaId(unsigned int entityId) {
+	character *ptr = CHARACTERS;
+
+	while (ptr) {
+		if (ptr->entityId == entityId) {
+			return ptr;
+		}
+
+		ptr = ptr->next;
+	}
+
+	printf("*FATAL* Could not find entity ID=%i\n", entityId);
+
+	return NULL;
+}
+
 void unsetStance(character *actor, unsigned int stance) {
 	actor->stanceFlags ^= stance;
 }
