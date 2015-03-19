@@ -8,7 +8,7 @@ enum {
 } delayFlag_t;
 
 typedef struct {
-	void (*castSpell)(character*, character*);
+	void (*castSpell)(World*, unsigned int, unsigned int);
 	unsigned int spellMask;
 	int castDelay;
 } Spell;

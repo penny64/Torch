@@ -1,11 +1,12 @@
 #define MAX_SPELLS 10
 
 #include "framework/actors.h"
-//#include "entities.h"
 
 
 #ifndef COMPON_H
 #define COMPON_H
+
+struct World;
 
 typedef enum {
 	COMPONENT_NONE = 0,

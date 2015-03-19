@@ -29,6 +29,6 @@ unsigned int createEntity(World *world) {
 	return MAX_ENTITIES;
 }
 
-void destroyEntity(World *world, unsigned int entityId) {
+void deleteEntity(World *world, unsigned int entityId) {
 	world->mask[entityId] = COMPONENT_NONE;
 }

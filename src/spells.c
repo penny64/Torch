@@ -56,6 +56,7 @@ void castSpell(World *world, unsigned int entityId) {
 	spellComponent->castSpell[spellComponent->activeSpell](world, owner, target);
 }
 
+
 //Spells
 
 void fireball(World *world, unsigned int ownerId, unsigned int targetId) {
