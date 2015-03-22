@@ -1362,7 +1362,7 @@ void decorateRooms() {
 				if (isNextToWall) {
 					claimSpawnPositionInRoom(roomPtr, x, y);
 					
-					createWoodenSword(x, y);
+					createWoodWall(x, y);
 				}
 			}
 		}
@@ -1458,6 +1458,10 @@ void activateDoors() {
 	while (itm) {
 		if (itm->itemFlags & IS_DOOR) {
 			enableDoor(itm);
+		}
+
+		if (itm->itemFlags & IS_SOLID) {
+			enableSolid(itm);
 		}
 		
 		itm = itm->next;

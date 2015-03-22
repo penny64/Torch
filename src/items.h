@@ -22,6 +22,8 @@ enum {
 	IS_TORCH_HOLDER = 0x01 << 12,
 	IS_ALLSEEING_EYE = 0x01 << 13,
 	IGNORE_ALLSEEING_EYE = 0x01 << 14,
+	IS_SOLID = 0x01 << 15,
+	IS_DESTROYABLE = 0x01 << 16,
 } itemFlag_t;
 
 enum {
@@ -83,7 +85,9 @@ void createDoor(int, int);
 void createKey(int, int);
 void createTorchHolder(int, int);
 void createWoodenSword(int, int);
+void createWoodWall(int, int);
 void createAllSeeingEye(int, int);
 void enableDoor(item*);
+void enableSolid(item*);
 
 #endif

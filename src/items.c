@@ -308,7 +308,7 @@ int itemHandleCharacterTouch(item *itm, character *actor) {
 	character *player = getPlayer();
 	
 	if (actor == player) {
-		if (itm->itemFlags & IS_DOOR) {
+		if (itm->itemFlags & IS_SOLID) {
 			if (itm->itemFlags & NEEDS_KEY && !actorGetItemWithFlag(player, IS_KEY)) {
 				showMessage("%cThe door refuses to open...%c", 10);
 
@@ -374,6 +374,21 @@ item *spawnItemWithRarity(int x, int y, int minRarity, int maxRarity) {
 	return getNewestItem();
 }
 
+void enableDoor(item *itm) {
+	light *lght = createDynamicLight(itm->x, itm->y, NULL);
+	itm->itemLight = lght;
+	lght->r_tint = 50;
+	lght->g_tint = 175;
+	lght->b_tint = 175;
+	lght->fuel = 99999;
+	lght->fuelMax = 99999;
+	lght->size = 3;
+}
+
+void enableSolid(item *itm) {
+	blockPosition(itm->x, itm->y);
+}
+
 
 //Item list
 
@@ -437,7 +452,7 @@ void createExit(int x, int y) {
 }
 
 void createDoor(int x, int y) {
-	createItem(x, y, '#', TCOD_color_RGB(50, 175, 175), TCOD_color_RGB(50, 75, 75), IS_DOOR | IGNORE_ALLSEEING_EYE | NEEDS_KEY);
+	createItem(x, y, '#', TCOD_color_RGB(50, 175, 175), TCOD_color_RGB(50, 75, 75), IS_DOOR | IGNORE_ALLSEEING_EYE | NEEDS_KEY | IS_SOLID);
 }
 
 void createKey(int x, int y) {
@@ -494,15 +509,9 @@ void createAllSeeingEye(int x, int y) {
 	lght->fuelMax = 999999;
 }
 
-void enableDoor(item *itm) {
-	blockPosition(itm->x, itm->y);
-	
-	light *lght = createDynamicLight(itm->x, itm->y, NULL);
-	itm->itemLight = lght;
-	lght->r_tint = 50;
-	lght->g_tint = 175;
-	lght->b_tint = 175;
-	lght->fuel = 99999;
-	lght->fuelMax = 99999;
-	lght->size = 3;
+void createWoodWall(int x, int y) {
+	item *itm = createItem(x, y, '#', TCOD_color_RGB(90 - getRandomInt(30, 50), 85 - getRandomInt(30, 50), 10), TCOD_color_RGB(90 - getRandomInt(30, 50), 85 - getRandomInt(30, 50), 10), IS_SOLID | IS_DESTROYABLE);
+
+	itm->statDamage = 3;
+	itm->statSpeed = 3;
 }
