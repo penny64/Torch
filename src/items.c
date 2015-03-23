@@ -510,7 +510,7 @@ void createAllSeeingEye(int x, int y) {
 }
 
 void createWoodWall(int x, int y) {
-	item *itm = createItem(x, y, '#', TCOD_color_RGB(90 - getRandomInt(30, 50), 85 - getRandomInt(30, 50), 10), TCOD_color_RGB(90 - getRandomInt(30, 50), 85 - getRandomInt(30, 50), 10), IS_SOLID | IS_DESTROYABLE);
+	item *itm = createItem(x, y, '#', TCOD_color_RGB(128 - 40, 101 - 40, 23 - 5), TCOD_color_RGB(128 - 50, 101 - 50, 23 - 5), IS_SOLID | IS_DESTROYABLE);
 
 	itm->statDamage = 3;
 	itm->statSpeed = 3;

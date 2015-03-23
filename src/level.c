@@ -1319,7 +1319,7 @@ void placeItems() {
 }
 
 void decorateRooms() {
-	int i, x, y, nx, ny, x1, y1, isNextToWall;
+	int i, ii, invalid, x, y, nx, ny, x1, y1, isNextToWall;
 	room *roomPtr = ROOMS;
 
 	while (roomPtr) {
@@ -1337,7 +1337,9 @@ void decorateRooms() {
 						}
 
 						if (TCOD_map_is_walkable(TUNNEL_MAP, x + x1, y + y1)) {
-							continue;
+							invalid = 1;
+
+							break;
 						}
 
 						if ((y1 == -1 && x1 == 1) || (y1 == -1 && x1 == -1) || (y1 == 1 && x1 == 1) || (y1 == 1 && x1 == -1)) {
@@ -1347,6 +1349,20 @@ void decorateRooms() {
 						nx = x + x1;
 						ny = y + y1;
 
+						for (ii = 0; ii < roomPtr->numberOfDoorPositions; ii ++) {
+							if (nx == roomPtr->doorPositions[ii][0] && ny == roomPtr->doorPositions[ii][1]) {
+								ii = -1;
+
+								break;
+							}
+						}
+
+						if (ii == -1) {
+							invalid = 1;
+
+							break;
+						}
+
 						if (!isPositionWalkable(nx, ny)) {
 							isNextToWall = 1;
 
@@ -1354,7 +1370,7 @@ void decorateRooms() {
 						}
 					}
 
-					if (isNextToWall) {
+					if (isNextToWall || invalid) {
 						break;
 					}
 				}
