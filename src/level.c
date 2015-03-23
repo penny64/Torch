@@ -1208,7 +1208,7 @@ void generatePuzzles() {
 			treasureRooms ++;
 		} else if (roomPtr->size >= 45 && roomPtr->size <= 65) {
 			roomPtr->flags |= IS_TORCH_ROOM;
-		} else if (roomPtr->size > 65 && roomPtr->size < 85) {
+		} else if (roomPtr->size >= 80 && roomPtr->size <= 90) {
 			if (roomPtr->numberOfConnectedRooms == 2) {
 				roomPtr->flags |= IS_LAVA_ROOM;
 			} else {
