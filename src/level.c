@@ -1329,6 +1329,7 @@ void decorateRooms() {
 				y = roomPtr->positionList[i][1];
 
 				isNextToWall = 0;
+				invalid = 0;
 
 				for (x1 = -1; x1 <= 1; x1 ++) {
 					for (y1 = -1; y1 <= 1; y1 ++) {
