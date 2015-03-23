@@ -1366,8 +1366,6 @@ void decorateRooms() {
 
 						if (!isPositionWalkable(nx, ny)) {
 							isNextToWall = 1;
-
-							break;
 						}
 					}
 
