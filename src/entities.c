@@ -18,6 +18,8 @@ unsigned int createEntity(World *world) {
 
 	for (entityId = 0; entityId < MAX_ENTITIES; entityId ++) {
 		if (world->mask[entityId] == COMPONENT_NONE) {
+			world->mask[entityId] = COMPONENT_OCCUPIED;
+
 			printf("Created new entity ID=%i\n", entityId);
 
 			return entityId;

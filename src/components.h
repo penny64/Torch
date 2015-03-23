@@ -10,9 +10,10 @@ struct World;
 
 typedef enum {
 	COMPONENT_NONE = 0,
-	COMPONENT_SPELL = 1 << 0,
-	COMPONENT_INPUT = 1 << 1,
-	COMPONENT_TICK = 1 << 2,
+	COMPONENT_OCCUPIED = 1 << 0,
+	COMPONENT_SPELL = 1 << 1,
+	COMPONENT_INPUT = 1 << 2,
+	COMPONENT_TICK = 1 << 3,
 } Component;
 
 typedef enum {

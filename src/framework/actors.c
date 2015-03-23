@@ -104,9 +104,7 @@ void deleteActor(character *chr) {
 		killPlayer();
 	}
 
-	if (chr->entityId) {
-		deleteEntity(getWorld(), chr->entityId);
-	}
+	deleteEntity(getWorld(), chr->entityId);
 	
 	if (lodgedItem) {
 		lodgedItem->itemFlags ^= IS_LODGED;
