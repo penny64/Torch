@@ -65,8 +65,7 @@ int main() {
 		}
 		
 		player = getPlayer();
-		
-		//While loop?
+
 		while (!player || (getPlayerMoveCount() && !GAME_DELAY)) {
 			if ((!player && !ATTRACT_TIME) || (player && getPlayerMoveCount())) {
 				tickSystemsWithMask(getWorld(), COMPONENT_TICK);
@@ -96,7 +95,6 @@ int main() {
 			}
 		}
 
-		//effectsLogic();
 		playerLogic();
 		uiLogic();
 
@@ -105,13 +103,9 @@ int main() {
         }
 
 		graphicsLogic();
-	
 		drawActors();
-
 		composeScene();
-
 		displayLogic();
-		
 		actorCleanup();
 	}
 	

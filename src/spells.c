@@ -6,6 +6,7 @@
 #include "systems.h"
 #include "entities.h"
 #include "components.h"
+#include "lights.h"
 
 void spellHandler(World*, unsigned int);
 void spellInputHandler(World*, unsigned int);
@@ -16,6 +17,7 @@ Spell SPELL_FIREBALL = {&fireball, SPELL_IS_FLAME, DELAY_SHORT};
 
 void startSpells() {
 	World *world = getWorld();
+
 	createSystemHandler(world, COMPONENT_SPELL, &spellHandler);
 	createSystemHandler(world, COMPONENT_INPUT, &spellInputHandler);
 }
@@ -30,6 +32,8 @@ void spellInputHandler(World *world, unsigned int entityId) {
 
 	if (isCharPressed('x')) {
 		castSpell(world, entityId);
+	} else if (isCharPressed('X')) {
+		printf("Casting menu\n");
 	}
 }
 
@@ -62,8 +66,16 @@ void castSpell(World *world, unsigned int entityId) {
 void fireball(World *world, unsigned int ownerId, unsigned int targetId) {
 	character *owner = getActorViaId(ownerId);
 	SpellComponent *spellComponent = &world->spell[ownerId];
+	int x, y, spellDelay;
+
+	x = owner->x;
+	y = owner->y;
+	spellDelay = spellComponent->castDelay[spellComponent->spellCount];
+
+	light *lght = createDynamicLight(x, y, owner);
+	lght->fuel = spellDelay;
 
 	setStance(owner, IS_CASTING);
 	setFutureStanceToRemove(owner, IS_CASTING);
-	setDelay(owner, spellComponent->castDelay[spellComponent->spellCount]);
+	setDelay(owner, spellDelay);
 }

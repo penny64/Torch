@@ -67,6 +67,7 @@ light *createDynamicLight(int x, int y, character *actor) {
 	_c->prev = NULL;
 	_c->next = NULL;
 	_c->fov = copyLevelMap();
+	_c->lightMap = copyLevelMap();
 	
 	if (DYNAMIC_LIGHTS == NULL) {
 		DYNAMIC_LIGHTS = _c;

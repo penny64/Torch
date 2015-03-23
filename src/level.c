@@ -488,7 +488,9 @@ int isTransitionInProgress() {
 }
 
 int levelLogic() {
+	int x, y;
 	character *player = getPlayer();
+	light *lghtPtr;
 
 	if (isLevelComplete() && player->itemLight) {
 		EXIT_WAVE_DIST = clipFloat(EXIT_WAVE_DIST + .5f, 0, 255);
@@ -497,6 +499,22 @@ int levelLogic() {
 			generateLevel();
 
 			return 1;
+		}
+	}
+
+	for (y = 0; y < WINDOW_HEIGHT; y ++) {
+		for (x = 0; x < WINDOW_HEIGHT; x ++) {
+			if (TCOD_map_is_walkable(LAVA_MAP, x, y)) {
+				if (getRandomFloat(0, 1) >= .8) {
+					lghtPtr = createDynamicLight(x, y, NULL);
+
+					lghtPtr->size = getRandomInt(3, 5);
+					lghtPtr->r_tint = 255;
+					lghtPtr->g_tint = 0;
+					lghtPtr->b_tint = 0;
+					lghtPtr->fuel = 5;
+				}
+			}
 		}
 	}
 
@@ -1211,6 +1229,8 @@ void generatePuzzles() {
 		} else if (roomPtr->size >= 80 && roomPtr->size <= 90) {
 			if (roomPtr->numberOfConnectedRooms == 2) {
 				roomPtr->flags |= IS_LAVA_ROOM;
+
+				printf("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n");
 			} else {
 				roomPtr->flags |= NEEDS_DOORS;
 			}
@@ -1227,7 +1247,6 @@ void generatePuzzles() {
 void placeItems() {
 	int i, invalidStartRoom, lavaWalkerX, lavaWalkerY, doorEnterIndex, doorExitIndex, exitPlaced = 0, startPlaced = 0, placedAllSeeingEye = 0;
 	int spawnPosition[2], doorEnter[2], doorExit[2];
-	item *itemPtr;
 	TCOD_dijkstra_t lavaWalker = TCOD_dijkstra_new(LEVEL_MAP, 0.0f);
 	room *roomPtr = ROOMS;
 
@@ -1301,13 +1320,13 @@ void placeItems() {
 					doorExit[0] = roomPtr->doorPositions[doorExitIndex][0];
 					doorExit[1] = roomPtr->doorPositions[doorExitIndex][1];
 
-					//TCOD_dijkstra_path_set(lavaWalker, doorExit[0], doorExit[1]);
+					TCOD_dijkstra_path_set(lavaWalker, doorExit[0], doorExit[1]);
 
 					printf("From: %i, %i, to: %i, %i\n", doorEnter[0], doorEnter[1], doorExit[0], doorExit[1]);
 
-					//while (TCOD_dijkstra_path_walk(lavaWalker, &lavaWalkerX, &lavaWalkerY)) {
-					//	TCOD_map_set_properties(LAVA_MAP, lavaWalkerX, lavaWalkerY, 0, 0);
-					//}
+					while (TCOD_dijkstra_path_walk(lavaWalker, &lavaWalkerX, &lavaWalkerY)) {
+						TCOD_map_set_properties(LAVA_MAP, lavaWalkerX, lavaWalkerY, 0, 0);
+					}
 				}
 			}
 		}
@@ -1510,10 +1529,6 @@ void colorRooms() {
 			r = 120;
 			g = 101;
 			b = 23;
-		} else if (roomPtr->flags & IS_LAVA_ROOM) { //CHECKED
-			r = 160;
-			g = 82;
-			b = 45;
 		} else if (roomPtr->flags & IS_TORCH_ROOM) { //CHECKED
 			r = 140 - RED_SHIFT;
 			g = 0;
@@ -1559,7 +1574,7 @@ void colorRooms() {
 			y = roomPtr->positionList[i][1];
 
 			if (TCOD_map_is_walkable(LAVA_MAP, x, y)) {
-				drawCharBackEx(LEVEL_CONSOLE, x, y, TCOD_color_RGB(90, 90, 255), TCOD_BKGND_SET);
+				drawCharBackEx(LEVEL_CONSOLE, x, y, TCOD_color_RGB(255, 0, 0), TCOD_BKGND_SET);
 			} else {
 				drawCharBackEx(LEVEL_CONSOLE, x, y, TCOD_color_RGB(clip(r + RED_SHIFT + getRandomInt(0, rMod), 0, 255), clip(g + getRandomInt(0, gMod), 0, 255), clip(b + getRandomInt(0, bMod), 0, 255)), TCOD_BKGND_SET);
 			}
