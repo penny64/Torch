@@ -49,7 +49,7 @@ void tickSystemsWithMask(World *world, unsigned int mask) {
 	unsigned int systemId, entityId;
 
 	for (systemId = 0; systemId < MAX_SYSTEMS; systemId ++) {
-		if (SYSTEMS->entityMask != COMPONENT_NONE && SYSTEMS->entityMask[systemId] & mask) {
+		if (SYSTEMS->entityMask[systemId] != COMPONENT_NONE && SYSTEMS->entityMask[systemId] & mask) {
 			for (entityId = 0; entityId < MAX_ENTITIES; entityId ++) {
 				if (world->mask[entityId] & SYSTEMS->entityMask[systemId]) {
 					SYSTEMS->callback[systemId](world, entityId);
