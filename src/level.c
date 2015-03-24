@@ -502,21 +502,13 @@ int levelLogic() {
 		}
 	}
 
-	for (y = 0; y < WINDOW_HEIGHT; y ++) {
+	/*for (y = 0; y < WINDOW_HEIGHT; y ++) {
 		for (x = 0; x < WINDOW_HEIGHT; x ++) {
 			if (TCOD_map_is_walkable(LAVA_MAP, x, y)) {
-				if (getRandomFloat(0, 1) >= .8) {
-					lghtPtr = createDynamicLight(x, y, NULL);
 
-					lghtPtr->size = getRandomInt(3, 5);
-					lghtPtr->r_tint = 255;
-					lghtPtr->g_tint = 0;
-					lghtPtr->b_tint = 0;
-					lghtPtr->fuel = 5;
-				}
 			}
 		}
-	}
+	}*/
 
 	return 0;
 }
@@ -1245,10 +1237,11 @@ void generatePuzzles() {
 }
 
 void placeItems() {
-	int i, invalidStartRoom, lavaWalkerX, lavaWalkerY, doorEnterIndex, doorExitIndex, exitPlaced = 0, startPlaced = 0, placedAllSeeingEye = 0;
+	int x, y, i, invalidStartRoom, lavaWalkerX, lavaWalkerY, doorEnterIndex, doorExitIndex, exitPlaced = 0, startPlaced = 0, placedAllSeeingEye = 0;
 	int spawnPosition[2], doorEnter[2], doorExit[2];
 	TCOD_dijkstra_t lavaWalker = TCOD_dijkstra_new(LEVEL_MAP, 0.0f);
 	room *roomPtr = ROOMS;
+	light *lghtPtr;
 
 	while (roomPtr) {
 		invalidStartRoom = 0;
@@ -1329,6 +1322,27 @@ void placeItems() {
 					}
 				}
 			}
+
+			for (i = 0; i < roomPtr->size; i ++) {
+				x = roomPtr->positionList[i][0];
+				y = roomPtr->positionList[i][1];
+
+				if (!TCOD_map_is_walkable(LAVA_MAP, x, y)) {
+					continue;
+				}
+
+				if (getRandomFloat(0, 1) >= .85) {
+					lghtPtr = createDynamicLight(x, y, NULL);
+
+					lghtPtr->size = getRandomInt(2, 3);
+					lghtPtr->r_tint = 20;
+					lghtPtr->g_tint = 20;
+					lghtPtr->b_tint = 20;
+					lghtPtr->brightness = .35;
+					lghtPtr->fuel = 9999;
+					lghtPtr->fuelMax = 9999;
+				}
+			}
 		}
 
 		roomPtr = roomPtr->next;
@@ -1340,6 +1354,7 @@ void placeItems() {
 void decorateRooms() {
 	int i, ii, invalid, x, y, nx, ny, x1, y1, isNextToWall;
 	room *roomPtr = ROOMS;
+	light *lghtPtr;
 
 	while (roomPtr) {
 		if (roomPtr->flags & IS_TORCH_ROOM) {
@@ -1529,6 +1544,10 @@ void colorRooms() {
 			r = 120;
 			g = 101;
 			b = 23;
+		} else if (roomPtr->flags & IS_LAVA_ROOM) { //CHECKED
+			r = 255;
+			g = 255;
+			b = 255;
 		} else if (roomPtr->flags & IS_TORCH_ROOM) { //CHECKED
 			r = 140 - RED_SHIFT;
 			g = 0;
