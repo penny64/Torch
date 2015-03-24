@@ -77,6 +77,7 @@ item *createItem(int x, int y, char chr, TCOD_color_t foreColor, TCOD_color_t ba
 	_c->backColor = backColor;
 	_c->statDamage = 0;
 	_c->statSpeed = 0;
+	_c->name = "null";
 	
 	if (ITEMS == NULL) {
 		ITEMS = _c;
@@ -459,8 +460,16 @@ void createKey(int x, int y) {
 	createItem(x, y, '-', TCOD_color_RGB(30, 175, 175), TCOD_color_RGB(30, 75, 75), IS_KEY | CAN_PICK_UP);
 }
 
+void randomizeSword(item *itm) {
+	itm->itemEffectFlags = IS_QUICK;
+
+	itm->name = "Sword of Speed";
+}
+
 void createWoodenSword(int x, int y) {
 	item *itm = createItem(x, y, '/', TCOD_color_RGB(210, 105, 30), TCOD_color_RGB(30, 30, 30), IS_WEAPON | IS_SWORD | CAN_PICK_UP);
+
+	randomizeSword(itm);
 	
 	itm->statDamage = 3;
 	itm->statSpeed = 3;

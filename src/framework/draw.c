@@ -26,5 +26,10 @@ void drawCharBackEx(TCOD_console_t console, int x, int y, TCOD_color_t color, TC
 }
 
 void drawString(TCOD_console_t console, int x, int y, const char *string) {
+	//TCOD_console_set_background_flag(console, TCOD_BKGND_SET);
+	//TCOD_console_set_default_background(console, TCOD_color_RGB(1, 1, 1));
+	//TCOD_console_set_default_foreground(console, TCOD_color_RGB(255, 245, 245));
 	TCOD_console_print_ex(console, x, y, TCOD_BKGND_SET, TCOD_LEFT, string, TCOD_COLCTRL_1, TCOD_COLCTRL_STOP);
+	//TCOD_console_print(console, x, y, string);
+	//TCOD_console_set_default_background(console, TCOD_color_RGB(255, 0, 255));
 }

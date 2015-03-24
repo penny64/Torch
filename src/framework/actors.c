@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 #include <assert.h>
 
 #include "../graphics.h"
@@ -288,13 +289,22 @@ void removeItemFromInventory(character *actor, item *itm) {
 }
 
 void pickUpItem(character *actor, item *itm) {
+	char itemName[40];
+	//char *tmp = malloc(strlen(s) + strlen(itm->name) + strlen(e) + 1);
+
+	//strcpy(itemName, "%c");
+	//strcat(itemName, itm->name);
+	//strcat(itemName, "%c");
+	snprintf(itemName, sizeof itemName, "%%c%s%%c", itm->name);
+
 	itm->owner = actor;
 
 	actor->inventory[actor->numberOfItems] = itm;
 	actor->numberOfItems ++;
 	
 	if (actor == getPlayer()) {
-		showMessage("%cPicked up item.%c", 10);
+		printf("%s\n", itemName);
+		showMessage(itemName, 10);
 	}
 }
 

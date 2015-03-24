@@ -27,6 +27,13 @@ enum {
 } itemFlag_t;
 
 enum {
+	IS_NORMAL = 0,
+	IS_FLAMING = 0x01 << 0,
+	IS_QUICK = 0x01 << 1,
+	IS_LIGHTNING = 0x01 << 2,
+} itemEffectFlag_t;
+
+enum {
 	RARITY_NONE = 0,
 	RARITY_LOW = 1,
 	RARITY_MEDIUM = 2,
@@ -39,7 +46,8 @@ typedef struct item item;
 
 struct item {
 	int x, y, vx, vy, statDamage, statSpeed, chr;
-	unsigned int itemFlags;
+	unsigned int itemFlags, itemEffectFlags;
+	char *name;
 	struct item *next, *prev;
 	struct character *owner, *lodgedInActor;
 	struct light *itemLight;
