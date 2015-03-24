@@ -52,7 +52,8 @@ void createVoidWorm(int x, int y) {
 	actor->foreColor = TCOD_color_RGB(25, 205, 25);
 	actor->itemLight->r_tint = 125;
 	actor->itemLight->b_tint = 125;
-	actor->itemLight->size = 5;
+	actor->itemLight->brightness = .35;
+	actor->itemLight->size = 3;
 	actor->itemLight->fuelMax = 99999;
 	actor->itemLight->fuel = actor->itemLight->fuelMax;
 	actor->stanceFlags = IS_STANDING;

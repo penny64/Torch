@@ -290,14 +290,20 @@ void getNewSpawnPosition(room *srcRoom, int coordArray[]) {
 
 		for (i = 0; i < srcRoom->numberOfOccupiedSpawnPositions; i ++) {
 			if (srcRoom->spawnPositions[i] == spawnIndex) {
+				x = -1;
+				y = -1;
 				invalid = 1;
 
 				break;
 			}
 		}
-
-		printf("Make sure we aren't running out of positions here\n");
 	}
+
+	if (x == -1 || y == -1) {
+		printf("Can't find spawn position.\n");
+	}
+
+	assert(x > -1 && y > -1);
 
 	srcRoom->spawnPositions[srcRoom->numberOfOccupiedSpawnPositions] = spawnIndex;
 	srcRoom->numberOfOccupiedSpawnPositions ++;
@@ -1331,7 +1337,7 @@ void placeItems() {
 					continue;
 				}
 
-				if (getRandomFloat(0, 1) >= .85) {
+				/*if (getRandomFloat(0, 1) >= .85) {
 					lghtPtr = createDynamicLight(x, y, NULL);
 
 					lghtPtr->size = getRandomInt(2, 3);
@@ -1341,7 +1347,7 @@ void placeItems() {
 					lghtPtr->brightness = .35;
 					lghtPtr->fuel = 9999;
 					lghtPtr->fuelMax = 9999;
-				}
+				}*/
 			}
 		}
 
