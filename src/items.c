@@ -286,14 +286,14 @@ void itemHandleCharacterCollision(item *itm, character *actor) {
 
 			deleteItem(itm);
 
-			showMessage("%cYou pick up the torch.%c", 10);
+			showMessage("You pick up the torch.", 10);
 			
 			return;
 		}
 
 		if (itm->itemFlags & IS_EXIT && isLevelComplete()) {
 			if (!player->itemLight) {
-				showMessage("%cYou forgot your torch!%c", 10);
+				showMessage("You forgot your torch!", 10);
 			} else {
 				exitLevel();
 			}
@@ -311,7 +311,7 @@ int itemHandleCharacterTouch(item *itm, character *actor) {
 	if (actor == player) {
 		if (itm->itemFlags & IS_SOLID) {
 			if (itm->itemFlags & NEEDS_KEY && !actorGetItemWithFlag(player, IS_KEY)) {
-				showMessage("%cThe door refuses to open...%c", 10);
+				showMessage("The door refuses to open...", 10);
 
 				return 0;
 			}
@@ -327,9 +327,9 @@ int itemHandleCharacterTouch(item *itm, character *actor) {
 			if (actor == player) {
 				if (itm->itemLight && actor->itemLight && actor->itemLight->fuel) {
 					if (!itm->itemLight->fuel) {
-						showMessage("%cBonfire rekindled. Torch has x fuel remaining.%c", 10);
+						showMessage("Bonfire rekindled. Torch has x fuel remaining.", 10);
 					} else {
-						showMessage("%cTorch rekindled. Bonfire has x fuel remaining.%c", 10);
+						showMessage("Torch rekindled. Bonfire has x fuel remaining.", 10);
 					}
 
 					itm->itemLight->fuel = itm->itemLight->fuelMax;

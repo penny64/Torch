@@ -32,6 +32,7 @@ TCOD_console_t getUiConsole() {
 
 void _drawMessage() {
 	float colorMod;
+	TCOD_color_t foreColor, backColor;
 	//char timeText[50];
 
 	if (DISPLAY_TEXT != NULL) {
@@ -45,9 +46,10 @@ void _drawMessage() {
 			colorMod = 1;
 		}
 
-		TCOD_console_set_color_control(TCOD_COLCTRL_1, TCOD_color_RGB(255 * colorMod, 250 * colorMod, 220 * colorMod), TCOD_color_RGB(0, 0, 0));
+		foreColor = TCOD_color_RGB(255 * colorMod, 250 * colorMod, 220 * colorMod);
+		backColor = TCOD_color_RGB(0, 0, 0);
 		
-		drawString(UI_CONSOLE, (WINDOW_WIDTH / 2) - (strlen(DISPLAY_TEXT) / 2), WINDOW_HEIGHT - 1, DISPLAY_TEXT);
+		drawString(UI_CONSOLE, (WINDOW_WIDTH / 2) - (strlen(DISPLAY_TEXT) / 2), WINDOW_HEIGHT - 1, foreColor, backColor, DISPLAY_TEXT);
 	}
 }
 
@@ -83,7 +85,8 @@ void _drawTorchFuel() {
 void _drawStance() {
 	int x = 0, y = WINDOW_HEIGHT - 1;
 	char *stanceText = NULL;
-	TCOD_color_t textColor = TCOD_color_RGB(255, 255, 255);
+	TCOD_color_t foreColor = TCOD_color_RGB(255, 255, 255);
+	TCOD_color_t backColor = TCOD_color_RGB(0, 0, 0);
 	character *player = getPlayer();
 	
 	if (!player) {
@@ -108,9 +111,7 @@ void _drawStance() {
 		}
 	}
 	
-	TCOD_console_set_color_control(TCOD_COLCTRL_1, textColor, TCOD_color_RGB(0, 0, 0));
-	
-	drawString(UI_CONSOLE, x, y, stanceText);
+	drawString(UI_CONSOLE, x, y, foreColor, backColor, stanceText);
 }
 
 void showMessage(const char *text, int timeInTurns) {

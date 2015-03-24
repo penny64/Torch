@@ -463,14 +463,14 @@ void completeLevel() {
 
 	createExit(EXIT_LOCATION[0], EXIT_LOCATION[1]);
 
-	showMessage("%cYou hear a low rumble.%c", 20);
+	showMessage("You hear a low rumble.", 20);
 }
 
 void exitLevel() {
 	EXIT_IN_PROGRESS = 1;
 	LEVEL_NUMBER ++;
 
-	showMessage("%cYou step down...%c", 20);
+	showMessage("You step down...", 20);
 }
 
 void setLevel(int levelNumber) {

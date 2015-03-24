@@ -289,22 +289,19 @@ void removeItemFromInventory(character *actor, item *itm) {
 }
 
 void pickUpItem(character *actor, item *itm) {
-	char itemName[40];
-	//char *tmp = malloc(strlen(s) + strlen(itm->name) + strlen(e) + 1);
+	//char itemPickupMessage[120];
 
-	//strcpy(itemName, "%c");
-	//strcat(itemName, itm->name);
-	//strcat(itemName, "%c");
-	snprintf(itemName, sizeof itemName, "%%c%s%%c", itm->name);
-
+	//strcpy(itemPickupMessage, "You pick up ");
+	//strcat(itemPickupMessage, itm->name);
+	char *itemPickupMessage = itm->name;
 	itm->owner = actor;
 
 	actor->inventory[actor->numberOfItems] = itm;
 	actor->numberOfItems ++;
 	
 	if (actor == getPlayer()) {
-		printf("%s\n", itemName);
-		showMessage(itemName, 10);
+		printf("%s\n", itemPickupMessage);
+		showMessage(itemPickupMessage, 10);
 	}
 }
 
@@ -317,7 +314,7 @@ void dropItem(character *actor, item *itm) {
 	//actor->numberOfItems ++;
 	
 	if (actor == getPlayer()) {
-		showMessage("%cDropped item.%c", 10);
+		showMessage("Dropped item.", 10);
 	}
 }
 
@@ -422,7 +419,7 @@ int _checkIfPositionLit(character *actor) {
 		printf("Actor is in unlit position\n");
 
 		if (actor == getPlayer()) {
-			showMessage("%cYou are lost to the shadows...%c", 20);
+			showMessage("You are lost to the shadows...", 20);
 		}
 
 		killActor(actor);
@@ -503,15 +500,15 @@ void _actorLogic(character *actor) {
 		
 		if (actor->nextStanceFlagsToRemove & IS_STUNNED) {
 			if (actor == player) {
-				showMessage("%cYou regain composure.%c", 5);
+				showMessage("You regain composure.", 5);
 			} else {
-				showMessage("%cIt regains composure.%c", 5);
+				showMessage("It regains composure.", 5);
 			}
 		} else if (actor->nextStanceFlagsToRemove & IS_HOLDING_LODGED_WEAPON) {
 			if (actor == player) {
-				showMessage("%cYou dislodge the weapon.%c", 5);
+				showMessage("You dislodge the weapon.", 5);
 			} else {
-				showMessage("%cSomething dislodges their weapon.%c", 5);
+				showMessage("Something dislodges their weapon.", 5);
 			}
 		}
 		
@@ -716,7 +713,7 @@ void killActor(character *actor) {
 	printf("Killed actor.\n");
 	
 	if (actor == getPlayer()) {
-		showMessage("%cYou die.%c", 15);
+		showMessage("You die.", 15);
 	}
 }
 

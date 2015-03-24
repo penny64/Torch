@@ -67,7 +67,7 @@ void considerKnockback(character *attacker, character *target, int attackDamage,
 			setDelay(target, 10);
 			
 			if (attacker == player) {
-				showMessage("%cTarget stunned!%c", 4);
+				showMessage("Target stunned!", 4);
 			}
 		} else {
 			printf("NO!\n");
@@ -77,7 +77,7 @@ void considerKnockback(character *attacker, character *target, int attackDamage,
 				setDelay(target, 8);
 				
 				if (attacker == player) {
-					showMessage("%cTarget knocked down!%c", 4);
+					showMessage("Target knocked down!", 4);
 				}
 			}
 		}
@@ -90,7 +90,7 @@ int performDamage(character *attacker, character *target, float attackDamage, fl
 	
 	if (attacker == player) {
 		if (percentageAttackDamage >= .75) {
-			showMessage("%cSolid hit.%c", 4);
+			showMessage("Solid hit.", 4);
 		}/* else if (percentageAttackDamage >= .5) {
 			showMessage("%cOK hit.%c", 4);
 		} else {
@@ -108,7 +108,7 @@ int performDamage(character *attacker, character *target, float attackDamage, fl
 		killActor(target);
 		
 		if (attacker == player) {
-			showMessage("%cSplat!%c", 7);
+			showMessage("Splat!", 7);
 		}
 
 		return 1;
@@ -161,7 +161,7 @@ int punch(character *attacker, character *target) {
 	if (target->stanceFlags & IS_STUCK_WITH_LODGED_WEAPON && getRandomInt(0, getItemLodgedInActor(target)->statDamage)) {
 		attackDamage *= 1.2;
 		
-		showMessage("%cYou punch the lodged sword!%c", 10);
+		showMessage("You punch the lodged sword!", 10);
 	}
 	
 	return performDamage(attacker, target, attackDamage, percentageAttackDamage);
@@ -221,7 +221,7 @@ int slash(character *attacker, character *target, item *weapon) {
 		target->stanceFlags |= IS_STUCK_WITH_LODGED_WEAPON;
 		
 		if (attacker == player) {
-			showMessage("%cThe weapon becomes lodged!%c", 10);
+			showMessage("The weapon becomes lodged!", 10);
 		}
 	} else if (attacker->stanceFlags & IS_MOVING) {
 		considerKnockback(attacker, target, attackDamage, percentageAttackDamage);
