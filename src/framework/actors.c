@@ -8,6 +8,7 @@
 #include "../items.h"
 #include "../player.h"
 #include "../combat.h"
+#include "numbers.h"
 #include "../ui.h"
 #include "display.h"
 #include "logging.h"
@@ -190,7 +191,7 @@ void setDelay(character *actor, int time) {
 }
 
 int getMovementCost(character *actor) {
-	int cost = actor->statSpeed;
+	int cost = getActorSpeed(actor);
 	item *lodgedItem = getItemLodgedInActor(actor);
 	
 	if (actor->stanceFlags & IS_CRAWLING) {
@@ -217,7 +218,20 @@ int getActorStrength(character *actor) {
 }
 
 int getActorSpeed(character *actor) {
-	return actor->statSpeed;
+	int inventoryIndex = 0, speed = actor->statSpeed;
+	item *itmPtr;
+
+	while (inventoryIndex < actor->numberOfItems) {
+		itmPtr = actor->inventory[inventoryIndex];
+
+		if (itmPtr->itemEffectFlags & IS_QUICK) {
+			speed = clip(speed - itmPtr->statSpeed, 1, 5);
+		}
+
+		inventoryIndex ++;
+	}
+
+	return speed;
 }
 
 void moveActor(character *actor, int vx, int vy) {
@@ -294,6 +308,16 @@ void pickUpItem(character *actor, item *itm) {
 	//strcpy(itemPickupMessage, "You pick up ");
 	//strcat(itemPickupMessage, itm->name);
 	char *itemPickupMessage = itm->name;
+	item *itmPtr;
+
+	if (itm->itemFlags & IS_WEAPON) {
+		itmPtr = actorGetItemWithFlag(actor, IS_WEAPON);
+
+		if (itmPtr) {
+			dropItem(actor, itmPtr);
+		}
+	}
+
 	itm->owner = actor;
 
 	actor->inventory[actor->numberOfItems] = itm;
@@ -306,6 +330,11 @@ void pickUpItem(character *actor, item *itm) {
 }
 
 void dropItem(character *actor, item *itm) {
+	if (!itm) {
+		printf("*FATAL* Trying to drop null item.\n");
+
+		assert(itm != NULL);
+	}
 	itm->x = actor->x;
 	itm->y = actor->y;
 	

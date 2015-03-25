@@ -195,7 +195,7 @@ int slash(character *attacker, character *target, item *weapon) {
 	
 	setStance(attacker, IS_SWINGING);
 	setFutureStanceToRemove(attacker, IS_SWINGING);
-	setDelay(attacker, weapon->statSpeed);
+	setDelay(attacker, getAttackSpeedOfWeapon(weapon));
 	
 	attackDamage = getRandomIntWithMean(lowerDamageValue, upperDamageValue, damageMean);
 	percentageAttackDamage = attackDamage / upperDamageValue;

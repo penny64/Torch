@@ -5,6 +5,7 @@
 #include "framework/display.h"
 #include "framework/actors.h"
 #include "framework/draw.h"
+#include "framework/numbers.h"
 #include "items.h"
 #include "lights.h"
 #include "player.h"
@@ -37,6 +38,7 @@ TCOD_console_t getItemConsole() {
 void createAllItemCards() {
 	createItemCard(&createTreasure, RARITY_MEDIUM);
 	createItemCard(&createWoodenSword, RARITY_MEDIUM);
+	createItemCard(&createBoots, RARITY_MEDIUM);
 	createItemCard(&createTorchHolder, RARITY_HIGH);
 	createItemCard(&createKey, RARITY_KEY);
 }
@@ -77,6 +79,7 @@ item *createItem(int x, int y, char chr, TCOD_color_t foreColor, TCOD_color_t ba
 	_c->backColor = backColor;
 	_c->statDamage = 0;
 	_c->statSpeed = 0;
+	_c->statLevel = 1;
 	_c->name = "null";
 	
 	if (ITEMS == NULL) {
@@ -211,6 +214,20 @@ void drawItems() {
 		
 		ptr = ptr->next;
 	}	
+}
+
+int getItemLevel(item *itm) {
+	return itm->statLevel;
+}
+
+int getAttackSpeedOfWeapon(item *itm) {
+	int attackSpeed = itm->statSpeed;
+
+	if (itm->itemEffectFlags & IS_QUICK) {
+		attackSpeed = clip(attackSpeed - getItemLevel(itm), 2, 10);
+	}
+
+	return attackSpeed;
 }
 
 item *getItemLodgedInActor(character *actor) {
@@ -460,19 +477,31 @@ void createKey(int x, int y) {
 	createItem(x, y, '-', TCOD_color_RGB(30, 175, 175), TCOD_color_RGB(30, 75, 75), IS_KEY | CAN_PICK_UP);
 }
 
-void randomizeSword(item *itm) {
+void randomizeSword(item *itm, int quality) {
 	itm->itemEffectFlags = IS_QUICK;
 
 	itm->name = "Sword of Speed";
+
+	itm->statDamage = clip(getRandomInt(3, 5) + quality, 3, 8);
+	itm->statSpeed = clip(getRandomInt(3, 4) + quality, 3, 8);
 }
 
 void createWoodenSword(int x, int y) {
 	item *itm = createItem(x, y, '/', TCOD_color_RGB(210, 105, 30), TCOD_color_RGB(30, 30, 30), IS_WEAPON | IS_SWORD | CAN_PICK_UP);
 
-	randomizeSword(itm);
-	
-	itm->statDamage = 3;
-	itm->statSpeed = 3;
+	randomizeSword(itm, getLevel());
+}
+
+void randomizeBoots(item *itm, int quality) {
+	itm->itemEffectFlags = IS_QUICK;
+	itm->name = "Boots of Speed";
+	itm->statSpeed = clip(getRandomInt(1, 2) + quality, 1, 4);
+}
+
+void createBoots(int x, int y) {
+	item *itm = createItem(x, y, 'b', TCOD_color_RGB(210, 105, 30), TCOD_color_RGB(30, 30, 30), IS_ARMOR | ARE_BOOTS | CAN_PICK_UP);
+
+	randomizeBoots(itm, getLevel());
 }
 
 void createTorchHolder(int x, int y) {

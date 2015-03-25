@@ -24,6 +24,8 @@ enum {
 	IGNORE_ALLSEEING_EYE = 0x01 << 14,
 	IS_SOLID = 0x01 << 15,
 	IS_DESTROYABLE = 0x01 << 16,
+	IS_ARMOR = 0x01 << 17,
+	ARE_BOOTS = 0x01 << 18,
 } itemFlag_t;
 
 enum {
@@ -45,7 +47,7 @@ enum {
 typedef struct item item;
 
 struct item {
-	int x, y, vx, vy, statDamage, statSpeed, chr;
+	int x, y, vx, vy, statDamage, statSpeed, statLevel, chr;
 	unsigned int itemFlags, itemEffectFlags;
 	char *name;
 	struct item *next, *prev;
@@ -77,6 +79,8 @@ item *getNewestItem(void);
 item *getItemLodgedInActor(character*);
 item *spawnItemWithRarity(int, int, int, int);
 void drawItems(void);
+int getItemLevel(item*);
+int getAttackSpeedOfWeapon(item*);
 int getTotalNumberOfKeytorches(void);
 int getNumberOfLitKeytorches(void);
 void deleteAllOwnerlessItems(void);
@@ -93,6 +97,7 @@ void createDoor(int, int);
 void createKey(int, int);
 void createTorchHolder(int, int);
 void createWoodenSword(int, int);
+void createBoots(int, int);
 void createWoodWall(int, int);
 void createAllSeeingEye(int, int);
 void enableDoor(item*);

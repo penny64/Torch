@@ -68,6 +68,7 @@ void deleteEnemies(void);
 void plantTorch(character*);
 void killActor(character*);
 void pickUpItem(character*, struct item*);
+void dropItem(character*, struct item*);
 void setStance(character*, unsigned int);
 void unsetStance(character*, unsigned int);
 void setDelay(character*, int);
