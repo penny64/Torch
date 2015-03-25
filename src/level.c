@@ -1373,14 +1373,14 @@ void decorateRooms() {
 
 				for (x1 = -1; x1 <= 1; x1 ++) {
 					for (y1 = -1; y1 <= 1; y1 ++) {
-						if (x + x1 < 0 || x + x1 >= WINDOW_WIDTH || y + y1 < 0 || y + y1 >= WINDOW_HEIGHT) {
-							continue;
-						}
-
 						if (TCOD_map_is_walkable(TUNNEL_MAP, x + x1, y + y1)) {
 							invalid = 1;
 
 							break;
+						}
+
+						if (x + x1 < 0 || x + x1 >= WINDOW_WIDTH || y + y1 < 0 || y + y1 >= WINDOW_HEIGHT) {
+							continue;
 						}
 
 						if ((y1 == -1 && x1 == 1) || (y1 == -1 && x1 == -1) || (y1 == 1 && x1 == 1) || (y1 == 1 && x1 == -1)) {
@@ -1409,7 +1409,9 @@ void decorateRooms() {
 						}
 					}
 
-					if (isNextToWall || invalid) {
+					if (invalid) {
+						isNextToWall = 0;
+
 						break;
 					}
 				}
