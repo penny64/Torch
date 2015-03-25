@@ -37,7 +37,7 @@ void tickSystems(World *world) {
 	for (systemId = 0; systemId < MAX_SYSTEMS; systemId ++) {
 		if (SYSTEMS->entityMask[systemId] != COMPONENT_NONE) {
 			for (entityId = 0; entityId < MAX_ENTITIES; entityId ++) {
-				if (world->mask[entityId] & SYSTEMS->entityMask[systemId]) {
+				if (world->mask[entityId] != COMPONENT_NONE && world->mask[entityId] & SYSTEMS->entityMask[systemId]) {
 					SYSTEMS->callback[systemId](world, entityId);
 				}
 			}
@@ -51,7 +51,7 @@ void tickSystemsWithMask(World *world, unsigned int mask) {
 	for (systemId = 0; systemId < MAX_SYSTEMS; systemId ++) {
 		if (SYSTEMS->entityMask[systemId] != COMPONENT_NONE && SYSTEMS->entityMask[systemId] & mask) {
 			for (entityId = 0; entityId < MAX_ENTITIES; entityId ++) {
-				if (world->mask[entityId] & SYSTEMS->entityMask[systemId]) {
+				if (world->mask[entityId] != COMPONENT_NONE && world->mask[entityId] & SYSTEMS->entityMask[systemId]) {
 					SYSTEMS->callback[systemId](world, entityId);
 				}
 			}
