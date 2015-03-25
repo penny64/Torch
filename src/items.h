@@ -33,6 +33,7 @@ enum {
 	IS_FLAMING = 0x01 << 0,
 	IS_QUICK = 0x01 << 1,
 	IS_LIGHTNING = 0x01 << 2,
+	IS_FORCE = 0x01 << 3,
 } itemEffectFlag_t;
 
 enum {
@@ -96,7 +97,7 @@ void createSign(int, int, char*);
 void createDoor(int, int);
 void createKey(int, int);
 void createTorchHolder(int, int);
-void createWoodenSword(int, int);
+void createSword(int, int);
 void createBoots(int, int);
 void createWoodWall(int, int);
 void createAllSeeingEye(int, int);

@@ -37,7 +37,7 @@ TCOD_console_t getItemConsole() {
 
 void createAllItemCards() {
 	createItemCard(&createTreasure, RARITY_MEDIUM);
-	createItemCard(&createWoodenSword, RARITY_MEDIUM);
+	createItemCard(&createSword, RARITY_MEDIUM);
 	createItemCard(&createBoots, RARITY_MEDIUM);
 	createItemCard(&createTorchHolder, RARITY_HIGH);
 	createItemCard(&createKey, RARITY_KEY);
@@ -486,7 +486,7 @@ void randomizeSword(item *itm, int quality) {
 	itm->statSpeed = clip(getRandomInt(3, 4) + quality, 3, 8);
 }
 
-void createWoodenSword(int x, int y) {
+void createSword(int x, int y) {
 	item *itm = createItem(x, y, '/', TCOD_color_RGB(210, 105, 30), TCOD_color_RGB(30, 30, 30), IS_WEAPON | IS_SWORD | CAN_PICK_UP);
 
 	randomizeSword(itm, getLevel());
