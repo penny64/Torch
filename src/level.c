@@ -1424,6 +1424,14 @@ void decorateRooms() {
 			}
 		}
 
+		if (roomPtr->flags & IS_TORCH_ROOM || roomPtr->flags & IS_TREASURE_ROOM) {
+			colorMod = (int)(fogValue * 120);
+
+			if (!TCOD_random_get_int(RANDOM, 0, 4)) {
+				setCharEx(LEVEL_CONSOLE, x, y, ',' + TCOD_random_get_int(RANDOM, 0, 4), TCOD_color_RGB(155 - colorMod, 290 - colorMod, 190 - colorMod));
+			}
+		}
+
 		roomPtr = roomPtr->next;
 	}
 }
@@ -1441,6 +1449,8 @@ void spawnEnemies() {
 	while (roomPtr) {
 		if (roomPtr->flags & IS_TREASURE_ROOM) {
 			getNewSpawnPosition(roomPtr, spawnPosition);
+
+			printf("CREATE BAT: %i, %i\n", spawnPosition[0], spawnPosition[1]);
 
 			createBat(spawnPosition[0], spawnPosition[1]);
 		} else if (numberOfVoidWorms < maxNumberOfVoidWorms) {
@@ -1746,11 +1756,11 @@ void generateLevel() {
 					//drawCharBackEx(LEVEL_CONSOLE, x, y, TCOD_color_RGB(95, 8, 8), TCOD_BKGND_SET);
 				}
 			} else if (!TCOD_map_is_walkable(LAVA_MAP, x, y)) {
-				colorMod = (int)(fogValue * 120);
+				//colorMod = (int)(fogValue * 120);
 				
-				if (!TCOD_random_get_int(RANDOM, 0, 4)) {
-					setCharEx(LEVEL_CONSOLE, x, y, ',' + TCOD_random_get_int(RANDOM, 0, 4), TCOD_color_RGB(155 - colorMod, 290 - colorMod, 190 - colorMod));
-				}
+				//if (!TCOD_random_get_int(RANDOM, 0, 4)) {
+				//	setCharEx(LEVEL_CONSOLE, x, y, ',' + TCOD_random_get_int(RANDOM, 0, 4), TCOD_color_RGB(155 - colorMod, 290 - colorMod, 190 - colorMod));
+				//}
 				
 				//drawCharBackEx(FOG_CONSOLE, x, y, TCOD_color_RGB(135 - colorMod, 120 - colorMod, 120 - colorMod), TCOD_BKGND_ALPHA(1));
 			}
