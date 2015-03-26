@@ -1600,7 +1600,7 @@ void colorRooms() {
 		for (y = 2; y < WINDOW_HEIGHT - 2; y ++) {
 			for (x = 2; x < WINDOW_WIDTH - 2; x ++) {
 				if (TUNNEL_ROOM_MAP[x][y] == roomPtr->id) {
-					drawCharBackEx(LEVEL_CONSOLE, x, y, TCOD_color_RGB(200 + RED_SHIFT, 82, 45), TCOD_BKGND_SET);
+					drawCharBackEx(LEVEL_CONSOLE, x, y, TCOD_color_RGB(200 + RED_SHIFT, 200, 200), TCOD_BKGND_SET);
 				}
 			}
 		}
