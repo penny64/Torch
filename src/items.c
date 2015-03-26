@@ -332,8 +332,11 @@ int itemHandleCharacterTouch(item *itm, character *actor) {
 
 				return 0;
 			}
-			unblockPosition(itm->x, itm->y);
-			deleteItem(itm);
+
+			if (itm->itemFlags & IS_DESTROYABLE) {
+				unblockPosition(itm->x, itm->y);
+				deleteItem(itm);
+			}
 			
 			return 1;
 		}
@@ -548,7 +551,7 @@ void createAllSeeingEye(int x, int y) {
 }
 
 void createWoodWall(int x, int y) {
-	item *itm = createItem(x, y, '#', TCOD_color_RGB(128 - 40, 101 - 40, 23 - 5), TCOD_color_RGB(128 - 50, 101 - 50, 23 - 5), IS_SOLID | IS_DESTROYABLE);
+	item *itm = createItem(x, y, '#', TCOD_color_RGB(128 - 40, 101 - 40, 23 - 5), TCOD_color_RGB(128 - 50, 101 - 50, 23 - 5), IS_SOLID);
 
 	itm->statDamage = 3;
 	itm->statSpeed = 3;
