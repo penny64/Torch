@@ -6,7 +6,7 @@ World *WORLD = NULL;
 
 
 void startEntities() {
-	WORLD = calloc(sizeof(World*), MAX_ENTITIES);
+	WORLD = calloc(sizeof(World), 1);
 }
 
 World *getWorld() {

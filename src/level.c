@@ -494,9 +494,7 @@ int isTransitionInProgress() {
 }
 
 int levelLogic() {
-	int x, y;
 	character *player = getPlayer();
-	light *lghtPtr;
 
 	if (isLevelComplete() && player->itemLight) {
 		EXIT_WAVE_DIST = clipFloat(EXIT_WAVE_DIST + .5f, 0, 255);
@@ -507,14 +505,6 @@ int levelLogic() {
 			return 1;
 		}
 	}
-
-	/*for (y = 0; y < WINDOW_HEIGHT; y ++) {
-		for (x = 0; x < WINDOW_HEIGHT; x ++) {
-			if (TCOD_map_is_walkable(LAVA_MAP, x, y)) {
-
-			}
-		}
-	}*/
 
 	return 0;
 }
@@ -1247,7 +1237,6 @@ void placeItems() {
 	int spawnPosition[2], doorEnter[2], doorExit[2];
 	TCOD_dijkstra_t lavaWalker = TCOD_dijkstra_new(LEVEL_MAP, 0.0f);
 	room *roomPtr = ROOMS;
-	light *lghtPtr;
 
 	while (roomPtr) {
 		invalidStartRoom = 0;
@@ -1360,7 +1349,6 @@ void placeItems() {
 void decorateRooms() {
 	int i, ii, invalid, x, y, nx, ny, x1, y1, isNextToWall;
 	room *roomPtr = ROOMS;
-	light *lghtPtr;
 
 	while (roomPtr) {
 		if (roomPtr->flags & IS_TORCH_ROOM) {
@@ -1555,9 +1543,9 @@ void colorRooms() {
 			g = 101;
 			b = 23;
 		} else if (roomPtr->flags & IS_LAVA_ROOM) { //CHECKED
-			r = 255;
-			g = 255;
-			b = 255;
+			r = 200;
+			g = 200;
+			b = 200;
 		} else if (roomPtr->flags & IS_TORCH_ROOM) { //CHECKED
 			r = 140 - RED_SHIFT;
 			g = 0;
@@ -1567,9 +1555,9 @@ void colorRooms() {
 			gMod = 70;
 			bMod = 170;
 		} else if (roomPtr->flags & IS_EXIT_ROOM) { //CHECKED
-			r = 245;
-			g = 245;
-			b = 245;
+			r = 145;
+			g = 145;
+			b = 145;
 
 			rMod = 10;
 			gMod = 10;
@@ -1577,12 +1565,12 @@ void colorRooms() {
 		} else if (roomPtr->numberOfConnectedRooms >= 3) {
 			if (roomPtr->size <= 30) { //CHECKED
 				r = 0 - RED_SHIFT;
-				g = 255;
-				b = 255;
+				g = 155;
+				b = 155;
 			} else { //CHECKED
-				r = 235 - RED_SHIFT;
-				g = 235;
-				b = 235;
+				r = 135 - RED_SHIFT;
+				g = 135;
+				b = 135;
 			}
 
 			rMod = 60;
@@ -1626,7 +1614,6 @@ void placeGrass() {
 	int x, y, i, colorMod, tileChar;
 	float tileRange, fogValue, fogPoint[2];
 	TCOD_noise_t fog = getFogNoise();
-	colorMod = getRandomInt(25, 75);
 
 	while (roomPtr) {
 		for (i = 0; i < roomPtr->size; i++) {
@@ -1639,7 +1626,8 @@ void placeGrass() {
 			fogValue = TCOD_noise_get_fbm_ex(fog, fogPoint, 32.0f, TCOD_NOISE_PERLIN) + .4f;
 
 			if (fogValue <= .5) {
-				tileRange = (.5 - fogValue) / .5;
+				tileRange = fogValue / .5;
+				colorMod = getRandomInt(25, 50);
 
 				if (tileRange >= .75) {
 					tileChar = (int) '.';
@@ -1651,10 +1639,8 @@ void placeGrass() {
 					tileChar = (int) '/';
 				}
 
-				printf("%f\n", tileRange);
-
 				setCharEx(LEVEL_CONSOLE, x, y, tileChar, TCOD_color_RGB(0, 255 - colorMod, 75));
-				drawCharBackEx(LEVEL_CONSOLE, x, y, TCOD_color_RGB(0, 100, 100), TCOD_BKGND_ALPHA(.5));
+				drawCharBackEx(LEVEL_CONSOLE, x, y, TCOD_color_RGB(0, 200-colorMod, 100), TCOD_BKGND_ALPHA(.3));
 			}
 		}
 
@@ -1664,7 +1650,7 @@ void placeGrass() {
 
 void generateLevel() {
 	int x, y, i, ii, spawnIndex, foundPlot, plotDist, plotPoints[MAX_ROOMS][2];
-	float fogValue, colorMod;
+	float fogValue;
 	float p[2];
 	TCOD_noise_t fog = getFogNoise();
 	TCOD_console_t dynamicLightConsole = getDynamicLightConsole();
