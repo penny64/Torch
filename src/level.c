@@ -1424,14 +1424,6 @@ void decorateRooms() {
 			}
 		}
 
-		if (roomPtr->flags & IS_TORCH_ROOM || roomPtr->flags & IS_TREASURE_ROOM) {
-			colorMod = (int)(fogValue * 120);
-
-			if (!TCOD_random_get_int(RANDOM, 0, 4)) {
-				setCharEx(LEVEL_CONSOLE, x, y, ',' + TCOD_random_get_int(RANDOM, 0, 4), TCOD_color_RGB(155 - colorMod, 290 - colorMod, 190 - colorMod));
-			}
-		}
-
 		roomPtr = roomPtr->next;
 	}
 }
@@ -1629,6 +1621,47 @@ void colorRooms() {
 	}
 }
 
+void placeGrass() {
+	room *roomPtr = ROOMS;
+	int x, y, i, colorMod, tileChar;
+	float tileRange, fogValue, fogPoint[2];
+	TCOD_noise_t fog = getFogNoise();
+	colorMod = getRandomInt(25, 75);
+
+	while (roomPtr) {
+		for (i = 0; i < roomPtr->size; i++) {
+			x = roomPtr->positionList[i][0];
+			y = roomPtr->positionList[i][1];
+
+			fogPoint[0] = (float) x / WINDOW_WIDTH;
+			fogPoint[1] = (float) y / WINDOW_HEIGHT;
+
+			fogValue = TCOD_noise_get_fbm_ex(fog, fogPoint, 32.0f, TCOD_NOISE_PERLIN) + .4f;
+
+			if (fogValue <= .5) {
+				tileRange = (.5 - fogValue) / .5;
+
+				if (tileRange >= .75) {
+					tileChar = (int) '.';
+				} else if (tileRange >= .5) {
+					tileChar = (int) ',';
+				} else if (tileRange >= .25) {
+					tileChar = (int) ';';
+				} else {
+					tileChar = (int) '/';
+				}
+
+				printf("%f\n", tileRange);
+
+				setCharEx(LEVEL_CONSOLE, x, y, tileChar, TCOD_color_RGB(0, 255 - colorMod, 75));
+				drawCharBackEx(LEVEL_CONSOLE, x, y, TCOD_color_RGB(0, 100, 100), TCOD_BKGND_ALPHA(.5));
+			}
+		}
+
+		roomPtr = roomPtr->next;
+	}
+}
+
 void generateLevel() {
 	int x, y, i, ii, spawnIndex, foundPlot, plotDist, plotPoints[MAX_ROOMS][2];
 	float fogValue, colorMod;
@@ -1698,7 +1731,8 @@ void generateLevel() {
 	//drawLights();
 	drawDynamicLights();
 	colorRooms();
-	
+	placeGrass();
+
 	if (!STARTING_ROOM) {
 		printf("Failed!\n");
 		
