@@ -303,11 +303,11 @@ void removeItemFromInventory(character *actor, item *itm) {
 }
 
 void pickUpItem(character *actor, item *itm) {
-	//char itemPickupMessage[120];
+	char itemPickupMessage[30];
 
-	//strcpy(itemPickupMessage, "You pick up ");
-	//strcat(itemPickupMessage, itm->name);
-	char *itemPickupMessage = itm->name;
+	strcpy(itemPickupMessage, "You pick up");
+	//strcat(itemPickupMessage, "klsjd");
+
 	item *itmPtr;
 
 	if (itm->itemFlags & IS_WEAPON) {
@@ -333,7 +333,7 @@ void pickUpItem(character *actor, item *itm) {
 	
 	if (actor == getPlayer()) {
 		printf("%s\n", itemPickupMessage);
-		showMessage(itemPickupMessage, 10);
+		showMessage(&itemPickupMessage, 10);
 	}
 }
 
