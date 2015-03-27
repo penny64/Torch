@@ -1,6 +1,6 @@
 #include "libtcod.h"
 #include "items.h"
-#define MAX_ROOMS 4
+#define MAX_ROOMS 6
 #define MAX_CONNECTED_ROOMS 5
 
 

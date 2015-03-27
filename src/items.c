@@ -192,7 +192,7 @@ void _drawItem(item *itm) {
 
 		distanceToLight = ((float)lghtPtr->size - distanceFloat((float)itm->x, (float)itm->y, (float)lghtPtr->x, (float)lghtPtr->y)) / (float)lghtPtr->size;
 
-		foreColor = TCOD_color_lerp(foreColor, TCOD_color_lerp(TCOD_color_RGB(lghtPtr->r_tint, lghtPtr->g_tint, lghtPtr->b_tint), TCOD_color_RGB(255, 255, 0), .4), clipFloat(distanceToLight, 0, .25));
+		foreColor = TCOD_color_lerp(foreColor, TCOD_color_lerp(TCOD_color_RGB(lghtPtr->r_tint, lghtPtr->g_tint, lghtPtr->b_tint), TCOD_color_RGB(255, 255, 0), .55), clipFloat(distanceToLight, 0, .25));
 	}
 
 	if (!player || (player->itemLight && !TCOD_map_is_walkable(player->itemLight->lightMap, itm->x, itm->y))) {

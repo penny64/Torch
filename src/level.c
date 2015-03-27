@@ -1344,8 +1344,6 @@ void placeItems() {
 
 		roomPtr = roomPtr->next;
 	}
-
-	generateKeys();
 }
 
 void decorateRooms() {
@@ -1593,7 +1591,7 @@ void colorRooms() {
 			y = roomPtr->positionList[i][1];
 
 			if (TCOD_map_is_walkable(LAVA_MAP, x, y)) {
-				drawCharBackEx(LEVEL_CONSOLE, x, y, TCOD_color_RGB(255, 0, 0), TCOD_BKGND_SET);
+				drawCharBackEx(LEVEL_CONSOLE, x, y, TCOD_color_RGB(255 - getRandomInt(0, 75), 0, 0), TCOD_BKGND_SET);
 			} else {
 				drawCharBackEx(LEVEL_CONSOLE, x, y, TCOD_color_RGB(clip(r + RED_SHIFT + getRandomInt(0, rMod), 0, 255), clip(g + getRandomInt(0, gMod), 0, 255), clip(b + getRandomInt(0, bMod), 0, 255)), TCOD_BKGND_SET);
 			}
@@ -1647,7 +1645,7 @@ void placeGrass() {
 					tileChar = 141;
 				}
 
-				setCharEx(LEVEL_CONSOLE, x, y, tileChar, TCOD_color_RGB(0, 205 - (colorMod / 2), 42));
+				setCharEx(LEVEL_CONSOLE, x, y, tileChar, TCOD_color_RGB(0, 205 - (colorMod * 1.5), 42));
 				drawCharBackEx(LEVEL_CONSOLE, x, y, TCOD_color_RGB(0, 105 - colorMod, 12), TCOD_BKGND_ALPHA(.7));
 			}
 		}
@@ -1657,7 +1655,7 @@ void placeGrass() {
 }
 
 void generateLevel() {
-	int x, y, i, ii, spawnIndex, foundPlot, plotDist, plotPoints[MAX_ROOMS][2];
+	int x, y, i, ii, foundPlot, plotDist, spawnPosition[2], plotPoints[MAX_ROOMS][2];
 	float fogValue;
 	float p[2];
 	TCOD_noise_t fog = getFogNoise();
@@ -1691,13 +1689,15 @@ void generateLevel() {
 		while (!foundPlot) {
 			foundPlot = 1;
 
+			printf("Finding spawn...\n");
+
 			x = TCOD_random_get_int(RANDOM, 8, WINDOW_WIDTH - 8);
 			y = TCOD_random_get_int(RANDOM, 8, WINDOW_HEIGHT - 8);
 
 			for (ii = 0; ii < i; ii++) {
 				plotDist = distance(x, y, plotPoints[ii - 1][0], plotPoints[ii - 1][1]);
 
-				if (plotDist <= 14 || plotDist >= 50) {
+				if (plotDist <= 12) {
 					foundPlot = 0;
 					
 					break;
@@ -1718,6 +1718,7 @@ void generateLevel() {
 	generatePuzzles();
 	decorateRooms();
 	placeItems();
+	generateKeys();
 	spawnEnemies();
 	//cleanUpDoors();
 	activateDoors();
@@ -1748,8 +1749,8 @@ void generateLevel() {
 			//createVoidWorm(player->x + 1, player->y + 1);
 			//showMessage("%cSomething watches from the shadows...%c", 10);
 		} else {
-			spawnIndex = clip(getRandomInt(0, STARTING_ROOM->size - 1), 0, 9999);
-			createBonfire(START_LOCATION[0] + 1, START_LOCATION[1]);
+			getNewSpawnPosition(STARTING_ROOM, spawnPosition);
+			createBonfire(spawnPosition[0], spawnPosition[1]);
 		}
 	}
 
