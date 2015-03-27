@@ -1237,6 +1237,7 @@ void placeItems() {
 	int spawnPosition[2], doorEnter[2], doorExit[2];
 	TCOD_dijkstra_t lavaWalker = TCOD_dijkstra_new(LEVEL_MAP, 0.0f);
 	room *roomPtr = ROOMS;
+	light *lghtPtr;
 
 	while (roomPtr) {
 		invalidStartRoom = 0;
@@ -1326,7 +1327,7 @@ void placeItems() {
 					continue;
 				}
 
-				/*if (getRandomFloat(0, 1) >= .85) {
+				if (getRandomFloat(0, 1) >= .85) {
 					lghtPtr = createDynamicLight(x, y, NULL);
 
 					lghtPtr->size = getRandomInt(2, 3);
@@ -1336,7 +1337,8 @@ void placeItems() {
 					lghtPtr->brightness = .35;
 					lghtPtr->fuel = 9999;
 					lghtPtr->fuelMax = 9999;
-				}*/
+					lghtPtr->flickerRate = .08;
+				}
 			}
 		}
 
@@ -1620,6 +1622,10 @@ void placeGrass() {
 			x = roomPtr->positionList[i][0];
 			y = roomPtr->positionList[i][1];
 
+			if (TCOD_map_is_walkable(LAVA_MAP, x, y)) {
+				continue;
+			}
+
 			fogPoint[0] = (float) x / WINDOW_WIDTH;
 			fogPoint[1] = (float) y / WINDOW_HEIGHT;
 
@@ -1627,20 +1633,20 @@ void placeGrass() {
 
 			if (fogValue <= .5) {
 				tileRange = fogValue / .5;
-				colorMod = getRandomInt(25, 50);
+				colorMod = getRandomInt(25, 45);
 
 				if (tileRange >= .75) {
 					tileChar = (int) '.';
 				} else if (tileRange >= .5) {
 					tileChar = (int) ',';
 				} else if (tileRange >= .25) {
-					tileChar = (int) ';';
+					tileChar = (int) ':';
 				} else {
-					tileChar = (int) '/';
+					tileChar = 141;
 				}
 
-				setCharEx(LEVEL_CONSOLE, x, y, tileChar, TCOD_color_RGB(0, 255 - colorMod, 75));
-				drawCharBackEx(LEVEL_CONSOLE, x, y, TCOD_color_RGB(0, 200-colorMod, 100), TCOD_BKGND_ALPHA(.3));
+				setCharEx(LEVEL_CONSOLE, x, y, tileChar, TCOD_color_RGB(0, 205 - (colorMod / 2), 42));
+				drawCharBackEx(LEVEL_CONSOLE, x, y, TCOD_color_RGB(0, 105 - colorMod, 12), TCOD_BKGND_ALPHA(.7));
 			}
 		}
 

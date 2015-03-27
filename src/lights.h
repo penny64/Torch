@@ -7,7 +7,7 @@ typedef struct light light;
 
 struct light {
 	int x, y, fuel, fuelMax, size, r_tint, g_tint, b_tint, noTint;
-	float sizeMod, brightness;
+	float sizeMod, brightness, flickerRate;
 	struct light *next, *prev;
 	struct character *owner;
 	TCOD_map_t fov;
@@ -22,6 +22,7 @@ light *createLight(int, int);
 light *createDynamicLight(int, int, character*);
 light *getLights(void);
 light *getDynamicLights(void);
+light *getNearestLight(int, int);
 void deleteDynamicLight(light*);
 void resetLight(light*);
 void lightLogic(void);

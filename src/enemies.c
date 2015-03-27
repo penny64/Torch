@@ -56,6 +56,7 @@ void createVoidWorm(int x, int y) {
 	actor->itemLight->size = 3;
 	actor->itemLight->fuelMax = 99999;
 	actor->itemLight->fuel = actor->itemLight->fuelMax;
+	actor->itemLight->flickerRate = 0;
 	actor->stanceFlags = IS_STANDING;
 }
 
@@ -74,6 +75,7 @@ void createVoidWormTail(int x, int y) {
 	actor->itemLight->r_tint = 0;
 	actor->itemLight->g_tint = 35;
 	actor->itemLight->b_tint = 0;
+	actor->itemLight->flickerRate = .2;
 	actor->itemLight->size = 3;
 	actor->itemLight->fuelMax = 12;
 	actor->itemLight->fuel = actor->itemLight->fuelMax;

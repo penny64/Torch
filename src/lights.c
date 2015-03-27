@@ -59,6 +59,7 @@ light *createDynamicLight(int x, int y, character *actor) {
 	_c->b_tint = 35;
 	_c->fuelMax = 70;
 	_c->fuel = _c->fuelMax;
+	_c->flickerRate = .5;
 	_c->brightness = .45;
 	_c->noTint = 0;
 	_c->owner = actor;
@@ -344,7 +345,7 @@ void _drawDynamicLight(light *lght) {
 				}
 
 				if (isPositionWalkable(x, y)) {
-					distMod -= getRandomFloat(0, .5);
+					distMod -= getRandomFloat(0, lght->flickerRate);
 				}
 				
 				if (distMod < 0) {
@@ -410,4 +411,18 @@ int isPositionLit(int x, int y) {
 	}
 	
 	return 0;
+}
+
+light *getNearestLight(int x, int y) {
+	light *lght = DYNAMIC_LIGHTS;
+
+	while (lght != NULL) {
+		if (lght->lightMap && TCOD_map_is_walkable(lght->lightMap, x, y)) {
+			return lght;
+		}
+
+		lght = lght->next;
+	}
+
+	return NULL;
 }

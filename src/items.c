@@ -176,14 +176,56 @@ void assignFlag(item *itm, unsigned int flag) {
 void _itemLogic(item *itm) {
 }
 
-void _drawItem(item *itm) {
+/*void _drawItem(item *itm) {
 	TCOD_console_t itemConsole = getItemConsole();
+	TCOD_color_t lightColor, foreColor = itm->foreColor;
+	light *lghtPtr;
+	character *player = getPlayer();
+	float distanceToLight;
 
 	if (itm->owner || itm->lodgedInActor) {
 		return;
 	}
 
-	drawChar(itemConsole, itm->x, itm->y, (int)itm->chr, itm->foreColor, itm->backColor);
+	if (player && player->itemLight && TCOD_map_is_walkable(player->itemLight->lightMap, itm->x, itm->y)) {
+		lghtPtr = player->itemLight;
+		lightColor = TCOD_color_lerp(TCOD_color_RGB(lghtPtr->r_tint, lghtPtr->g_tint, lghtPtr->b_tint), TCOD_color_RGB(255, 255, 255), .75);
+
+		distanceToLight = distanceFloat((float)itm->x, (float)itm->y, (float)lghtPtr->x, (float)lghtPtr->y) / (float)lghtPtr->size;
+	} else {
+		distanceToLight = 0;
+		lightColor = TCOD_color_RGB(0, 0, 0);
+	}
+
+	foreColor = TCOD_color_lerp(foreColor, lightColor, clipFloat(distanceToLight, 0, .45));
+
+	drawChar(itemConsole, itm->x, itm->y, itm->chr, foreColor, itm->backColor);
+}*/
+
+void _drawItem(item *itm) {
+	TCOD_console_t itemConsole = getItemConsole();
+	TCOD_color_t foreColor = itm->foreColor;
+	light *lghtPtr;
+	character *player = getPlayer();
+	float distanceToLight;
+
+	if (itm->owner || itm->lodgedInActor) {
+		return;
+	}
+
+	if (isPositionLit(itm->x, itm->y)) {
+		lghtPtr = getNearestLight(itm->x, itm->y);
+
+		distanceToLight = ((float)lghtPtr->size - distanceFloat((float)itm->x, (float)itm->y, (float)lghtPtr->x, (float)lghtPtr->y)) / (float)lghtPtr->size;
+
+		foreColor = TCOD_color_lerp(foreColor, TCOD_color_RGB(lghtPtr->r_tint, lghtPtr->g_tint, lghtPtr->b_tint), clipFloat(distanceToLight, 0, .25));
+	}
+
+	if (!player || (player->itemLight && !TCOD_map_is_walkable(player->itemLight->lightMap, itm->x, itm->y))) {
+		foreColor = TCOD_color_lerp(foreColor, TCOD_color_RGB(120, 120, 120), .2);
+	}
+
+	drawChar(itemConsole, itm->x, itm->y, itm->chr, foreColor, itm->backColor);
 }
 
 void resetItemForNewLevel(item *itm) {
@@ -333,7 +375,7 @@ int itemHandleCharacterTouch(item *itm, character *actor) {
 				return 0;
 			}
 
-			if (itm->itemFlags & IS_DESTROYABLE) {
+			if (itm->itemFlags & IS_DESTROYABLE || itm->itemFlags & IS_DOOR) {
 				unblockPosition(itm->x, itm->y);
 				deleteItem(itm);
 			}
@@ -424,6 +466,7 @@ void createBonfire(int x, int y) {
 	lght->r_tint = 65;
 	lght->g_tint = 60;
 	lght->b_tint = 65;
+	lght->flickerRate = .1;
 }
 
 void createBonfireKeystone(int x, int y) {
