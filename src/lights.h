@@ -1,12 +1,15 @@
 #include "framework/actors.h"
 
+#include <stdint.h>
+
 #ifndef LIGHTS_H
 #define LIGHTS_H
 
 typedef struct light light;
 
 struct light {
-	int x, y, fuel, fuelMax, size, r_tint, g_tint, b_tint, noTint;
+	int x, y, fuel, fuelMax, size, noTint;
+	uint8_t r_tint, g_tint, b_tint;
 	float sizeMod, brightness, flickerRate;
 	struct light *next, *prev;
 	struct character *owner;

@@ -1144,7 +1144,7 @@ void placeTunnels() {
 }
 
 void generateKeys() {
-	int i, ii, spawnIndex, invalid, openList[MAX_CONNECTED_ROOMS], closedList[MAX_CONNECTED_ROOMS];
+	int i, ii, invalid, spawnPosition[2], openList[MAX_CONNECTED_ROOMS], closedList[MAX_CONNECTED_ROOMS];
 	int openListIndex = 0, connectedRoomsIndex = 0;
 	room *lastRoomPtr = NULL, *roomPtr = getRoomWithFlags(IS_START_ROOM);
 	
@@ -1165,8 +1165,8 @@ void generateKeys() {
 		connectedRoomsIndex ++;
 		
 		if (roomPtr->flags & NEEDS_DOORS) {
-			spawnIndex = clip(getRandomInt(0, lastRoomPtr->size - 1), 0, 9999);
-			spawnItemWithRarity(lastRoomPtr->positionList[spawnIndex][0], lastRoomPtr->positionList[spawnIndex][1], RARITY_KEY, RARITY_KEY);
+			getNewSpawnPosition(lastRoomPtr, spawnPosition);
+			spawnItemWithRarity(spawnPosition[0], spawnPosition[1], RARITY_KEY, RARITY_KEY);
 		}
 
 		for (i = 0; i < roomPtr->numberOfConnectedRooms; i++) {
@@ -1530,7 +1530,7 @@ void unblockPosition(int x, int y) {
 }
 
 void colorRooms() {
-	int i, x, y, r, g, b, rMod, gMod, bMod;
+	int i, x, y, r, g, b, rMod, gMod, bMod, colorMod;
 	room *roomPtr = ROOMS;
 
 	while (roomPtr) {
@@ -1602,7 +1602,9 @@ void colorRooms() {
 		for (y = 2; y < WINDOW_HEIGHT - 2; y ++) {
 			for (x = 2; x < WINDOW_WIDTH - 2; x ++) {
 				if (TUNNEL_ROOM_MAP[x][y] == roomPtr->id) {
-					drawCharBackEx(LEVEL_CONSOLE, x, y, TCOD_color_RGB(200 + RED_SHIFT, 200, 200), TCOD_BKGND_SET);
+					colorMod = getRandomInt(0, 15);
+
+					drawCharBackEx(LEVEL_CONSOLE, x, y, TCOD_color_RGB(200 + RED_SHIFT - colorMod, 200 - colorMod, 200 - colorMod), TCOD_BKGND_SET);
 				}
 			}
 		}
@@ -1633,7 +1635,7 @@ void placeGrass() {
 
 			if (fogValue <= .5) {
 				tileRange = fogValue / .5;
-				colorMod = getRandomInt(25, 45);
+				colorMod = getRandomInt(25, 65);
 
 				if (tileRange >= .75) {
 					tileChar = (int) '.';
