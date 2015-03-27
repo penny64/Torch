@@ -176,32 +176,6 @@ void assignFlag(item *itm, unsigned int flag) {
 void _itemLogic(item *itm) {
 }
 
-/*void _drawItem(item *itm) {
-	TCOD_console_t itemConsole = getItemConsole();
-	TCOD_color_t lightColor, foreColor = itm->foreColor;
-	light *lghtPtr;
-	character *player = getPlayer();
-	float distanceToLight;
-
-	if (itm->owner || itm->lodgedInActor) {
-		return;
-	}
-
-	if (player && player->itemLight && TCOD_map_is_walkable(player->itemLight->lightMap, itm->x, itm->y)) {
-		lghtPtr = player->itemLight;
-		lightColor = TCOD_color_lerp(TCOD_color_RGB(lghtPtr->r_tint, lghtPtr->g_tint, lghtPtr->b_tint), TCOD_color_RGB(255, 255, 255), .75);
-
-		distanceToLight = distanceFloat((float)itm->x, (float)itm->y, (float)lghtPtr->x, (float)lghtPtr->y) / (float)lghtPtr->size;
-	} else {
-		distanceToLight = 0;
-		lightColor = TCOD_color_RGB(0, 0, 0);
-	}
-
-	foreColor = TCOD_color_lerp(foreColor, lightColor, clipFloat(distanceToLight, 0, .45));
-
-	drawChar(itemConsole, itm->x, itm->y, itm->chr, foreColor, itm->backColor);
-}*/
-
 void _drawItem(item *itm) {
 	TCOD_console_t itemConsole = getItemConsole();
 	TCOD_color_t foreColor = itm->foreColor;
