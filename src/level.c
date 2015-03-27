@@ -779,7 +779,7 @@ int isLevelValid() {
 void placeTunnels() {
 	int x, y, x1, y1, w_x, w_y, mapUpdates, currentValue, neighborValue, lowestValue, index, lowestX, lowestY, invalid, randomRoomSize, dist;
 	int numberOfFailedAttemptsToFindADestRoom, neighborCollision, banDoubleTunnels, srcRoomIndex, dstRoomIndex, startCount = 0, runCount = -1;
-	int doorPlaced, destDoorPlaced, ownsTunnels, roomDistance, minDistanceToDestRoom, maxHallDistance;//, openRoomList[MAX_ROOMS], closedRoomList[MAX_ROOMS], openListCount, closedListCount, inClosedList, inOpenList, i, ii, id;
+	int doorPlaced, destDoorPlaced, ownsTunnels, roomDistance, minDistanceToDestRoom, maxHallDistance;
 	int exitEarly;
 	room *srcRoom = NULL, *dstRoom = NULL, *tempDestRoom = NULL;
 	
@@ -919,9 +919,9 @@ void placeTunnels() {
 				
 				for (y1 = -1; y1 <= 1; y1++) {
 					for (x1 = -1; x1 <= 1; x1++) {
-						if (x1 == 0 && y1 == 0) {
-							continue;
-						}
+						//if (x1 == 0 && y1 == 0) {
+						//	continue;
+						//}
 						
 						if ((banDoubleTunnels && TCOD_map_is_walkable(TUNNEL_MAP, x + x1, y + y1)) || (ROOM_MAP[x + x1][y + y1] && (ROOM_MAP[x + x1][y + y1] != srcRoom->id && ROOM_MAP[x + x1][y + y1] != dstRoom->id))) {
 							neighborCollision = 1;
