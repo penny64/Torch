@@ -15,6 +15,11 @@ enum {
 	IS_PUZZLE_ROOM = 0x01 << 7,
 } roomFlag_t;
 
+enum {
+	LEVEL_PLAIN = 0,
+	LEVEL_KEYTORCH = 1,
+} levelType_t;
+
 typedef struct room room;
 
 struct room {

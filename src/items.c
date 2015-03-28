@@ -213,10 +213,6 @@ void itemLogic() {
 		
 		ptr = ptr->next;
 	}
-
-	if (getTotalNumberOfKeytorches() > 0 && !isLevelComplete() && getNumberOfLitKeytorches() == getTotalNumberOfKeytorches()) {
-		completeLevel();
-	}
 }
 
 void drawItems() {

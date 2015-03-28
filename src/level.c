@@ -38,6 +38,7 @@ int EXIT_IN_PROGRESS;
 int START_LOCATION[2];
 int EXIT_LOCATION[2];
 int LEVEL_NUMBER;
+int LEVEL_TYPE;
 int (*openList)[WINDOW_WIDTH * WINDOW_HEIGHT];
 int (*START_POSITIONS)[WINDOW_WIDTH * WINDOW_HEIGHT];
 room *STARTING_ROOM = NULL, *ROOMS = NULL;
@@ -493,8 +494,24 @@ int isTransitionInProgress() {
 	return EXIT_IN_PROGRESS;
 }
 
+int checkForLevelCompletion() {
+	if (LEVEL_TYPE == LEVEL_KEYTORCH) {
+		if (getTotalNumberOfKeytorches() > 0 && !isLevelComplete() && getNumberOfLitKeytorches() == getTotalNumberOfKeytorches()) {
+			return 1;
+		}
+	} else if (LEVEL_TYPE == LEVEL_PLAIN) {
+		return 1;
+	}
+
+	return 0;
+}
+
 int levelLogic() {
 	character *player = getPlayer();
+
+	if (checkForLevelCompletion()) {
+		completeLevel();
+	}
 
 	if (isLevelComplete() && player->itemLight) {
 		EXIT_WAVE_DIST = clipFloat(EXIT_WAVE_DIST + .5f, 0, 255);
@@ -1242,14 +1259,6 @@ void placeItems() {
 	while (roomPtr) {
 		invalidStartRoom = 0;
 
-		if (!exitPlaced && roomPtr->size <= 80) {
-			roomPtr->flags |= IS_EXIT_ROOM;
-
-			getNewSpawnPosition(roomPtr, EXIT_LOCATION);
-
-			exitPlaced = 1;
-		}
-
 		if (!startPlaced && !(roomPtr->flags & NEEDS_DOORS)) {
 			for (i = 0; i < roomPtr->numberOfConnectedRooms; i++) {
 				if (getRoomViaId(roomPtr->connectedRooms[i])->flags & NEEDS_DOORS) {
@@ -1340,6 +1349,22 @@ void placeItems() {
 					lghtPtr->flickerRate = .08;
 				}
 			}
+		}
+
+		roomPtr = roomPtr->next;
+	}
+
+	roomPtr = ROOMS;
+
+	while (roomPtr) {
+		if (!exitPlaced && roomPtr->size <= 80 && !(roomPtr->flags & IS_START_ROOM)) {
+			roomPtr->flags |= IS_EXIT_ROOM;
+
+			getNewSpawnPosition(roomPtr, EXIT_LOCATION);
+
+			exitPlaced = 1;
+
+			break;
 		}
 
 		roomPtr = roomPtr->next;
@@ -1654,6 +1679,10 @@ void placeGrass() {
 	}
 }
 
+void pickRoomType() {
+	LEVEL_TYPE = getRandomInt(0, 1);
+}
+
 void generateLevel() {
 	int x, y, i, ii, foundPlot, plotDist, spawnPosition[2], plotPoints[MAX_ROOMS][2];
 	float fogValue;
@@ -1682,6 +1711,8 @@ void generateLevel() {
 	deleteAllRooms();
 	deleteEnemies();
 	deleteAllOwnerlessItems();
+
+	pickRoomType();
 	
 	for (i = 0; i <= MAX_ROOMS; i++) {
 		foundPlot = 0;
