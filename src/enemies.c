@@ -28,14 +28,14 @@ void createRagdoll(int x, int y) {
 	actor->hp = 25;
 	actor->hpMax = 25;
 	actor->sightRange = 4;
-	actor->statSpeed = 4;
+	actor->statSpeed = 3;
 	actor->aiFlags = TRACK_TARGET | IS_ALIVE;
 	actor->chr = (int)'&';
 	actor->foreColor = TCOD_color_RGB(205, 205, 205);
 	actor->itemLight->r_tint = 50;
 	actor->itemLight->g_tint = 50;
 	actor->itemLight->b_tint = 50;
-	actor->itemLight->size = 6;
+	actor->itemLight->size = 3;
 	actor->itemLight->fuelMax = 99999;
 	actor->itemLight->fuel = actor->itemLight->fuelMax;
 }

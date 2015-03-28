@@ -13,6 +13,7 @@ enum {
 	IS_LAVA_ROOM = 0x01 << 5,
 	IS_START_ROOM = 0x01 << 6,
 	IS_PUZZLE_ROOM = 0x01 << 7,
+	IS_FURNACE_ROOM = 0x01 << 8,
 } roomFlag_t;
 
 enum {

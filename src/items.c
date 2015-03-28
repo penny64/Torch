@@ -349,6 +349,10 @@ int itemHandleCharacterTouch(item *itm, character *actor) {
 				unblockPosition(itm->x, itm->y);
 				deleteItem(itm);
 			}
+
+			if (itm->itemFlags & IS_ALLSEEING_EYE) {
+				activateAllSeeingEye(itm);
+			}
 			
 			return 1;
 		}
@@ -369,10 +373,6 @@ int itemHandleCharacterTouch(item *itm, character *actor) {
 					itm->backColor = TCOD_color_RGB(155, 155, 155);
 				}
 			}
-		}
-		
-		if (itm->itemFlags & IS_ALLSEEING_EYE) {
-			activateAllSeeingEye(itm);
 		}
 	}
 	
@@ -549,9 +549,8 @@ void activateAllSeeingEye(item *itm) {
 }
 
 void createAllSeeingEye(int x, int y) {
-	item *itm = createItem(x, y, ' ', TCOD_color_RGB(175, 175, 30), TCOD_color_RGB(75, 75, 0), IS_ALLSEEING_EYE);
-	
-	blockPosition(itm->x, itm->y);
+	item *itm = createItem(x, y, ' ', TCOD_color_RGB(175, 175, 30), TCOD_color_RGB(75, 75, 0), IS_ALLSEEING_EYE | IS_SOLID);
+
 	itm->chr = 207;
 	light *lght = createDynamicLight(x, y, NULL);
 	itm->itemLight = lght;
@@ -565,6 +564,13 @@ void createAllSeeingEye(int x, int y) {
 
 void createWoodWall(int x, int y) {
 	item *itm = createItem(x, y, '#', TCOD_color_RGB(128 - 40, 101 - 40, 23 - 5), TCOD_color_RGB(128 - 50, 101 - 50, 23 - 5), IS_SOLID);
+
+	itm->statDamage = 3;
+	itm->statSpeed = 3;
+}
+
+void createMetalWall(int x, int y) {
+	item *itm = createItem(x, y, '+', TCOD_color_RGB(128, 128, 128), TCOD_color_RGB(118, 118, 118), IS_SOLID);
 
 	itm->statDamage = 3;
 	itm->statSpeed = 3;

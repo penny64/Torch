@@ -1216,8 +1216,8 @@ void generateKeys() {
 }
 
 void generatePuzzles() {
-	int treasureRooms = 0;
-	room *roomPtr = ROOMS;
+	int i, treasureRooms = 0, numberOfFurances = 0;
+	room *neighborRoomPtr, *roomPtr = ROOMS;
 
 	STARTING_ROOM = NULL;
 
@@ -1234,8 +1234,6 @@ void generatePuzzles() {
 		} else if (roomPtr->size >= 80 && roomPtr->size <= 90) {
 			if (roomPtr->numberOfConnectedRooms == 2) {
 				roomPtr->flags |= IS_LAVA_ROOM;
-
-				printf("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n");
 			} else {
 				roomPtr->flags |= NEEDS_DOORS;
 			}
@@ -1243,6 +1241,23 @@ void generatePuzzles() {
 		
 		if (roomPtr->numberOfConnectedRooms == 1) {
 			roomPtr->flags |= IS_RARE_SPAWN;
+		}
+
+		roomPtr = roomPtr->next;
+	}
+
+	roomPtr = ROOMS;
+
+	while (roomPtr && !numberOfFurances) {
+		for (i = 0; i < roomPtr->numberOfConnectedRooms; i ++) {
+			neighborRoomPtr = getRoomViaId(roomPtr->connectedRooms[i]);
+
+			if (neighborRoomPtr->flags & IS_LAVA_ROOM) {
+				roomPtr->flags |= IS_FURNACE_ROOM;
+				numberOfFurances ++;
+
+				break;
+			}
 		}
 
 		roomPtr = roomPtr->next;
@@ -1376,7 +1391,7 @@ void decorateRooms() {
 	room *roomPtr = ROOMS;
 
 	while (roomPtr) {
-		if (roomPtr->flags & IS_TORCH_ROOM) {
+		if ((roomPtr->flags & IS_TORCH_ROOM) || (roomPtr->flags & IS_FURNACE_ROOM)) {
 			for (i = 0; i < roomPtr->size; i ++) {
 				x = roomPtr->positionList[i][0];
 				y = roomPtr->positionList[i][1];
@@ -1431,8 +1446,12 @@ void decorateRooms() {
 
 				if (isNextToWall) {
 					claimSpawnPositionInRoom(roomPtr, x, y);
-					
-					createWoodWall(x, y);
+
+					if (roomPtr->flags & IS_TORCH_ROOM) {
+						createWoodWall(x, y);
+					} else if (roomPtr->flags & IS_FURNACE_ROOM) {
+						createMetalWall(x, y);
+					}
 				}
 			}
 		}
@@ -1442,7 +1461,7 @@ void decorateRooms() {
 }
 
 void spawnEnemies() {
-	int spawnPosition[2], maxNumberOfVoidWorms, numberOfVoidWorms = 0;
+	int spawnPosition[2], maxNumberOfVoidWorms, numberOfRagdolls = 0, numberOfVoidWorms = 0;
 	room *roomPtr = ROOMS;
 
 	if (LEVEL_NUMBER >= 2) {
@@ -1455,8 +1474,6 @@ void spawnEnemies() {
 		if (roomPtr->flags & IS_TREASURE_ROOM) {
 			getNewSpawnPosition(roomPtr, spawnPosition);
 
-			printf("CREATE BAT: %i, %i\n", spawnPosition[0], spawnPosition[1]);
-
 			createBat(spawnPosition[0], spawnPosition[1]);
 		} else if (numberOfVoidWorms < maxNumberOfVoidWorms) {
 			getNewSpawnPosition(roomPtr, spawnPosition);
@@ -1465,6 +1482,19 @@ void spawnEnemies() {
 
 			numberOfVoidWorms ++;
 		} else if (roomPtr->flags & IS_EXIT_ROOM) {
+		} else {
+			if (numberOfRagdolls < clip(LEVEL_NUMBER + 3, 0, 8) && !getRandomInt(0, 3 + numberOfRagdolls)) {
+				getNewSpawnPosition(roomPtr, spawnPosition);
+
+				createRagdoll(spawnPosition[0], spawnPosition[1]);
+				numberOfRagdolls ++;
+			}
+		}
+
+		if (roomPtr->flags & IS_FURNACE_ROOM && getRandomInt(0, 3)) {
+			getNewSpawnPosition(roomPtr, spawnPosition);
+
+			createRagdoll(spawnPosition[0], spawnPosition[1]);
 		}
 
 		roomPtr = roomPtr->next;
@@ -1585,8 +1615,8 @@ void colorRooms() {
 			b = 145;
 
 			rMod = 10;
-			gMod = 10;
-			bMod = 10;
+			gMod = 60;
+			bMod = 80;
 		} else if (roomPtr->numberOfConnectedRooms >= 3) {
 			if (roomPtr->size <= 30) { //CHECKED
 				r = 0 - RED_SHIFT;
@@ -1603,12 +1633,12 @@ void colorRooms() {
 			bMod = 60;
 		} else { //CHCKED
 			r = 120;
-			g = 120;
+			g = 40;
 			b = 120;
 
-			rMod = 15;
+			rMod = 45;
 			gMod = 15;
-			bMod = 15;
+			bMod = 45;
 		}
 		
 		for (i = 0; i < roomPtr->size; i ++) {

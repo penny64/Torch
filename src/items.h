@@ -100,6 +100,7 @@ void createTorchHolder(int, int);
 void createSword(int, int);
 void createBoots(int, int);
 void createWoodWall(int, int);
+void createMetalWall(int, int);
 void createAllSeeingEye(int, int);
 void enableDoor(item*);
 void enableSolid(item*);
