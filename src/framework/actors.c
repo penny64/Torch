@@ -327,7 +327,7 @@ void pickUpItem(character *actor, item *itm) {
 	actor->numberOfItems ++;
 	
 	if (actor == getPlayer()) {
-		showMessage(10, "You pick up %s", itm->name);
+		showMessage(10, "You pick up %s", itm->name, NULL);
 	}
 }
 
@@ -341,11 +341,9 @@ void dropItem(character *actor, item *itm) {
 	itm->y = actor->y;
 	
 	removeItemFromInventory(actor, itm);
-	//actor->inventory[actor->numberOfItems] = itm;
-	//actor->numberOfItems ++;
 	
 	if (actor == getPlayer()) {
-		showMessage(10, "Dropped item.");
+		showMessage(10, "Dropped item.", NULL);
 	}
 }
 
@@ -450,7 +448,7 @@ int _checkIfPositionLit(character *actor) {
 		printf("Actor is in unlit position\n");
 
 		if (actor == getPlayer()) {
-			showMessage(20, "You are lost to the shadows...");
+			showMessage(20, "You are lost to the shadows...", NULL);
 		}
 
 		killActor(actor);
@@ -531,15 +529,15 @@ void _actorLogic(character *actor) {
 		
 		if (actor->nextStanceFlagsToRemove & IS_STUNNED) {
 			if (actor == player) {
-				showMessage(5, "You regain composure.");
+				showMessage(5, "You regain composure.", NULL);
 			} else {
-				showMessage(5, "It regains composure.");
+				showMessage(5, "It regains composure.", NULL);
 			}
 		} else if (actor->nextStanceFlagsToRemove & IS_HOLDING_LODGED_WEAPON) {
 			if (actor == player) {
-				showMessage(5, "You dislodge the weapon.");
+				showMessage(5, "You dislodge the weapon.", NULL);
 			} else {
-				showMessage(5, "Something dislodges their weapon.");
+				showMessage(5, "Something dislodges their weapon.", NULL);
 			}
 		}
 		
@@ -596,7 +594,7 @@ void _actorLogic(character *actor) {
 			
 			printf("Handle letting go of weapon!\n");
 			
-			showMessage(10, "You let go of the weapon.");
+			showMessage(10, "You let go of the weapon.", NULL);
 			
 			return;
 		}
@@ -744,7 +742,7 @@ void killActor(character *actor) {
 	printf("Killed actor.\n");
 	
 	if (actor == getPlayer()) {
-		showMessage(15, "You die.");
+		showMessage(15, "You die.", NULL);
 	}
 }
 

@@ -464,14 +464,14 @@ void completeLevel() {
 
 	createExit(EXIT_LOCATION[0], EXIT_LOCATION[1]);
 
-	showMessage(20, "You hear a low rumble.");
+	showMessage(20, "You hear a low rumble.", NULL);
 }
 
 void exitLevel() {
 	EXIT_IN_PROGRESS = 1;
 	LEVEL_NUMBER ++;
 
-	showMessage(20, "You step down...");
+	showMessage(20, "You step down...", NULL);
 }
 
 void setLevel(int levelNumber) {
@@ -509,7 +509,7 @@ int checkForLevelCompletion() {
 int levelLogic() {
 	character *player = getPlayer();
 
-	if (checkForLevelCompletion()) {
+	if (!isLevelComplete() && checkForLevelCompletion()) {
 		completeLevel();
 	}
 

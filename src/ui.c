@@ -12,7 +12,7 @@
 
 
 TCOD_console_t UI_CONSOLE;
-const char *DISPLAY_TEXT;
+char *DISPLAY_TEXT;
 float DISPLAY_TEXT_TIME, DISPLAY_TEXT_TIME_MAX;
 int DISPLAY_TEXT_FADE = 0, FADE_DELAY = 0;
 
@@ -24,6 +24,9 @@ void setupUi() {
 	TCOD_console_set_default_background(UI_CONSOLE, TCOD_color_RGB(255, 0, 255));
 	TCOD_console_set_key_color(UI_CONSOLE, TCOD_color_RGB(255, 0, 255));
 	TCOD_console_clear(UI_CONSOLE);
+
+	DISPLAY_TEXT = calloc(WINDOW_WIDTH, sizeof(char));
+	DISPLAY_TEXT[0] = '\0';
 }
 
 TCOD_console_t getUiConsole() {
@@ -33,9 +36,8 @@ TCOD_console_t getUiConsole() {
 void _drawMessage() {
 	float colorMod;
 	TCOD_color_t foreColor, backColor;
-	//char timeText[50];
 
-	if (DISPLAY_TEXT != NULL) {
+	if (DISPLAY_TEXT[0] != '\0') {
 		colorMod = DISPLAY_TEXT_TIME / (float)DISPLAY_TEXT_TIME_MAX;
 
 		if (colorMod < 0) {
@@ -50,6 +52,7 @@ void _drawMessage() {
 		backColor = TCOD_color_RGB(0, 0, 0);
 		
 		drawString(UI_CONSOLE, (WINDOW_WIDTH / 2) - (strlen(DISPLAY_TEXT) / 2), WINDOW_HEIGHT - 1, foreColor, backColor, DISPLAY_TEXT);
+		printf("MSG: %s\n", DISPLAY_TEXT);
 	}
 }
 
@@ -114,30 +117,39 @@ void _drawStance() {
 	drawString(UI_CONSOLE, x, y, foreColor, backColor, stanceText);
 }
 
-void showMessage(int timeInTurns, const char *text, ...) {
-	char *joinedString = malloc(WINDOW_WIDTH * sizeof(*joinedString));
-	char *theArg = "";
-	joinedString[0] = '\0';
+void showMessage(int timeInTurns, char *text, ...) {
+	//char *joinedString = malloc(WINDOW_WIDTH * sizeof(*joinedString));
+	int isSet = 0;
+	char *theArg;
+
 	va_list ap;
 	theArg = text;
 
 	va_start(ap, text);
-	while(theArg != NULL)
-	{
-		strcat( joinedString, theArg );
-		strcat( joinedString, "\n\r" );
+
+	while(theArg != NULL) {
+		if (!isSet) {
+			strcpy(DISPLAY_TEXT, theArg);
+
+			isSet = 1;
+		} else {
+			strcat(DISPLAY_TEXT, theArg);
+		}
+		//strcat(joinedString, "\n\r" );
 
 		theArg = va_arg(ap, char*);
 	}
-	printf("STRING: %s\n", joinedString);
-	DISPLAY_TEXT = joinedString;
+
+	printf("STRING: %s\n", DISPLAY_TEXT);
+
 	va_end(ap);
+
 	DISPLAY_TEXT_TIME = 0;
 	DISPLAY_TEXT_TIME_MAX = (float)timeInTurns * 2;
 	DISPLAY_TEXT_FADE = 0;
 	FADE_DELAY = 0;
 
-	free(joinedString);
+	//free(joinedString);
 }
 
 void drawUi() {
@@ -165,7 +177,7 @@ void uiLogic() {
 		}
 	} else if (DISPLAY_TEXT_FADE && DISPLAY_TEXT_TIME > 0) {
 		DISPLAY_TEXT_TIME -= 3;
-	} else if (DISPLAY_TEXT != NULL) {
-		DISPLAY_TEXT = NULL;
+	} else if (DISPLAY_TEXT[0] != '\0') {
+		DISPLAY_TEXT[0] = '\0';
 	}
 }

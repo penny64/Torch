@@ -4,7 +4,7 @@
 void setupUi(void);
 void drawUi(void);
 void uiLogic(void);
-void showMessage(int, const char*, ...);
+void showMessage(int, char*, ...);
 
 
 TCOD_console_t getUiConsole(void);
