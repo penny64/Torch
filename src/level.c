@@ -808,7 +808,7 @@ void placeTunnels() {
 		runCount ++;
 		startCount = 0;
 		ownsTunnels = 0;
-		banDoubleTunnels = getRandomInt(0, 2);
+		banDoubleTunnels = 1;//getRandomInt(0, 2);
 		
 		for (y = 2; y < WINDOW_HEIGHT - 1; y++) {
 			for (x = 2; x < WINDOW_WIDTH - 1; x++) {
@@ -882,10 +882,6 @@ void placeTunnels() {
 		}
 
 		maxHallDistance = 16;
-		
-		if (srcRoom->flags & IS_TREASURE_ROOM || dstRoom->flags & IS_TREASURE_ROOM) {
-			banDoubleTunnels = 1;
-		}
 		
 		for (y = 2; y < WINDOW_HEIGHT - 1; y++) {
 			for (x = 2; x < WINDOW_WIDTH - 1; x++) {
@@ -1302,7 +1298,7 @@ void placeItems() {
 			if (roomPtr->size <= 15 && getRandomFloat(0, 1) >= .6) {
 				createAndPlaceItemInRoom(roomPtr, &createAllSeeingEye);
 
-				placedAllSeeingEye += 1;
+				placedAllSeeingEye = 1;
 			}
 		}
 
@@ -1340,6 +1336,15 @@ void placeItems() {
 					while (TCOD_dijkstra_path_walk(lavaWalker, &lavaWalkerX, &lavaWalkerY)) {
 						TCOD_map_set_properties(LAVA_MAP, lavaWalkerX, lavaWalkerY, 0, 0);
 					}
+				}
+			}
+
+			for (i = 0; i < roomPtr->size; i++) {
+				x = roomPtr->positionList[i][0];
+				y = roomPtr->positionList[i][1];
+
+				if (!TCOD_map_is_walkable(LAVA_MAP, x, y)) {
+					claimSpawnPositionInRoom(roomPtr, x, y);
 				}
 			}
 
