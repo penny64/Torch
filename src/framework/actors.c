@@ -303,11 +303,6 @@ void removeItemFromInventory(character *actor, item *itm) {
 }
 
 void pickUpItem(character *actor, item *itm) {
-	char itemPickupMessage[30];
-
-	strcpy(itemPickupMessage, "You pick up");
-	//strcat(itemPickupMessage, "klsjd");
-
 	item *itmPtr;
 
 	if (itm->itemFlags & IS_WEAPON) {
@@ -332,8 +327,7 @@ void pickUpItem(character *actor, item *itm) {
 	actor->numberOfItems ++;
 	
 	if (actor == getPlayer()) {
-		printf("%s\n", itemPickupMessage);
-		showMessage(&itemPickupMessage, 10);
+		showMessage(10, "You pick up %s", itm->name);
 	}
 }
 
@@ -351,7 +345,7 @@ void dropItem(character *actor, item *itm) {
 	//actor->numberOfItems ++;
 	
 	if (actor == getPlayer()) {
-		showMessage("Dropped item.", 10);
+		showMessage(10, "Dropped item.");
 	}
 }
 
@@ -456,7 +450,7 @@ int _checkIfPositionLit(character *actor) {
 		printf("Actor is in unlit position\n");
 
 		if (actor == getPlayer()) {
-			showMessage("You are lost to the shadows...", 20);
+			showMessage(20, "You are lost to the shadows...");
 		}
 
 		killActor(actor);
@@ -537,15 +531,15 @@ void _actorLogic(character *actor) {
 		
 		if (actor->nextStanceFlagsToRemove & IS_STUNNED) {
 			if (actor == player) {
-				showMessage("You regain composure.", 5);
+				showMessage(5, "You regain composure.");
 			} else {
-				showMessage("It regains composure.", 5);
+				showMessage(5, "It regains composure.");
 			}
 		} else if (actor->nextStanceFlagsToRemove & IS_HOLDING_LODGED_WEAPON) {
 			if (actor == player) {
-				showMessage("You dislodge the weapon.", 5);
+				showMessage(5, "You dislodge the weapon.");
 			} else {
-				showMessage("Something dislodges their weapon.", 5);
+				showMessage(5, "Something dislodges their weapon.");
 			}
 		}
 		
@@ -602,7 +596,7 @@ void _actorLogic(character *actor) {
 			
 			printf("Handle letting go of weapon!\n");
 			
-			showMessage("%cYou let go of the weapon.%c", 10);
+			showMessage(10, "You let go of the weapon.");
 			
 			return;
 		}
@@ -750,7 +744,7 @@ void killActor(character *actor) {
 	printf("Killed actor.\n");
 	
 	if (actor == getPlayer()) {
-		showMessage("You die.", 15);
+		showMessage(15, "You die.");
 	}
 }
 

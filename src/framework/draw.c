@@ -25,7 +25,7 @@ void drawCharBackEx(TCOD_console_t console, int x, int y, TCOD_color_t color, TC
 	TCOD_console_set_char_background(console, x, y, color, flag);
 }
 
-void drawString(TCOD_console_t console, int x, int y, TCOD_color_t foreColor, TCOD_color_t backColor, const char *string) {
+void drawString(TCOD_console_t console, int x, int y, TCOD_color_t foreColor, TCOD_color_t backColor, const char *string, ...) {
 	TCOD_console_set_background_flag(console, TCOD_BKGND_SET);
 	TCOD_console_set_default_background(console, backColor);
 	TCOD_console_set_default_foreground(console, foreColor);

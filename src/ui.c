@@ -114,7 +114,7 @@ void _drawStance() {
 	drawString(UI_CONSOLE, x, y, foreColor, backColor, stanceText);
 }
 
-void showMessage(const char *text, int timeInTurns) {
+void showMessage(int timeInTurns, const char *text, ...) {
 	DISPLAY_TEXT = text;
 	DISPLAY_TEXT_TIME = 0;
 	DISPLAY_TEXT_TIME_MAX = (float)timeInTurns * 2;
