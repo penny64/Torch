@@ -115,11 +115,29 @@ void _drawStance() {
 }
 
 void showMessage(int timeInTurns, const char *text, ...) {
-	DISPLAY_TEXT = text;
+	char *joinedString = malloc(WINDOW_WIDTH * sizeof(*joinedString));
+	char *theArg = "";
+	joinedString[0] = '\0';
+	va_list ap;
+	theArg = text;
+
+	va_start(ap, text);
+	while(theArg != NULL)
+	{
+		strcat( joinedString, theArg );
+		strcat( joinedString, "\n\r" );
+
+		theArg = va_arg(ap, char*);
+	}
+	printf("STRING: %s\n", joinedString);
+	DISPLAY_TEXT = joinedString;
+	va_end(ap);
 	DISPLAY_TEXT_TIME = 0;
 	DISPLAY_TEXT_TIME_MAX = (float)timeInTurns * 2;
 	DISPLAY_TEXT_FADE = 0;
 	FADE_DELAY = 0;
+
+	free(joinedString);
 }
 
 void drawUi() {
