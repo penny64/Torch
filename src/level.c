@@ -1225,7 +1225,7 @@ void generatePuzzles() {
 			roomPtr->flags |= NEEDS_DOORS;
 
 			treasureRooms ++;
-		} else if (roomPtr->size >= 45 && roomPtr->size <= 65) {
+		} else if (LEVEL_TYPE == LEVEL_KEYTORCH && roomPtr->size >= 45 && roomPtr->size <= 65) {
 			roomPtr->flags |= IS_TORCH_ROOM;
 		} else if (roomPtr->size >= 80 && roomPtr->size <= 90) {
 			if (roomPtr->numberOfConnectedRooms == 2) {
