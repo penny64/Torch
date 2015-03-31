@@ -328,7 +328,7 @@ void pickUpItem(character *actor, item *itm) {
 	actor->numberOfItems ++;
 	
 	if (actor == getPlayer()) {
-		showMessage(10, "You pick up %s", itm->name, NULL);
+		showMessage(10, "You pick up <", itm->name, ">", NULL);
 	}
 }
 

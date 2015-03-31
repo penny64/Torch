@@ -494,9 +494,31 @@ void createKey(int x, int y) {
 }
 
 void randomizeSword(item *itm, int quality) {
-	itm->itemEffectFlags = IS_QUICK;
+	float typeChance = getRandomFloat(0, 1);
 
-	itm->name = "Sword of Speed";
+	if (typeChance >= .6) {
+		itm->itemEffectFlags = IS_FLAMING;
+		itm->name = "Burning Sword";
+		itm->foreColor.g -= 25;
+		itm->foreColor.b -= 25;
+	} else if (typeChance >= .75) {
+		itm->itemEffectFlags = IS_QUICK;
+		itm->name = "Sword of Speed";
+		itm->foreColor.r -= 45;
+		itm->foreColor.g -= 45;
+		itm->foreColor.b -= 45;
+	} else if (typeChance >= .85) {
+		itm->itemEffectFlags = IS_LIGHTNING;
+		itm->name = "Shocking Sword";
+		itm->foreColor.b -= 25;
+	} else if (typeChance >= .9) {
+		itm->itemEffectFlags = IS_FORCE;
+		itm->name = "Forceful Sword";
+		itm->foreColor.g -= 35;
+	} else {
+		itm->itemEffectFlags = IS_NORMAL;
+		itm->name = "Sword";
+	}
 
 	itm->statDamage = clip(getRandomInt(3, 5) + quality, 3, 8);
 	itm->statSpeed = clip(getRandomInt(3, 4) + quality, 3, 8);
