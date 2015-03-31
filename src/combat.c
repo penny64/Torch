@@ -230,6 +230,69 @@ int slash(character *attacker, character *target, item *weapon) {
 	return 0;
 }
 
+int stab(character *attacker, character *target, item *weapon) {
+	character *player = getPlayer();
+	int attackerStrength = getActorStrength(attacker);
+	int attackerLevel = getActorLevel(attacker);
+	int attackerLuck = getActorLuck(attacker);
+	int weaponDamage = getRandomIntWithMean(0, weapon->statDamage, weapon->statDamage + (2 + attackerLevel)) + attacker->statStabCount;
+
+	attackerLuck = getRandomIntWithMean(0, attackerLuck, clip(attackerLuck - 1, 0, attackerLuck));
+
+	float targetOpenness = getTargetOpenness(target);
+	int lowerDamageValue = attackerStrength;
+	int upperDamageValue = (attackerStrength + 2) + attackerLevel + attackerLuck;
+	int damageMean = (upperDamageValue * (1.3 * targetOpenness)) + weaponDamage;
+	float attackDamage, percentageAttackDamage, movementDamageBonus = .0f;
+
+	if (attacker->stanceFlags & IS_STABBING) {
+		movementDamageBonus = (10.f - ((float)getActorSpeed(attacker))) / 10.f;
+		movementDamageBonus *= attackerStrength;
+
+		printf("Extra movement damage: %f\n", movementDamageBonus);
+	}
+
+	lowerDamageValue += (int)(movementDamageBonus + .5f);
+	upperDamageValue += (int)(movementDamageBonus + .5f);
+	damageMean += (int)(movementDamageBonus + .5f);
+	attacker->statStabCount ++;
+
+	setStance(attacker, IS_STABBING);
+	setDelay(attacker, getAttackSpeedOfWeapon(weapon));
+
+	attackDamage = getRandomIntWithMean(lowerDamageValue, upperDamageValue, damageMean);
+	percentageAttackDamage = attackDamage / upperDamageValue;
+
+	float attackDamageBeforeDefense = attackDamage;
+
+	if ((attacker->traitFlags & TORCH_ATTACK_PENALTY && !actorGetItemWithFlag(attacker, IS_TORCH_HOLDER) && attacker->itemLight)) {
+		attackDamage /= 2;
+
+		attacker->itemLight->fuel -= 25;
+	}
+
+	printf("lower=%i, upper=%i, perc=%f, actual=%f\n", lowerDamageValue, upperDamageValue, percentageAttackDamage, attackDamage);
+
+	if (performDamage(attacker, target, attackDamage, percentageAttackDamage)) {
+		return 1;
+	}
+
+	if (attackDamageBeforeDefense <= upperDamageValue * .85 && getRandomFloat(0.f, 1.f) > (attackDamageBeforeDefense / (upperDamageValue * .85)) / (upperDamageValue * .85)) {
+		weapon->itemFlags |= IS_LODGED;
+		weapon->lodgedInActor = target;
+		attacker->stanceFlags |= IS_HOLDING_LODGED_WEAPON;
+		target->stanceFlags |= IS_STUCK_WITH_LODGED_WEAPON;
+
+		if (attacker == player) {
+			showMessage(10, "The weapon becomes lodged!", NULL);
+		}
+	} else if (attacker->stanceFlags & IS_MOVING) {
+		considerKnockback(attacker, target, attackDamage, percentageAttackDamage);
+	}
+
+	return 0;
+}
+
 int attack(character *attacker, character *target) {
 	item *attackerWeapon = actorGetItemWithFlag(attacker, IS_WEAPON);
 	
@@ -252,6 +315,8 @@ int attack(character *attacker, character *target) {
 	
 	if (attackerWeapon->itemFlags & IS_SWORD) {
 		return slash(attacker, target, attackerWeapon);
+	} else if (attackerWeapon->itemFlags & IS_DAGGER) {
+		return stab(attacker, target, attackerWeapon);
 	}
 	
 	printf("Something terrible has happened.\n");

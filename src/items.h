@@ -26,6 +26,7 @@ enum {
 	IS_DESTROYABLE = 0x01 << 16,
 	IS_ARMOR = 0x01 << 17,
 	ARE_BOOTS = 0x01 << 18,
+	IS_DAGGER = 0x01 << 19,
 } itemFlag_t;
 
 enum {
@@ -98,6 +99,7 @@ void createDoor(int, int);
 void createKey(int, int);
 void createTorchHolder(int, int);
 void createSword(int, int);
+void createDagger(int, int);
 void createBoots(int, int);
 void createWoodWall(int, int);
 void createMetalWall(int, int);

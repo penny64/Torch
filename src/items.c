@@ -38,6 +38,7 @@ TCOD_console_t getItemConsole() {
 void createAllItemCards() {
 	createItemCard(&createTreasure, RARITY_MEDIUM);
 	createItemCard(&createSword, RARITY_MEDIUM);
+	createItemCard(&createDagger, RARITY_LOW);
 	createItemCard(&createBoots, RARITY_MEDIUM);
 	createItemCard(&createTorchHolder, RARITY_HIGH);
 	createItemCard(&createKey, RARITY_KEY);
@@ -379,7 +380,6 @@ int itemHandleCharacterTouch(item *itm, character *actor) {
 	return 0;
 }
 
-
 item *spawnItemWithRarity(int x, int y, int minRarity, int maxRarity) {
 	int i, listLength = 0;
 	itemCard *itemList[255];
@@ -502,10 +502,29 @@ void randomizeSword(item *itm, int quality) {
 	itm->statSpeed = clip(getRandomInt(3, 4) + quality, 3, 8);
 }
 
+void randomizeDagger(item *itm, int quality) {
+	itm->itemEffectFlags = 0;
+
+	itm->name = "Dagger";
+
+	itm->statDamage = clip(getRandomInt(2, 3) + quality, 2, 6);
+	itm->statSpeed = clip(getRandomInt(1, 2) + quality, 1, 5);
+}
+
 void createSword(int x, int y) {
-	item *itm = createItem(x, y, '/', TCOD_color_RGB(210, 105, 30), TCOD_color_RGB(30, 30, 30), IS_WEAPON | IS_SWORD | CAN_PICK_UP);
+	item *itm = createItem(x, y, ' ', TCOD_color_RGB(255, 255, 255), TCOD_color_RGB(30, 30, 30), IS_WEAPON | IS_SWORD | CAN_PICK_UP);
+
+	itm->chr = 170;
 
 	randomizeSword(itm, getLevel());
+}
+
+void createDagger(int x, int y) {
+	item *itm = createItem(x, y, ' ', TCOD_color_RGB(210, 105, 30), TCOD_color_RGB(30, 30, 30), IS_WEAPON | IS_DAGGER | CAN_PICK_UP);
+
+	itm->chr = 170;
+
+	randomizeDagger(itm, getLevel());
 }
 
 void randomizeBoots(item *itm, int quality) {

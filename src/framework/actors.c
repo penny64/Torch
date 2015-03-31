@@ -68,6 +68,7 @@ character *createActor(int x, int y) {
 	_c->statLuck = 2;
 	_c->statSpeed = 1;
 	_c->statStrength = 3;
+	_c->statStabCount = 0;
 	_c->sightRange = 16;
 	_c->numberOfItems = 0;
 	_c->prev = NULL;
@@ -575,12 +576,12 @@ void _actorLogic(character *actor) {
 	}
 
 	if (hitActor) {
+		actor->vx = 0;
+		actor->vy = 0;
+
 		if (attack(actor, ptr)) {
 			return;
 		}
-		
-		actor->vx = 0;
-		actor->vy = 0;
 	} else if (actor->vx || actor->vy) {
 		if (actor->stanceFlags & IS_STUCK_WITH_LODGED_WEAPON && getItemLodgedInActor(actor)->owner) {
 			printf("Cant move because of stuck weapon.\n");
@@ -614,15 +615,33 @@ void _actorLogic(character *actor) {
 				actor->itemLight->fuel -= getLevel();
 			}
 
+			if (actor->stanceFlags & IS_STABBING) {
+				actor->statStabCount --;
+
+				if (!actor->statStabCount) {
+					unsetStance(actor, IS_STABBING);
+				}
+			}
+
 			TCOD_map_compute_fov(actor->fov, actor->x, actor->y, actor->sightRange, 1, FOV_SHADOW);
 		} else {
 			if (actor->stanceFlags & IS_MOVING) {
 				unsetStance(actor, IS_MOVING);
+
+				if (actor->stanceFlags & IS_STABBING) {
+					actor->statStabCount = 0;
+					unsetStance(actor, IS_STABBING);
+				}
 			}
 		}
 	} else {
 		if (actor->stanceFlags & IS_MOVING) {
 			unsetStance(actor, IS_MOVING);
+
+			if (actor->stanceFlags & IS_STABBING) {
+				actor->statStabCount = 0;
+				unsetStance(actor, IS_STABBING);
+			}
 		}
 	}
 

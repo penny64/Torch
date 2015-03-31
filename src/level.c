@@ -1311,7 +1311,7 @@ void placeItems() {
 		if (roomPtr->flags & IS_RARE_SPAWN) {
 			getNewSpawnPosition(roomPtr, spawnPosition);
 
-			spawnItemWithRarity(spawnPosition[0], spawnPosition[1], RARITY_MEDIUM, RARITY_MEDIUM);
+			spawnItemWithRarity(spawnPosition[0], spawnPosition[1], RARITY_LOW, RARITY_HIGH);
 		}
 
 		if (roomPtr->flags & IS_LAVA_ROOM) {
@@ -1805,6 +1805,7 @@ void generateLevel() {
 		player->y = START_LOCATION[1];
 		player->itemLight->x = player->x;
 		player->itemLight->y = player->y;
+		createDagger(START_LOCATION[0], START_LOCATION[1]);
 		
 		moveActor(player, 1, 0);
 	}

@@ -52,7 +52,6 @@ void _drawMessage() {
 		backColor = TCOD_color_RGB(0, 0, 0);
 		
 		drawString(UI_CONSOLE, (WINDOW_WIDTH / 2) - (strlen(DISPLAY_TEXT) / 2), WINDOW_HEIGHT - 1, foreColor, backColor, DISPLAY_TEXT);
-		printf("MSG: %s\n", DISPLAY_TEXT);
 	}
 }
 
@@ -95,16 +94,24 @@ void _drawStance() {
 	if (!player) {
 		return;
 	}
+
+	stanceText = "";
 	
 	item *weapon = actorGetItemWithFlag(player, IS_WEAPON);
 
 	if (player->stanceFlags & IS_CASTING) {
 		stanceText = "Casting";
 	} else if (weapon) {
-		if (player->stanceFlags & IS_MOVING) {
-			stanceText = "Run.Slash";
-		} else if (player->stanceFlags & IS_STANDING) {
-			stanceText = "Slash";
+		if (weapon->itemFlags & IS_SWORD) {
+			if (player->stanceFlags & IS_MOVING) {
+				stanceText = "Run.Slash";
+			} else if (player->stanceFlags & IS_STANDING) {
+				stanceText = "Slash";
+			}
+		} else if (weapon->itemFlags & IS_DAGGER) {
+			if (player->stanceFlags & IS_STABBING) {
+				stanceText = "Stab";
+			}
 		}
 	} else {
 		if (player->stanceFlags & IS_MOVING) {
@@ -118,7 +125,6 @@ void _drawStance() {
 }
 
 void showMessage(int timeInTurns, char *text, ...) {
-	//char *joinedString = malloc(WINDOW_WIDTH * sizeof(*joinedString));
 	int isSet = 0;
 	char *theArg;
 
@@ -135,12 +141,9 @@ void showMessage(int timeInTurns, char *text, ...) {
 		} else {
 			strcat(DISPLAY_TEXT, theArg);
 		}
-		//strcat(joinedString, "\n\r" );
 
 		theArg = va_arg(ap, char*);
 	}
-
-	printf("STRING: %s\n", DISPLAY_TEXT);
 
 	va_end(ap);
 
@@ -148,8 +151,6 @@ void showMessage(int timeInTurns, char *text, ...) {
 	DISPLAY_TEXT_TIME_MAX = (float)timeInTurns * 2;
 	DISPLAY_TEXT_FADE = 0;
 	FADE_DELAY = 0;
-
-	//free(joinedString);
 }
 
 void drawUi() {
