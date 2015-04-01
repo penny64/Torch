@@ -1179,7 +1179,9 @@ void generateKeys() {
 		
 		if (roomPtr->flags & NEEDS_DOORS) {
 			getNewSpawnPosition(lastRoomPtr, spawnPosition);
-			spawnItemWithRarity(spawnPosition[0], spawnPosition[1], RARITY_KEY, RARITY_KEY);
+			printf("Key\n");
+			spawnItemWithRarity(spawnPosition[0], spawnPosition[1], IS_KEY, RARITY_KEY, RARITY_KEY);
+			printf("Key done\n");
 		}
 
 		for (i = 0; i < roomPtr->numberOfConnectedRooms; i++) {
@@ -1306,12 +1308,23 @@ void placeItems() {
 			getNewSpawnPosition(roomPtr, spawnPosition);
 
 			createTreasure(spawnPosition[0], spawnPosition[1]);
+
+			printf("Treasure room\n");
+			for (i = 0; i < getRandomInt(1, 3); i ++) {
+				getNewSpawnPosition(roomPtr, spawnPosition);
+
+				spawnItemWithRarity(spawnPosition[0], spawnPosition[1], IS_WEAPON, RARITY_LOW, RARITY_LOW);
+			}
+
+			printf("Treasure room over\n");
 		}
 
 		if (roomPtr->flags & IS_RARE_SPAWN) {
 			getNewSpawnPosition(roomPtr, spawnPosition);
 
-			spawnItemWithRarity(spawnPosition[0], spawnPosition[1], RARITY_LOW, RARITY_HIGH);
+			printf("Rare spawn\n");
+			spawnItemWithRarity(spawnPosition[0], spawnPosition[1], IS_ARMOR, RARITY_MEDIUM, RARITY_HIGH);
+			printf("Rare spawn done\n");
 		}
 
 		if (roomPtr->flags & IS_LAVA_ROOM) {
@@ -1804,8 +1817,7 @@ void generateLevel() {
 		player->x = START_LOCATION[0];
 		player->y = START_LOCATION[1];
 		player->itemLight->x = player->x;
-		player->itemLight->y = player->y;
-		createDagger(START_LOCATION[0], START_LOCATION[1]);
+		player->itemLight->y = player->y;;
 		
 		moveActor(player, 1, 0);
 	}

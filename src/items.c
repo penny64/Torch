@@ -36,12 +36,12 @@ TCOD_console_t getItemConsole() {
 }
 
 void createAllItemCards() {
-	createItemCard(&createTreasure, RARITY_MEDIUM);
-	createItemCard(&createSword, RARITY_MEDIUM);
-	createItemCard(&createDagger, RARITY_LOW);
-	createItemCard(&createBoots, RARITY_MEDIUM);
-	createItemCard(&createTorchHolder, RARITY_HIGH);
-	createItemCard(&createKey, RARITY_KEY);
+	createItemCard(&createTreasure, RARITY_MEDIUM, 0x0);
+	createItemCard(&createLowSword, RARITY_LOW, IS_WEAPON | IS_SWORD);
+	createItemCard(&createLowDagger, RARITY_LOW, IS_WEAPON | IS_DAGGER);
+	createItemCard(&createBoots, RARITY_MEDIUM, IS_ARMOR | ARE_BOOTS);
+	createItemCard(&createTorchHolder, RARITY_HIGH, 0x0);
+	createItemCard(&createKey, RARITY_KEY, IS_KEY);
 }
 
 item *getItems() {
@@ -99,12 +99,13 @@ item *createItem(int x, int y, char chr, TCOD_color_t foreColor, TCOD_color_t ba
 	return _c;
 }
 
-itemCard *createItemCard(void (*createItem)(int, int), int rarity) {
+itemCard *createItemCard(void (*createItem)(int, int), unsigned int rarity, unsigned int itemFlags) {
 	itemCard *_c, *_p_c;
 	
 	_c = calloc(1, sizeof(itemCard));
 	_c->createItem = createItem;
 	_c->rarity = rarity;
+	_c->itemFlags = itemFlags;
 	
 	if (ITEM_CARDS == NULL) {
 		ITEM_CARDS = _c;
@@ -380,13 +381,13 @@ int itemHandleCharacterTouch(item *itm, character *actor) {
 	return 0;
 }
 
-item *spawnItemWithRarity(int x, int y, int minRarity, int maxRarity) {
+item *spawnItemWithRarity(int x, int y, unsigned int itemFlags, unsigned int minRarity, unsigned int maxRarity) {
 	int i, listLength = 0;
 	itemCard *itemList[255];
 	itemCard *itemCardPtr = ITEM_CARDS;
 	
 	while (itemCardPtr) {
-		if (itemCardPtr->rarity >= minRarity && itemCardPtr->rarity <= maxRarity) {
+		if (itemCardPtr->rarity >= minRarity && itemCardPtr->rarity <= maxRarity && (itemCardPtr->itemFlags & itemFlags)) {
 			for (i = 0; i < 7 - itemCardPtr->rarity; i ++) {
 				itemList[listLength] = itemCardPtr;
 				listLength ++;
@@ -493,8 +494,12 @@ void createKey(int x, int y) {
 	createItem(x, y, '-', TCOD_color_RGB(30, 175, 175), TCOD_color_RGB(30, 75, 75), IS_KEY | CAN_PICK_UP);
 }
 
-void randomizeSword(item *itm, int quality) {
+
+void createLowSword(int x, int y) {
+	item *itm = createItem(x, y, ' ', TCOD_color_RGB(255, 255, 255), TCOD_color_RGB(30, 30, 30), IS_WEAPON | IS_SWORD | CAN_PICK_UP);
 	float typeChance = getRandomFloat(0, 1);
+
+	itm->chr = 170;
 
 	if (typeChance >= .6) {
 		itm->itemEffectFlags = IS_FLAMING;
@@ -520,33 +525,18 @@ void randomizeSword(item *itm, int quality) {
 		itm->name = "Sword";
 	}
 
-	itm->statDamage = clip(getRandomInt(3, 5) + quality, 3, 8);
-	itm->statSpeed = clip(getRandomInt(3, 4) + quality, 3, 8);
+	itm->statDamage = getRandomInt(3, 5);
+	itm->statSpeed = getRandomInt(3, 4);
 }
 
-void randomizeDagger(item *itm, int quality) {
-	itm->itemEffectFlags = 0;
-
-	itm->name = "Dagger";
-
-	itm->statDamage = clip(getRandomInt(2, 3) + quality, 2, 6);
-	itm->statSpeed = clip(getRandomInt(1, 2) + quality, 1, 5);
-}
-
-void createSword(int x, int y) {
-	item *itm = createItem(x, y, ' ', TCOD_color_RGB(255, 255, 255), TCOD_color_RGB(30, 30, 30), IS_WEAPON | IS_SWORD | CAN_PICK_UP);
-
-	itm->chr = 170;
-
-	randomizeSword(itm, getLevel());
-}
-
-void createDagger(int x, int y) {
+void createLowDagger(int x, int y) {
 	item *itm = createItem(x, y, ' ', TCOD_color_RGB(210, 105, 30), TCOD_color_RGB(30, 30, 30), IS_WEAPON | IS_DAGGER | CAN_PICK_UP);
 
 	itm->chr = 170;
-
-	randomizeDagger(itm, getLevel());
+	itm->itemEffectFlags = 0;
+	itm->name = "Dagger";
+	itm->statDamage = getRandomInt(2, 3);
+	itm->statSpeed = getRandomInt(1, 2);
 }
 
 void randomizeBoots(item *itm, int quality) {

@@ -61,7 +61,7 @@ struct item {
 typedef struct itemCard itemCard;
 
 struct itemCard {
-	int rarity;
+	unsigned int rarity, itemFlags;
 	struct itemCard *next, *prev;
 	void (*createItem)(int, int);
 };
@@ -70,7 +70,7 @@ void itemSetup(void);
 void itemsShutdown(void);
 void itemLogic(void);
 item *createItem(int, int, char, TCOD_color_t, TCOD_color_t, unsigned int);
-itemCard *createItemCard(void (*)(int, int), int);
+itemCard *createItemCard(void (*)(int, int), unsigned int, unsigned int);
 void deleteItem(item*);
 void assignFlag(item*, unsigned int);
 void itemHandleCharacterCollision(item*, character*);
@@ -79,7 +79,7 @@ TCOD_console_t getItemConsole(void);
 item *getItems(void);
 item *getNewestItem(void);
 item *getItemLodgedInActor(character*);
-item *spawnItemWithRarity(int, int, int, int);
+item *spawnItemWithRarity(int, int, unsigned int, unsigned int, unsigned int);
 void drawItems(void);
 int getItemLevel(item*);
 int getAttackSpeedOfWeapon(item*);
@@ -98,8 +98,8 @@ void createSign(int, int, char*);
 void createDoor(int, int);
 void createKey(int, int);
 void createTorchHolder(int, int);
-void createSword(int, int);
-void createDagger(int, int);
+void createLowSword(int, int);
+void createLowDagger(int, int);
 void createBoots(int, int);
 void createWoodWall(int, int);
 void createMetalWall(int, int);
