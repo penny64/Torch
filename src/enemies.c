@@ -29,15 +29,18 @@ void createRagdoll(int x, int y) {
 	actor->hpMax = 25;
 	actor->sightRange = 4;
 	actor->statSpeed = 3;
-	actor->aiFlags = TRACK_TARGET | IS_ALIVE;
+	actor->aiFlags = TRACK_TARGET | IS_ALIVE | IS_IMMUNE_TO_DARKNESS;
 	actor->chr = (int)'&';
 	actor->foreColor = TCOD_color_RGB(205, 205, 205);
-	actor->itemLight->r_tint = 50;
+
+	deleteDynamicLight(actor->itemLight);
+	actor->itemLight = NULL;
+	/*actor->itemLight->r_tint = 50;
 	actor->itemLight->g_tint = 50;
 	actor->itemLight->b_tint = 50;
 	actor->itemLight->size = 3;
 	actor->itemLight->fuelMax = 99999;
-	actor->itemLight->fuel = actor->itemLight->fuelMax;
+	actor->itemLight->fuel = actor->itemLight->fuelMax;*/
 }
 
 void createVoidWorm(int x, int y) {
@@ -50,13 +53,16 @@ void createVoidWorm(int x, int y) {
 	actor->aiFlags = IS_VOID_WORM | RANDOM_WALK | DROP_VOID_ON_DEATH | IS_IMMUNE_TO_DARKNESS | IS_ALIVE;
 	actor->chr = 128;
 	actor->foreColor = TCOD_color_RGB(25, 205, 25);
-	actor->itemLight->r_tint = 125;
+
+	deleteDynamicLight(actor->itemLight);
+	actor->itemLight = NULL;
+	/*actor->itemLight->r_tint = 125;
 	actor->itemLight->b_tint = 125;
 	actor->itemLight->brightness = .35;
 	actor->itemLight->size = 3;
 	actor->itemLight->fuelMax = 99999;
 	actor->itemLight->fuel = actor->itemLight->fuelMax;
-	actor->itemLight->flickerRate = 0;
+	actor->itemLight->flickerRate = 0;*/
 	actor->stanceFlags = IS_STANDING;
 }
 

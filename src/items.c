@@ -497,7 +497,7 @@ void createKey(int x, int y) {
 
 void createLowSword(int x, int y) {
 	item *itm = createItem(x, y, ' ', TCOD_color_RGB(255, 255, 255), TCOD_color_RGB(30, 30, 30), IS_WEAPON | IS_SWORD | CAN_PICK_UP);
-	float typeChance = getRandomFloat(0, 1);
+	float typeChance = getRandomFloat(0, 1) + ((float) getLevel() / 23.f);
 
 	itm->chr = 170;
 
@@ -540,8 +540,18 @@ void createLowDagger(int x, int y) {
 }
 
 void randomizeBoots(item *itm, int quality) {
-	itm->itemEffectFlags = IS_QUICK;
-	itm->name = "Boots of Speed";
+	float typeChance = getRandomFloat(0, 1) + ((float) getLevel() / 23.f);
+
+	if (typeChance >= .55) {
+		itm->itemEffectFlags = IS_QUICK;
+		itm->name = "Boots of Speed";
+	} else if (typeChance >= .25) {
+		itm->itemEffectFlags = IS_FLAMING;
+		itm->name = "Burning Boots";
+	} else {
+		itm->name = "Boots";
+	}
+
 	itm->statSpeed = clip(getRandomInt(1, 2) + quality, 1, 4);
 }
 
