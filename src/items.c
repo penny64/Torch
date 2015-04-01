@@ -611,8 +611,9 @@ void createWoodWall(int x, int y) {
 }
 
 void createMetalWall(int x, int y) {
-	item *itm = createItem(x, y, '+', TCOD_color_RGB(128, 128, 128), TCOD_color_RGB(118, 118, 118), IS_SOLID);
+	item *itm = createItem(x, y, '+', TCOD_color_RGB(86, 86, 86), TCOD_color_RGB(118, 118, 118), IS_SOLID);
 
+	itm->chr = 177;
 	itm->statDamage = 3;
 	itm->statSpeed = 3;
 }
