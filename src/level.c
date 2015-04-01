@@ -831,7 +831,6 @@ void placeTunnels() {
 
 			while (!dstRoom && numberOfFailedAttemptsToFindADestRoom <= ROOM_COUNT_MAX) {
 				dstRoomIndex = getRandomInt(1, ROOM_COUNT_MAX);
-
 				tempDestRoom = getRoomViaId(dstRoomIndex);
 				
 				if (isRoomConnectedTo(srcRoom, tempDestRoom)) {
@@ -842,7 +841,7 @@ void placeTunnels() {
 				
 				roomDistance = distance(srcRoom->centerX, srcRoom->centerY, tempDestRoom->centerX, tempDestRoom->centerY);
 
-				if (roomDistance <= maxHallDistance && roomDistance < minDistanceToDestRoom) {
+				if (roomDistance <= maxHallDistance) {
 					minDistanceToDestRoom = roomDistance;
 					dstRoom = tempDestRoom;
 				} else {
@@ -902,8 +901,8 @@ void placeTunnels() {
 				invalid = 0;
 				neighborCollision = 0;
 				
-				for (y1 = -maxHallSize; y1 <= maxHallSize; y1++) {
-					for (x1 = -maxHallSize; x1 <= maxHallSize; x1++) {
+				for (y1 = -1; y1 <= 1; y1++) {
+					for (x1 = -1; x1 <= 1; x1++) {
 						if (x + x1 < 0 || x + x1 >= WINDOW_WIDTH || y + y1 < 0 || y + y1 >= WINDOW_HEIGHT) {
 							continue;
 						}
@@ -930,8 +929,8 @@ void placeTunnels() {
 					}
 				}
 				
-				for (y1 = -1; y1 <= 1; y1++) {
-					for (x1 = -1; x1 <= 1; x1++) {
+				for (y1 = -2; y1 <= 2; y1++) {
+					for (x1 = -2; x1 <= 2; x1++) {
 						//if (x1 == 0 && y1 == 0) {
 						//	continue;
 						//}
@@ -1067,8 +1066,8 @@ void placeTunnels() {
 			
 			//printf("\tSub 2 START\n");
 			
-			for (y1 = -maxHallSize; y1 <= maxHallSize; y1++) {
-				for (x1 = -maxHallSize; x1 <= maxHallSize; x1++) {
+			for (y1 = -1; y1 <= 1; y1++) {
+				for (x1 = -1; x1 <= 1; x1++) {
 					if ((w_x + x1 <= 2 || w_x + x1 >= WINDOW_WIDTH - 2 || w_y + y1 <= 2 || w_y + y1 >= WINDOW_HEIGHT - 2)) {
 						continue;
 					}
@@ -1079,8 +1078,6 @@ void placeTunnels() {
 						if (dist - randomRoomSize <= 4) {
 							TCOD_map_set_properties(TUNNEL_WALLS, w_x + x1, w_y + y1, 1, 1);
 						}
-						
-						continue;
 					}
 					
 					//if (dist <= randomRoomSize && !TCOD_map_is_walkable(LEVEL_MAP, w_x + x1, w_y + y1)) {
@@ -1097,21 +1094,24 @@ void placeTunnels() {
 
 							doorPlaced = 1;
 						}
-					}
+					} else if (ROOM_MAP[w_x + x1][w_y + y1] == dstRoom->id) {
+						if (!doorPlaced) {
+							addRoomDoorPosition(srcRoom, w_x + x1, w_y + y1);
 
-					if (ROOM_MAP[w_x + x1][w_y + y1] == dstRoom->id) {
+							doorPlaced = 1;
+						}
+
 						exitEarly = 1;
 
 						break;
 					}
-					
-					TCOD_map_set_properties(LEVEL_MAP, w_x + x1, w_y + y1, 1, 1);
 				}
 
 				if (exitEarly) {
 					break;
 				}
 			}
+			TCOD_map_set_properties(LEVEL_MAP, w_x, w_y, 1, 1);
 			
 			//printf("\tSub 2 END\n");
 			
@@ -1651,7 +1651,7 @@ void colorRooms() {
 			bMod = 60;
 		} else { //CHCKED
 			r = 120;
-			g = 40;
+			g = 0;
 			b = 120;
 
 			rMod = 45;
@@ -1808,9 +1808,9 @@ void generateLevel() {
 	placeGrass();
 
 	if (!STARTING_ROOM) {
-		printf("Failed!\n");
+		printf("*FATAL* No starting room\n");
 		
-		return;
+		assert(STARTING_ROOM);
 	}
 	
 	if (player) {
