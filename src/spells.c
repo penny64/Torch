@@ -5,6 +5,7 @@
 #include "framework/input.h"
 #include "spells.h"
 #include "systems.h"
+#include "particles.h"
 #include "entities.h"
 #include "components.h"
 #include "lights.h"
@@ -131,6 +132,8 @@ void fireball(World *world, unsigned int ownerId, unsigned int targetId) {
 	lght->b_tint = 40;
 	lght->fuel = spellDelay;
 	lght->fuelMax = spellDelay;
+
+	createParticle(x, y, 0, 1.2);
 
 	setStance(owner, IS_CASTING);
 	setFutureStanceToRemove(owner, IS_CASTING);

@@ -34,7 +34,7 @@ typedef struct {
 typedef struct {
 	char chr;
 	int x, y;
-	float exactX, exactY, velocityX, velocityY;
+	float exactX, exactY, velocity[2];
 } RectComponent;
 
 #endif

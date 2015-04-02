@@ -8,4 +8,4 @@
 #endif
 
 void startRects(void);
-void registerRectSystem(World*, unsigned int);
+void registerRectSystem(World*, unsigned int, int, int, int, float);

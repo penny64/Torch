@@ -1,0 +1,1 @@
+void createParticle(int, int, int, float);

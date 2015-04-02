@@ -29,3 +29,19 @@ float clipFloat(float f, float min, float max) {
   return t > max ? max : t;
 }
 
+int directionTo(int x1, int y1, int x2, int y2) {
+	double theta = atan2((y1 - y2), -(x1 - x2));
+
+	if (theta < 0) {
+		theta += 2 * M_PI;
+	}
+
+	return (int)((theta * (180 / M_PI)) + .5);
+}
+
+void velocity(float velocityArray[2], int direction, float speed) {
+	double rad = (double)direction * (M_PI / 180);
+
+	velocityArray[0] = (float)(cos(rad) * (double)speed);
+	velocityArray[1] = (float)(sin(rad) * (double)speed);
+}
