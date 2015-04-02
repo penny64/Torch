@@ -14,6 +14,8 @@ typedef enum {
 	COMPONENT_SPELL = 1 << 1,
 	COMPONENT_INPUT = 1 << 2,
 	COMPONENT_TICK = 1 << 3,
+	COMPONENT_RECT = 1 << 4,
+	COMPONENT_DRAW = 1 << 5,
 } Component;
 
 typedef enum {
@@ -28,5 +30,11 @@ typedef struct {
 	unsigned int spellTraits[MAX_SPELLS];
 	int spellCount, activeSpell, castDelay[MAX_SPELLS];
 } SpellComponent;
+
+typedef struct {
+	char chr;
+	int x, y;
+	float exactX, exactY, velocityX, velocityY;
+} RectComponent;
 
 #endif

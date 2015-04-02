@@ -11,6 +11,7 @@ struct World {
 	unsigned int mask[MAX_ENTITIES];
 
 	SpellComponent spell[MAX_ENTITIES];
+	RectComponent rect[MAX_ENTITIES];
 };
 
 #endif

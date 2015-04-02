@@ -16,7 +16,7 @@ void spellHandler(World*, unsigned int);
 void spellInputHandler(World*, unsigned int);
 void fireball(World*, unsigned int, unsigned int);
 
-Spell SPELL_FIREBALL = {"Fireball", &fireball, SPELL_IS_FLAME, DELAY_SHORT};
+Spell SPELL_FIREBALL = {"Fireball", &fireball, SPELL_IS_FLAME, -1, DELAY_SHORT};
 
 unsigned int MENU_OWNER_ID;
 World *MENU_WORLD_PTR;
@@ -129,8 +129,8 @@ void fireball(World *world, unsigned int ownerId, unsigned int targetId) {
 	lght->r_tint = 200;
 	lght->g_tint = 40;
 	lght->b_tint = 40;
-	lght->fuel = spellDelay + 5;
-	lght->fuelMax = spellDelay + 5;
+	lght->fuel = spellDelay;
+	lght->fuelMax = spellDelay;
 
 	setStance(owner, IS_CASTING);
 	setFutureStanceToRemove(owner, IS_CASTING);

@@ -7,6 +7,7 @@
 #include "systems.h"
 #include "entities.h"
 #include "spells.h"
+#include "rects.h"
 #include "graphics.h"
 #include "lights.h"
 #include "player.h"
@@ -36,6 +37,7 @@ void setup() {
 	startEntities();
 	startSystems();
 	startSpells();
+	startRects();
 
 	//Attract screen
 	generateLevel();
@@ -103,6 +105,7 @@ int main() {
         }
 
 		graphicsLogic();
+		tickSystemsWithMask(getWorld(), COMPONENT_DRAW);
 		drawActors();
 		composeScene();
 		displayLogic();

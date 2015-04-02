@@ -1819,8 +1819,6 @@ void generateLevel() {
 	if (player) {
 		if (LEVEL_NUMBER == 1) {
 			plantTorch(player);
-			//createVoidWorm(player->x + 1, player->y + 1);
-			//showMessage("%cSomething watches from the shadows...%c", 10);
 		} else {
 			getNewSpawnPosition(STARTING_ROOM, spawnPosition);
 			createBonfire(spawnPosition[0], spawnPosition[1]);

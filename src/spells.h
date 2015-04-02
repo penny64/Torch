@@ -11,7 +11,7 @@ typedef struct {
 	char *name;
 	void (*castSpell)(World*, unsigned int, unsigned int);
 	unsigned int spellMask;
-	unsigned int parentItem;
+	int parentItem;
 	int castDelay;
 } Spell;
 
