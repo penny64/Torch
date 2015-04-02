@@ -83,6 +83,12 @@ void playerInputLogic() {
 	if (!PLAYER_ACTOR || PLAYER_ACTOR->hp <= 0 || isTransitionInProgress()) {
 		return;
 	}
+
+	if (isMenuOpen()) {
+		uiInput();
+
+		return;
+	}
 	
 	if (isTCODCharPressed(TCODK_LEFT)) {
 		moveActor(PLAYER_ACTOR, -1, 0);

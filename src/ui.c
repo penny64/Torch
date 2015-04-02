@@ -17,8 +17,8 @@
 TCOD_console_t UI_CONSOLE;
 char *DISPLAY_TEXT;
 char *MENU_ITEMS[WINDOW_HEIGHT];
-float DISPLAY_TEXT_TIME, DISPLAY_TEXT_TIME_MAX, MENU_ITEM_INDEX;
-int MENU_ITEM_COUNT, DISPLAY_TEXT_FADE = 0, FADE_DELAY = 0, SHOW_ABILITY_MENU = 1;
+float DISPLAY_TEXT_TIME, DISPLAY_TEXT_TIME_MAX;
+int MENU_ITEM_COUNT, MENU_ITEM_INDEX, DISPLAY_TEXT_FADE = 0, FADE_DELAY = 0, SHOW_ABILITY_MENU = 1;
 void (*MENU_CALLBACK)(int, char*);
 
 
@@ -154,6 +154,10 @@ void _drawMenu() {
 	TCOD_console_set_default_background(UI_CONSOLE, TCOD_color_RGB(0, 0, 0));
 }
 
+int isMenuOpen() {
+	return MENU_CALLBACK != NULL;
+}
+
 void createMenu(char *menuItems[WINDOW_HEIGHT], void (*callback)(int, char*)) {
 	int i;
 
@@ -221,6 +225,13 @@ void uiInput() {
 		if (isTCODCharPressed(TCODK_DOWN)) {
 			MENU_ITEM_INDEX ++;
 		}
+	}
+
+	if (isTCODCharPressed(TCODK_ENTER)) {
+		MENU_CALLBACK(MENU_ITEM_INDEX, MENU_ITEMS[MENU_ITEM_INDEX]);
+
+		MENU_CALLBACK = NULL;
+		MENU_ITEMS[0] = NULL;
 	}
 }
 

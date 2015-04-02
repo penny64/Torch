@@ -1811,7 +1811,7 @@ void generateLevel() {
 		createBoots(player->x, player->y);
 		item *ptr = getNewestItem();
 
-		ptr->itemEffectFlags |= IS_FLAMING;
+		ptr->itemEffectFlags = IS_FLAMING;
 		
 		moveActor(player, 1, 0);
 	}

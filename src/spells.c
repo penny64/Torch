@@ -18,6 +18,9 @@ void fireball(World*, unsigned int, unsigned int);
 
 Spell SPELL_FIREBALL = {"Fireball", &fireball, SPELL_IS_FLAME, DELAY_SHORT};
 
+unsigned int MENU_OWNER_ID;
+World *MENU_WORLD_PTR;
+
 
 void startSpells() {
 	World *world = getWorld();
@@ -54,6 +57,7 @@ void addSpell(World *world, unsigned int entityId, Spell spell) {
 	spellComponent->castSpell[spellComponent->spellCount] = spell.castSpell;
 	spellComponent->spellTraits[spellComponent->spellCount] = spell.spellMask;
 	spellComponent->castDelay[spellComponent->spellCount] = spell.castDelay;
+	spellComponent->activeSpell = -1;
 
 	spellComponent->spellCount ++;
 }
@@ -64,11 +68,32 @@ void castSpell(World *world, unsigned int entityId) {
 	unsigned int owner = entityId;
 	unsigned int target = entityId;
 
+	if (!spellComponent->spellCount) {
+		showMessage(10, "No spells known.", NULL);
+
+		return;
+	}
+
+	if (spellComponent->activeSpell == -1) {
+		createCastingMenu(world, entityId);
+
+		showMessage(10, "No spell selected.", NULL);
+
+		return;
+	}
+
+	printf("Casting\n");
 	spellComponent->castSpell[spellComponent->activeSpell](world, owner, target);
 }
 
 void _castingMenuCallback(int menuItemIndex, char *menuItemString) {
-	printf("Selected item: %s @ %i\n", menuItemString, menuItemIndex);
+	character *entity = getActorViaId(MENU_OWNER_ID);
+	SpellComponent *spellComponent = &MENU_WORLD_PTR->spell[MENU_OWNER_ID];
+
+	spellComponent->activeSpell = menuItemIndex;
+
+	MENU_WORLD_PTR = NULL;
+	MENU_OWNER_ID = NULL;
 }
 
 void createCastingMenu(World *world, unsigned int entityId) {
@@ -83,6 +108,9 @@ void createCastingMenu(World *world, unsigned int entityId) {
 
 	menuStrings[i] = NULL;
 
+	MENU_OWNER_ID = entityId;
+	MENU_WORLD_PTR = world;
+
 	createMenu(menuStrings, &_castingMenuCallback);
 }
 
@@ -95,10 +123,14 @@ void fireball(World *world, unsigned int ownerId, unsigned int targetId) {
 
 	x = owner->x;
 	y = owner->y;
-	spellDelay = spellComponent->castDelay[spellComponent->spellCount];
+	spellDelay = spellComponent->castDelay[spellComponent->activeSpell];
 
 	light *lght = createDynamicLight(x, y, owner);
-	lght->fuel = spellDelay;
+	lght->r_tint = 200;
+	lght->g_tint = 40;
+	lght->b_tint = 40;
+	lght->fuel = spellDelay + 5;
+	lght->fuelMax = spellDelay + 5;
 
 	setStance(owner, IS_CASTING);
 	setFutureStanceToRemove(owner, IS_CASTING);
