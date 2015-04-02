@@ -5,24 +5,29 @@
 #include "framework/display.h"
 #include "framework/draw.h"
 #include "framework/numbers.h"
+#include "framework/input.h"
+#include "entities.h"
 #include "libtcod.h"
 #include "lights.h"
+#include "graphics.h"
 #include "player.h"
 #include "ui.h"
 
 
 TCOD_console_t UI_CONSOLE;
 char *DISPLAY_TEXT;
-float DISPLAY_TEXT_TIME, DISPLAY_TEXT_TIME_MAX;
-int DISPLAY_TEXT_FADE = 0, FADE_DELAY = 0;
+char *MENU_ITEMS[WINDOW_HEIGHT];
+float DISPLAY_TEXT_TIME, DISPLAY_TEXT_TIME_MAX, MENU_ITEM_INDEX;
+int MENU_ITEM_COUNT, DISPLAY_TEXT_FADE = 0, FADE_DELAY = 0, SHOW_ABILITY_MENU = 1;
+void (*MENU_CALLBACK)(int, char*);
 
 
 void setupUi() {
 	UI_CONSOLE = TCOD_console_new(WINDOW_WIDTH, WINDOW_HEIGHT);
 
 	TCOD_console_set_color_control(TCOD_COLCTRL_1, TCOD_color_RGB(200, 200, 200), TCOD_color_RGB(25, 25, 25));
-	TCOD_console_set_default_background(UI_CONSOLE, TCOD_color_RGB(255, 0, 255));
-	TCOD_console_set_key_color(UI_CONSOLE, TCOD_color_RGB(255, 0, 255));
+	TCOD_console_set_default_background(UI_CONSOLE, TCOD_color_RGB(0, 0, 0));
+	TCOD_console_set_key_color(UI_CONSOLE, TCOD_color_RGB(0, 0, 0));
 	TCOD_console_clear(UI_CONSOLE);
 
 	DISPLAY_TEXT = calloc(WINDOW_WIDTH, sizeof(char));
@@ -49,7 +54,7 @@ void _drawMessage() {
 		}
 
 		foreColor = TCOD_color_RGB(255 * colorMod, 250 * colorMod, 220 * colorMod);
-		backColor = TCOD_color_RGB(0, 0, 0);
+		backColor = TCOD_color_RGB(1, 1, 1);
 		
 		drawString(UI_CONSOLE, (WINDOW_WIDTH / 2) - (strlen(DISPLAY_TEXT) / 2), WINDOW_HEIGHT - 1, foreColor, backColor, DISPLAY_TEXT);
 	}
@@ -88,7 +93,7 @@ void _drawStance() {
 	int x = 0, y = WINDOW_HEIGHT - 1;
 	char *stanceText = NULL;
 	TCOD_color_t foreColor = TCOD_color_RGB(255, 255, 255);
-	TCOD_color_t backColor = TCOD_color_RGB(0, 0, 0);
+	TCOD_color_t backColor = TCOD_color_RGB(1, 1, 1);
 	character *player = getPlayer();
 	
 	if (!player) {
@@ -122,6 +127,49 @@ void _drawStance() {
 	}
 	
 	drawString(UI_CONSOLE, x, y, foreColor, backColor, stanceText);
+}
+
+void _drawMenu() {
+	int i, fadeValue;
+	TCOD_color_t cursorColor;
+
+	if (!MENU_CALLBACK) {
+		return;
+	}
+
+	fadeValue = abs(getAnimateFrame() - 30) * 2;
+	cursorColor = TCOD_color_RGB(120 + fadeValue, 120 + fadeValue, 120 + fadeValue);
+
+	TCOD_console_set_default_background(UI_CONSOLE, TCOD_color_RGB(15, 10, 10));
+	TCOD_console_set_default_foreground(UI_CONSOLE, TCOD_color_RGB(200, 200, 200));
+
+	for (i = 0; i < MENU_ITEM_COUNT; i ++) {
+		if (MENU_ITEM_INDEX == i) {
+			drawChar(UI_CONSOLE, 1, 2 + i, '>', cursorColor, TCOD_color_RGB(1, 1, 1));
+		}
+
+		TCOD_console_print(UI_CONSOLE, 3, 2 + i, MENU_ITEMS[i]);
+	}
+
+	TCOD_console_set_default_background(UI_CONSOLE, TCOD_color_RGB(0, 0, 0));
+}
+
+void createMenu(char *menuItems[WINDOW_HEIGHT], void (*callback)(int, char*)) {
+	int i;
+
+	memcpy(MENU_ITEMS, menuItems, sizeof(char*) * WINDOW_HEIGHT);
+
+	MENU_CALLBACK = callback;
+	MENU_ITEM_INDEX = 0;
+	MENU_ITEM_COUNT = 0;
+
+	for (i = 0; i < WINDOW_HEIGHT; i ++) {
+		if (MENU_ITEMS[i] == NULL) {
+			break;
+		}
+
+		MENU_ITEM_COUNT ++;
+	}
 }
 
 void showMessage(int timeInTurns, char *text, ...) {
@@ -158,7 +206,22 @@ void drawUi() {
 	
 	_drawTorchFuel();
 	_drawStance();
+	_drawMenu();
 	_drawMessage();
+}
+
+void uiInput() {
+	if (MENU_ITEM_INDEX) {
+		if (isTCODCharPressed(TCODK_UP)) {
+			MENU_ITEM_INDEX --;
+		}
+	}
+
+	if (MENU_ITEM_INDEX < MENU_ITEM_COUNT) {
+		if (isTCODCharPressed(TCODK_DOWN)) {
+			MENU_ITEM_INDEX ++;
+		}
+	}
 }
 
 void uiLogic() {

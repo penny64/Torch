@@ -23,6 +23,7 @@ typedef enum {
 } SpellTraits;
 
 typedef struct {
+	char *name[MAX_SPELLS];
 	void (*castSpell[MAX_SPELLS])(struct World*, unsigned int, unsigned int);
 	unsigned int spellTraits[MAX_SPELLS];
 	int spellCount, activeSpell, castDelay[MAX_SPELLS];

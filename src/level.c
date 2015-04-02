@@ -532,7 +532,7 @@ void carve(int x, int y) {
 
 	TCOD_map_t existingLevel = copyLevelMap();
 	
-	for (i = 0; i < TCOD_random_get_int(RANDOM, 9, 12 + getRandomInt(5, 30)); i++) {
+	for (i = 0; i < TCOD_random_get_int(RANDOM, 9, 12 + getRandomInt(5, 25)); i++) {
 		for (ii = 0; ii <= 0; ii++) { //Useless
 			for (y1 = -1 - ii; y1 <= 1 + ii; y1++) {
 				for (x1 = -1 - ii; x1 <= 1 + ii; x1++) {
@@ -1806,7 +1806,12 @@ void generateLevel() {
 		player->x = START_LOCATION[0];
 		player->y = START_LOCATION[1];
 		player->itemLight->x = player->x;
-		player->itemLight->y = player->y;;
+		player->itemLight->y = player->y;
+
+		createBoots(player->x, player->y);
+		item *ptr = getNewestItem();
+
+		ptr->itemEffectFlags |= IS_FLAMING;
 		
 		moveActor(player, 1, 0);
 	}

@@ -37,5 +37,5 @@ void drawString(TCOD_console_t console, int x, int y, TCOD_color_t foreColor, TC
 	//TCOD_console_print_ex(console, x, y, TCOD_BKGND_SET, TCOD_LEFT, string, TCOD_COLCTRL_1, TCOD_COLCTRL_STOP);
 	TCOD_console_print(console, x, y, string, ap);
 	va_end(ap);
-	TCOD_console_set_default_background(console, TCOD_color_RGB(255, 0, 255));
+	TCOD_console_set_default_background(console, TCOD_color_RGB(0, 0, 0));
 }

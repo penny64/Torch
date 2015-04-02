@@ -584,8 +584,6 @@ void activateAllSeeingEye(item *itm) {
 	itm->itemLight->fuel = 10;
 	itm->foreColor.r = 10;
 	itm->foreColor.g = 10;
-	//deleteDynamicLight(itm->itemLight);
-	//itm->itemLight = NULL;
 	itm->itemFlags ^= IS_ALLSEEING_EYE;
 }
 

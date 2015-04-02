@@ -1,18 +1,22 @@
 #include <stdio.h>
 
 #include "framework/actors.h"
+#include "framework/display.h"
 #include "framework/input.h"
 #include "spells.h"
 #include "systems.h"
 #include "entities.h"
 #include "components.h"
 #include "lights.h"
+#include "ui.h"
 
+
+void createCastingMenu(World*, unsigned int);
 void spellHandler(World*, unsigned int);
 void spellInputHandler(World*, unsigned int);
 void fireball(World*, unsigned int, unsigned int);
 
-Spell SPELL_FIREBALL = {&fireball, SPELL_IS_FLAME, DELAY_SHORT};
+Spell SPELL_FIREBALL = {"Fireball", &fireball, SPELL_IS_FLAME, DELAY_SHORT};
 
 
 void startSpells() {
@@ -33,7 +37,7 @@ void spellInputHandler(World *world, unsigned int entityId) {
 	if (isCharPressed('x')) {
 		castSpell(world, entityId);
 	} else if (isCharPressed('X')) {
-		printf("Casting menu\n");
+		createCastingMenu(world, entityId);
 	}
 }
 
@@ -46,9 +50,12 @@ void registerSpellSystem(World *world, unsigned int entityId) {
 void addSpell(World *world, unsigned int entityId, Spell spell) {
 	SpellComponent *spellComponent = &world->spell[entityId];
 
+	spellComponent->name[spellComponent->spellCount] = spell.name;
 	spellComponent->castSpell[spellComponent->spellCount] = spell.castSpell;
 	spellComponent->spellTraits[spellComponent->spellCount] = spell.spellMask;
 	spellComponent->castDelay[spellComponent->spellCount] = spell.castDelay;
+
+	spellComponent->spellCount ++;
 }
 
 
@@ -60,6 +67,24 @@ void castSpell(World *world, unsigned int entityId) {
 	spellComponent->castSpell[spellComponent->activeSpell](world, owner, target);
 }
 
+void _castingMenuCallback(int menuItemIndex, char *menuItemString) {
+	printf("Selected item: %s @ %i\n", menuItemString, menuItemIndex);
+}
+
+void createCastingMenu(World *world, unsigned int entityId) {
+	character *entity = getActorViaId(entityId);
+	SpellComponent *spellComponent = &world->spell[entityId];
+	int i;
+	char *menuStrings[WINDOW_HEIGHT];
+
+	for (i = 0; i < spellComponent->spellCount; i ++) {
+		menuStrings[i] = spellComponent->name[i];
+	}
+
+	menuStrings[i] = NULL;
+
+	createMenu(menuStrings, &_castingMenuCallback);
+}
 
 //Spells
 
