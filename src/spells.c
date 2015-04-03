@@ -16,6 +16,8 @@
 void createCastingMenu(World*, unsigned int);
 void spellHandler(World*, unsigned int);
 void spellInputHandler(World*, unsigned int);
+void spellCollisionWithSolidHandler(World*, unsigned int);
+void spellMovementHandler(World*, unsigned int);
 void fireball(World*, unsigned int, unsigned int);
 void _spellTargetCursorCallback(int, int);
 void createTargetCursor(World*, unsigned int, void (*)(int, int));
@@ -31,6 +33,8 @@ void startSpells() {
 
 	createSystemHandler(world, COMPONENT_SPELL, &spellHandler);
 	createSystemHandler(world, COMPONENT_INPUT, &spellInputHandler);
+	createSystemHandler(world, COMPONENT_SPELL_BULLET | COMPONENT_COLLISION_SOLID, &spellCollisionWithSolidHandler);
+	createSystemHandler(world, COMPONENT_MOVED | COMPONENT_SPELL_BULLET, &spellMovementHandler);
 }
 
 void spellHandler(World *world, unsigned int entityId) {
@@ -46,6 +50,21 @@ void spellInputHandler(World *world, unsigned int entityId) {
 	} else if (isCharPressed('X')) {
 		createCastingMenu(world, entityId);
 	}
+}
+
+void spellCollisionWithSolidHandler(World *world, unsigned int entityId) {
+	SpellComponent *spellComponent = &world->spell[entityId];
+	RectComponent *rectComponent = &world->rect[entityId];
+}
+
+void spellMovementHandler(World *world, unsigned int entityId) {
+	RectComponent *rectComponent = &world->rect[entityId];
+	LightComponent *lightComponent = &world->light[entityId];
+
+	light *lightPtr = getLightViaId(lightComponent->lightId);
+
+	lightPtr->x = rectComponent->x;
+	lightPtr->y = rectComponent->y;
 }
 
 void registerSpellSystem(World *world, unsigned int entityId) {
@@ -94,11 +113,26 @@ void castSpell(World *world, unsigned int entityId) {
 }
 
 void _spellTargetCursorCallback(int x, int y) {
-	character *owner = getActorViaId(UI_OWNER_ID);
-
+	character *owner = getActorViaId((unsigned int)UI_OWNER_ID);
+	SpellComponent *spellComponent = &UI_WORLD_PTR->spell[UI_OWNER_ID];
 	int direction = directionTo(owner->x, owner->y, x, y);
 
-	createParticle(owner->x, owner->y, '*', direction, 3.1, TCOD_color_RGB(200, 200, 200), TCOD_color_RGB(20, 20, 20));
+	createBullet(UI_OWNER_ID, owner->x, owner->y, '*', direction, 3.1, TCOD_color_RGB(200, 200, 200), TCOD_color_RGB(20, 20, 20));
+
+	LightComponent *lightComponent = &UI_WORLD_PTR->light[UI_OWNER_ID];
+
+	light *lght = createDynamicLight(owner->x, owner->y, NULL);
+
+	lightComponent->lightId = lght->entityId;
+	lght->r_tint = 255;
+	lght->g_tint = 40;
+	lght->b_tint = 40;
+	lght->brightness = .9;
+	lght->size = 3;
+	lght->fuel = 20;
+	lght->fuelMax = 20;
+
+	spellComponent->castSpell[spellComponent->activeSpell](UI_WORLD_PTR, owner->entityId, owner->entityId);
 
 	UI_WORLD_PTR = NULL;
 	UI_OWNER_ID = -1;

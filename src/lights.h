@@ -10,6 +10,7 @@ typedef struct light light;
 struct light {
 	int x, y, fuel, fuelMax, size, noTint;
 	uint8_t r_tint, g_tint, b_tint;
+	unsigned int entityId;
 	float sizeMod, brightness, flickerRate;
 	struct light *next, *prev;
 	struct character *owner;
@@ -26,6 +27,7 @@ light *createDynamicLight(int, int, character*);
 light *getLights(void);
 light *getDynamicLights(void);
 light *getNearestLight(int, int);
+light *getLightViaId(unsigned int);
 void deleteDynamicLight(light*);
 void resetLight(light*);
 void lightLogic(void);

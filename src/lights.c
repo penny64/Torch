@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <assert.h>
 
 #include "libtcod.h"
 #include "framework/display.h"
@@ -9,6 +10,8 @@
 #include "player.h"
 #include "level.h"
 #include "lights.h"
+#include "entities.h"
+#include "systems.h"
 #include "items.h"
 
 
@@ -52,6 +55,7 @@ light *createDynamicLight(int x, int y, character *actor) {
 	light *_c, *_p_c;
 	
 	_c = calloc(1, sizeof(light));
+	_c->entityId = createEntity(getWorld());
 	_c->x = x;
 	_c->y = y;
 	_c->r_tint = 55;
@@ -84,6 +88,20 @@ light *createDynamicLight(int x, int y, character *actor) {
 	}
 
 	return _c;
+}
+
+light *getLightViaId(unsigned int entityId) {
+	light *ptr = DYNAMIC_LIGHTS;
+
+	while (ptr) {
+		if (ptr->entityId == entityId) {
+			return ptr;
+		}
+
+		ptr = ptr->next;
+	}
+
+	assert(ptr->entityId == entityId);
 }
 
 void startLights() {

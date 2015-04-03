@@ -16,6 +16,11 @@ typedef enum {
 	COMPONENT_TICK = 1 << 3,
 	COMPONENT_RECT = 1 << 4,
 	COMPONENT_DRAW = 1 << 5,
+	COMPONENT_COLLISION_SOLID = 1 << 6,
+	COMPONENT_COLLISION_ACTOR = 1 << 7,
+	COMPONENT_SPELL_BULLET = 1 << 8,
+	COMPONENT_MOVED = 1 << 9,
+	COMPONENT_LIGHT = 1 << 10,
 } Component;
 
 typedef enum {
@@ -34,9 +39,13 @@ typedef struct {
 
 typedef struct {
 	char chr;
-	int x, y;
+	int x, y, ownerId;
 	double exactX, exactY, velocity[2];
 	TCOD_color_t foreColor, backColor;
 } RectComponent;
+
+typedef struct {
+	unsigned int lightId;
+} LightComponent;
 
 #endif
