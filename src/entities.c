@@ -1,6 +1,7 @@
 #include <stdio.h>
 
 #include "entities.h"
+#include "systems.h"
 
 World *WORLD = NULL;
 
@@ -32,5 +33,7 @@ unsigned int createEntity(World *world) {
 }
 
 void deleteEntity(World *world, unsigned int entityId) {
+	tickSystemsWithMaskForEntity(world, entityId, COMPONENT_DELETED);
+
 	world->mask[entityId] = COMPONENT_NONE;
 }

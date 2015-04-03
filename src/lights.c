@@ -102,6 +102,8 @@ light *getLightViaId(unsigned int entityId) {
 	}
 
 	assert(ptr->entityId == entityId);
+
+	return NULL;
 }
 
 void startLights() {

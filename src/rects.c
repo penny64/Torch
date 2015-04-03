@@ -63,9 +63,9 @@ void rectTickHandler(World *world, unsigned int entityId) {
 
 			tickSystemsWithMaskForEntity(world, entityId, COMPONENT_COLLISION_SOLID);
 
-		}else if (world->mask[entityId] & COMPONENT_COLLISION_ACTOR) {
+		} else if (world->mask[entityId] & COMPONENT_COLLISION_ACTOR) {
 			rectComponent->collidingWithEntityId = isCollidingWithActor(rectComponent->x, rectComponent->y, rectComponent->ownerId);
-			
+
 			if (rectComponent->collidingWithEntityId != -1){
 				collisionType = COMPONENT_COLLISION_ACTOR;
 

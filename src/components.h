@@ -21,6 +21,7 @@ typedef enum {
 	COMPONENT_SPELL_BULLET = 1 << 8,
 	COMPONENT_MOVED = 1 << 9,
 	COMPONENT_LIGHT = 1 << 10,
+	COMPONENT_DELETED = 1 << 11,
 } Component;
 
 typedef enum {

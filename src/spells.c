@@ -18,6 +18,7 @@ void spellHandler(World*, unsigned int);
 void spellInputHandler(World*, unsigned int);
 void spellCollisionWithSolidHandler(World*, unsigned int);
 void spellCollisionWithActorHandler(World*, unsigned int);
+void spellDeleteHandler(World*, unsigned int);
 void spellMovementHandler(World*, unsigned int);
 void fireball(World*, unsigned int, unsigned int);
 void _spellTargetCursorCallback(int, int);
@@ -36,7 +37,8 @@ void startSpells() {
 	createSystemHandler(world, COMPONENT_INPUT, &spellInputHandler);
 	createSystemHandler(world, COMPONENT_SPELL_BULLET | COMPONENT_COLLISION_SOLID, &spellCollisionWithSolidHandler);
 	createSystemHandler(world, COMPONENT_SPELL_BULLET | COMPONENT_COLLISION_ACTOR, &spellCollisionWithActorHandler);
-	createSystemHandler(world, COMPONENT_MOVED | COMPONENT_SPELL_BULLET, &spellMovementHandler);
+	createSystemHandler(world, COMPONENT_SPELL_BULLET | COMPONENT_MOVED, &spellMovementHandler);
+	createSystemHandler(world, COMPONENT_SPELL_BULLET | COMPONENT_DELETED, &spellDeleteHandler);
 }
 
 void spellHandler(World *world, unsigned int entityId) {
@@ -57,6 +59,8 @@ void spellInputHandler(World *world, unsigned int entityId) {
 void spellCollisionWithSolidHandler(World *world, unsigned int entityId) {
 	SpellComponent *spellComponent = &world->spell[entityId];
 	RectComponent *rectComponent = &world->rect[entityId];
+
+	deleteEntity(world, entityId);
 }
 
 void spellCollisionWithActorHandler(World *world, unsigned int entityId) {
@@ -66,6 +70,8 @@ void spellCollisionWithActorHandler(World *world, unsigned int entityId) {
 	character *target = getActorViaId((unsigned int)rectComponent->collidingWithEntityId);
 
 	target->hp -= 100;
+
+	deleteEntity(world, entityId);
 }
 
 void spellMovementHandler(World *world, unsigned int entityId) {
@@ -74,8 +80,25 @@ void spellMovementHandler(World *world, unsigned int entityId) {
 
 	light *lightPtr = getLightViaId(lightComponent->lightId);
 
+	if (!lightPtr) {
+		return;
+	}
+
 	lightPtr->x = rectComponent->x;
 	lightPtr->y = rectComponent->y;
+}
+
+void spellDeleteHandler(World *world, unsigned int entityId) {
+	LightComponent *lightComponent = &world->light[entityId];
+
+	light *lightPtr = getLightViaId(lightComponent->lightId);
+
+	if (lightComponent->lightId != - 1 && !lightPtr) {
+		return;
+	}
+
+	deleteDynamicLight(lightPtr);
+	lightComponent->lightId = -1;
 }
 
 void registerSpellSystem(World *world, unsigned int entityId) {
@@ -130,19 +153,6 @@ void _spellTargetCursorCallback(int x, int y) {
 
 	createBullet(UI_OWNER_ID, owner->x, owner->y, '*', direction, 3.1, TCOD_color_RGB(200, 200, 200), TCOD_color_RGB(20, 20, 20));
 
-	LightComponent *lightComponent = &UI_WORLD_PTR->light[UI_OWNER_ID];
-
-	light *lght = createDynamicLight(owner->x, owner->y, NULL);
-
-	lightComponent->lightId = lght->entityId;
-	lght->r_tint = 255;
-	lght->g_tint = 40;
-	lght->b_tint = 40;
-	lght->brightness = .9;
-	lght->size = 3;
-	lght->fuel = 20;
-	lght->fuelMax = 20;
-
 	spellComponent->castSpell[spellComponent->activeSpell](UI_WORLD_PTR, owner->entityId, owner->entityId);
 
 	UI_WORLD_PTR = NULL;
@@ -195,12 +205,12 @@ void fireball(World *world, unsigned int ownerId, unsigned int targetId) {
 	y = owner->y;
 	spellDelay = spellComponent->castDelay[spellComponent->activeSpell];
 
-	light *lght = createDynamicLight(x, y, owner);
+	/*light *lght = createDynamicLight(x, y, owner);
 	lght->r_tint = 200;
 	lght->g_tint = 40;
 	lght->b_tint = 40;
 	lght->fuel = spellDelay;
-	lght->fuelMax = spellDelay;
+	lght->fuelMax = spellDelay;*/
 
 	setStance(owner, IS_CASTING);
 	setFutureStanceToRemove(owner, IS_CASTING);

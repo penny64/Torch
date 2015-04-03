@@ -61,7 +61,7 @@ void tickSystemsWithMask(World *world, unsigned int mask) {
 }
 
 void tickSystemsWithMaskForEntity(World *world, unsigned int entityId, unsigned int mask) {
-	unsigned int systemId, eId;
+	unsigned int systemId;
 
 	for (systemId = 0; systemId < MAX_SYSTEMS; systemId ++) {
 		if (SYSTEMS->entityMask[systemId] != COMPONENT_NONE && SYSTEMS->entityMask[systemId] & mask) {
