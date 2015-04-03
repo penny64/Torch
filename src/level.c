@@ -801,7 +801,6 @@ void placeTunnels() {
 	room *srcRoom = NULL, *dstRoom = NULL, *tempDestRoom = NULL;
 	
 	ROOM_COUNT = ROOM_COUNT_MAX;
-	int maxHallSize = 1;
 	maxHallDistance = 16;
 	
 	while (1) {

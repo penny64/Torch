@@ -2,6 +2,7 @@
 
 #include "framework/actors.h"
 #include "framework/display.h"
+#include "framework/numbers.h"
 #include "framework/input.h"
 #include "spells.h"
 #include "systems.h"
@@ -16,11 +17,13 @@ void createCastingMenu(World*, unsigned int);
 void spellHandler(World*, unsigned int);
 void spellInputHandler(World*, unsigned int);
 void fireball(World*, unsigned int, unsigned int);
+void _spellTargetCursorCallback(int, int);
+void createTargetCursor(World*, unsigned int, void (*)(int, int));
 
-Spell SPELL_FIREBALL = {"Fireball", &fireball, SPELL_IS_FLAME, -1, DELAY_SHORT};
+Spell SPELL_FIREBALL = {"Fireball", &fireball, SPELL_IS_FLAME | SPELL_IS_AIMABLE, -1, DELAY_SHORT};
 
-unsigned int MENU_OWNER_ID;
-World *MENU_WORLD_PTR;
+int UI_OWNER_ID;
+World *UI_WORLD_PTR;
 
 
 void startSpells() {
@@ -31,12 +34,12 @@ void startSpells() {
 }
 
 void spellHandler(World *world, unsigned int entityId) {
-	SpellComponent *spellComponent = &world->spell[entityId];
+	//SpellComponent *spellComponent = &world->spell[entityId];
 
 }
 
 void spellInputHandler(World *world, unsigned int entityId) {
-	SpellComponent *spellComponent = &world->spell[entityId];
+	//SpellComponent *spellComponent = &world->spell[entityId];
 
 	if (isCharPressed('x')) {
 		castSpell(world, entityId);
@@ -83,22 +86,43 @@ void castSpell(World *world, unsigned int entityId) {
 		return;
 	}
 
-	printf("Casting\n");
-	spellComponent->castSpell[spellComponent->activeSpell](world, owner, target);
+	if (spellComponent->spellTraits[spellComponent->activeSpell] & SPELL_IS_AIMABLE) {
+		createTargetCursor(world, entityId, &_spellTargetCursorCallback);
+	} else {
+		spellComponent->castSpell[spellComponent->activeSpell](world, owner, target);
+	}
+}
+
+void _spellTargetCursorCallback(int x, int y) {
+	character *owner = getActorViaId(UI_OWNER_ID);
+
+	int direction = directionTo(owner->x, owner->y, x, y);
+
+	createParticle(owner->x, owner->y, '*', direction, 3.1, TCOD_color_RGB(200, 200, 200), TCOD_color_RGB(20, 20, 20));
+
+	UI_WORLD_PTR = NULL;
+	UI_OWNER_ID = -1;
 }
 
 void _castingMenuCallback(int menuItemIndex, char *menuItemString) {
-	character *entity = getActorViaId(MENU_OWNER_ID);
-	SpellComponent *spellComponent = &MENU_WORLD_PTR->spell[MENU_OWNER_ID];
+	SpellComponent *spellComponent = &UI_WORLD_PTR->spell[UI_OWNER_ID];
 
 	spellComponent->activeSpell = menuItemIndex;
 
-	MENU_WORLD_PTR = NULL;
-	MENU_OWNER_ID = NULL;
+	UI_WORLD_PTR = NULL;
+	UI_OWNER_ID = -1;
+}
+
+void createTargetCursor(World *world, unsigned int entityId, void (*callback)(int, int)) {
+	character *entity = getActorViaId(entityId);
+
+	UI_OWNER_ID = entityId;
+	UI_WORLD_PTR = world;
+
+	createCursor(entity->x, entity->y, entity->fov, callback);
 }
 
 void createCastingMenu(World *world, unsigned int entityId) {
-	character *entity = getActorViaId(entityId);
 	SpellComponent *spellComponent = &world->spell[entityId];
 	int i;
 	char *menuStrings[WINDOW_HEIGHT];
@@ -109,8 +133,8 @@ void createCastingMenu(World *world, unsigned int entityId) {
 
 	menuStrings[i] = NULL;
 
-	MENU_OWNER_ID = entityId;
-	MENU_WORLD_PTR = world;
+	UI_OWNER_ID = entityId;
+	UI_WORLD_PTR = world;
 
 	createMenu(menuStrings, &_castingMenuCallback);
 }
@@ -132,8 +156,6 @@ void fireball(World *world, unsigned int ownerId, unsigned int targetId) {
 	lght->b_tint = 40;
 	lght->fuel = spellDelay;
 	lght->fuelMax = spellDelay;
-
-	createParticle(x, y, 0, 1.2);
 
 	setStance(owner, IS_CASTING);
 	setFutureStanceToRemove(owner, IS_CASTING);

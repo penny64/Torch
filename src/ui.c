@@ -21,6 +21,14 @@ float DISPLAY_TEXT_TIME, DISPLAY_TEXT_TIME_MAX;
 int MENU_ITEM_COUNT, MENU_ITEM_INDEX, DISPLAY_TEXT_FADE = 0, FADE_DELAY = 0, SHOW_ABILITY_MENU = 1;
 void (*MENU_CALLBACK)(int, char*);
 
+typedef struct {
+	int x, y;
+	TCOD_map_t map;
+	void (*callback)(int, int);
+} Cursor;
+
+Cursor CURSOR = {0, 0, NULL};
+
 
 void setupUi() {
 	UI_CONSOLE = TCOD_console_new(WINDOW_WIDTH, WINDOW_HEIGHT);
@@ -154,8 +162,21 @@ void _drawMenu() {
 	TCOD_console_set_default_background(UI_CONSOLE, TCOD_color_RGB(0, 0, 0));
 }
 
-int isMenuOpen() {
-	return MENU_CALLBACK != NULL;
+void _drawCursor() {
+	int fadeValue = abs(getAnimateFrame() - 30) * 2;
+	TCOD_color_t cursorColor;
+
+	if (!CURSOR.map) {
+		return;
+	}
+
+	cursorColor = TCOD_color_RGB(120 + fadeValue, 120 + fadeValue, 120 + fadeValue);
+
+	drawChar(UI_CONSOLE, CURSOR.x, CURSOR.y, 'V', cursorColor, TCOD_color_RGB(1, 1, 1));
+}
+
+int isUiOpen() {
+	return MENU_CALLBACK != NULL || CURSOR.map;
 }
 
 void createMenu(char *menuItems[WINDOW_HEIGHT], void (*callback)(int, char*)) {
@@ -174,6 +195,13 @@ void createMenu(char *menuItems[WINDOW_HEIGHT], void (*callback)(int, char*)) {
 
 		MENU_ITEM_COUNT ++;
 	}
+}
+
+void createCursor(int x, int y, TCOD_map_t fov, void (*callback)(int, int)) {
+	CURSOR.x = x;
+	CURSOR.y = y;
+	CURSOR.map = fov;
+	CURSOR.callback = callback;
 }
 
 void showMessage(int timeInTurns, char *text, ...) {
@@ -212,26 +240,51 @@ void drawUi() {
 	_drawStance();
 	_drawMenu();
 	_drawMessage();
+	_drawCursor();
 }
 
 void uiInput() {
-	if (MENU_ITEM_INDEX) {
-		if (isTCODCharPressed(TCODK_UP)) {
-			MENU_ITEM_INDEX --;
-		}
-	}
+	int nx = 0, ny = 0;
 
-	if (MENU_ITEM_INDEX < MENU_ITEM_COUNT) {
+	if (MENU_CALLBACK) {
+		if (MENU_ITEM_INDEX) {
+			if (isTCODCharPressed(TCODK_UP)) {
+				MENU_ITEM_INDEX--;
+			}
+		}
+
+		if (MENU_ITEM_INDEX < MENU_ITEM_COUNT) {
+			if (isTCODCharPressed(TCODK_DOWN)) {
+				MENU_ITEM_INDEX++;
+			}
+		}
+
+		if (isTCODCharPressed(TCODK_ENTER)) {
+			MENU_CALLBACK(MENU_ITEM_INDEX, MENU_ITEMS[MENU_ITEM_INDEX]);
+
+			MENU_CALLBACK = NULL;
+			MENU_ITEMS[0] = NULL;
+		}
+	} else if (CURSOR.map) {
 		if (isTCODCharPressed(TCODK_DOWN)) {
-			MENU_ITEM_INDEX ++;
+			ny = 1;
+		} else if (isTCODCharPressed(TCODK_UP)) {
+			ny = -1;
+		} else if (isTCODCharPressed(TCODK_LEFT)) {
+			nx = -1;
+		} else if (isTCODCharPressed(TCODK_RIGHT)) {
+			nx = 1;
+		} else if (isTCODCharPressed(TCODK_ENTER)) {
+			CURSOR.callback(CURSOR.x, CURSOR.y);
+			CURSOR.map = NULL;
 		}
-	}
 
-	if (isTCODCharPressed(TCODK_ENTER)) {
-		MENU_CALLBACK(MENU_ITEM_INDEX, MENU_ITEMS[MENU_ITEM_INDEX]);
+		if ((nx || ny) && TCOD_map_is_walkable(CURSOR.map, CURSOR.x + nx, CURSOR.y + ny)) {
+			CURSOR.x += nx;
+			CURSOR.y += ny;
+		}
 
-		MENU_CALLBACK = NULL;
-		MENU_ITEMS[0] = NULL;
+
 	}
 }
 

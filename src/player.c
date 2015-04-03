@@ -84,7 +84,7 @@ void playerInputLogic() {
 		return;
 	}
 
-	if (isMenuOpen()) {
+	if (isUiOpen()) {
 		uiInput();
 
 		return;

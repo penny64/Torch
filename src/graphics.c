@@ -6,6 +6,7 @@
 #include "framework/actors.h"
 #include "framework/draw.h"
 #include "framework/numbers.h"
+#include "systems.h"
 #include "lights.h"
 #include "graphics.h"
 #include "player.h"
@@ -203,11 +204,13 @@ void composeScene() {
 	TCOD_console_t shadowConsole = getShadowConsole();
 	TCOD_console_t fogConsole = getFogConsole();
 	TCOD_console_t UiConsole = getUiConsole();
-	
+
+	drawActors();
 	drawDynamicLights();
 	applyFov();
 	drawUi();
 	drawItems();
+	tickSystemsWithMask(getWorld(), COMPONENT_DRAW);
 	
 	TCOD_console_blit(levelConsole, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, NULL, 0, 0, 1, 1);
 	//TCOD_console_blit(lightConsole, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, NULL, 0, 0, 0, .9f);

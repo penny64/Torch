@@ -105,8 +105,6 @@ int main() {
         }
 
 		graphicsLogic();
-		tickSystemsWithMask(getWorld(), COMPONENT_DRAW);
-		drawActors();
 		composeScene();
 		displayLogic();
 		actorCleanup();

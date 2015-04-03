@@ -22,6 +22,7 @@ typedef enum {
 	SPELL_NONE = 0,
 	SPELL_IS_FLAME = 1 << 0,
 	SPELL_IS_LIGHTNING = 1 << 1,
+	SPELL_IS_AIMABLE = 1 << 2,
 } SpellTraits;
 
 typedef struct {
@@ -35,6 +36,7 @@ typedef struct {
 	char chr;
 	int x, y;
 	float exactX, exactY, velocity[2];
+	TCOD_color_t foreColor, backColor;
 } RectComponent;
 
 #endif
