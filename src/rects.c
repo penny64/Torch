@@ -35,6 +35,7 @@ void registerRectSystem(World *world, unsigned int entityId, int x, int y, int c
 	rectComponent->foreColor = foreColor;
 	rectComponent->backColor = backColor;
 	rectComponent->ownerId = -1;
+	rectComponent->collidingWithEntityId = -1;
 
 	velocity(rectComponent->velocity, direction, speed);
 
@@ -63,8 +64,12 @@ void rectTickHandler(World *world, unsigned int entityId) {
 			tickSystemsWithMaskForEntity(world, entityId, COMPONENT_COLLISION_SOLID);
 
 		}else if (world->mask[entityId] & COMPONENT_COLLISION_ACTOR) {
-			if (isCollidingWithActor(rectComponent->x, rectComponent->y, rectComponent->ownerId) != -1){
+			rectComponent->collidingWithEntityId = isCollidingWithActor(rectComponent->x, rectComponent->y, rectComponent->ownerId);
+			
+			if (rectComponent->collidingWithEntityId != -1){
 				collisionType = COMPONENT_COLLISION_ACTOR;
+
+				tickSystemsWithMaskForEntity(world, entityId, COMPONENT_COLLISION_ACTOR);
 			}
 		}
 
@@ -105,30 +110,10 @@ void rectTickHandler(World *world, unsigned int entityId) {
 
 		vx -= tvx;
 		vy -= tvy;
-
-		//TODO: Check against owner
-		/*while (actorPtr != NULL) {
-			if (actorPtr == actor || ptr->hp <= 0) {
-				ptr = ptr->next;
-
-				continue;
-			}
-
-			if (ptr->x == nx && ptr->y == ny) {
-				hitActor = 1;
-
-				break;
-			}
-
-			ptr = ptr->next;
-		}*/
 	}
 
-	//rectComponent->exactX += rectComponent->velocity[0];
-	//rectComponent->exactY += rectComponent->velocity[1];
-
-	rectComponent->x = (int)(rectComponent->exactX + .5);
-	rectComponent->y = (int)(rectComponent->exactY + .5);
+	//rectComponent->x = (int)(rectComponent->exactX + .5);
+	//rectComponent->y = (int)(rectComponent->exactY + .5);
 }
 
 void rectDrawHandler(World *world, unsigned int entityId) {

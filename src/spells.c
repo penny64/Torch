@@ -17,6 +17,7 @@ void createCastingMenu(World*, unsigned int);
 void spellHandler(World*, unsigned int);
 void spellInputHandler(World*, unsigned int);
 void spellCollisionWithSolidHandler(World*, unsigned int);
+void spellCollisionWithActorHandler(World*, unsigned int);
 void spellMovementHandler(World*, unsigned int);
 void fireball(World*, unsigned int, unsigned int);
 void _spellTargetCursorCallback(int, int);
@@ -34,6 +35,7 @@ void startSpells() {
 	createSystemHandler(world, COMPONENT_SPELL, &spellHandler);
 	createSystemHandler(world, COMPONENT_INPUT, &spellInputHandler);
 	createSystemHandler(world, COMPONENT_SPELL_BULLET | COMPONENT_COLLISION_SOLID, &spellCollisionWithSolidHandler);
+	createSystemHandler(world, COMPONENT_SPELL_BULLET | COMPONENT_COLLISION_ACTOR, &spellCollisionWithActorHandler);
 	createSystemHandler(world, COMPONENT_MOVED | COMPONENT_SPELL_BULLET, &spellMovementHandler);
 }
 
@@ -55,6 +57,15 @@ void spellInputHandler(World *world, unsigned int entityId) {
 void spellCollisionWithSolidHandler(World *world, unsigned int entityId) {
 	SpellComponent *spellComponent = &world->spell[entityId];
 	RectComponent *rectComponent = &world->rect[entityId];
+}
+
+void spellCollisionWithActorHandler(World *world, unsigned int entityId) {
+	SpellComponent *spellComponent = &world->spell[entityId];
+	RectComponent *rectComponent = &world->rect[entityId];
+
+	character *target = getActorViaId((unsigned int)rectComponent->collidingWithEntityId);
+
+	target->hp -= 100;
 }
 
 void spellMovementHandler(World *world, unsigned int entityId) {

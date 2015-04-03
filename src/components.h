@@ -39,7 +39,7 @@ typedef struct {
 
 typedef struct {
 	char chr;
-	int x, y, ownerId;
+	int x, y, ownerId, collidingWithEntityId;
 	double exactX, exactY, velocity[2];
 	TCOD_color_t foreColor, backColor;
 } RectComponent;
