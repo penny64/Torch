@@ -30,7 +30,7 @@ float clipFloat(float f, float min, float max) {
 }
 
 int directionTo(int x1, int y1, int x2, int y2) {
-	double theta = atan2((y1 - y2), -(x1 - x2));
+	double theta = atan2((y2 - y1), -(x1 - x2));
 
 	if (theta < 0) {
 		theta += 2 * M_PI;
