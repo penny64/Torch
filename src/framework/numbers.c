@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <math.h>
+#include <stdio.h>
 
 #include "numbers.h"
 
@@ -39,9 +40,9 @@ int directionTo(int x1, int y1, int x2, int y2) {
 	return (int)((theta * (180 / M_PI)) + .5);
 }
 
-void velocity(float velocityArray[2], int direction, float speed) {
+void velocity(double velocityArray[2], int direction, float speed) {
 	double rad = (double)direction * (M_PI / 180);
 
-	velocityArray[0] = (float)(cos(rad) * (double)speed);
-	velocityArray[1] = (float)(sin(rad) * (double)speed);
+	velocityArray[0] = (cos(rad) * (double)speed);
+	velocityArray[1] = (sin(rad) * (double)speed);
 }

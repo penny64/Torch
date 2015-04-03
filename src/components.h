@@ -35,7 +35,7 @@ typedef struct {
 typedef struct {
 	char chr;
 	int x, y;
-	float exactX, exactY, velocity[2];
+	double exactX, exactY, velocity[2];
 	TCOD_color_t foreColor, backColor;
 } RectComponent;
 
