@@ -205,12 +205,12 @@ void fireball(World *world, unsigned int ownerId, unsigned int targetId) {
 	y = owner->y;
 	spellDelay = spellComponent->castDelay[spellComponent->activeSpell];
 
-	/*light *lght = createDynamicLight(x, y, owner);
+	light *lght = createDynamicLight(x, y, owner);
 	lght->r_tint = 200;
 	lght->g_tint = 40;
 	lght->b_tint = 40;
 	lght->fuel = spellDelay;
-	lght->fuelMax = spellDelay;*/
+	lght->fuelMax = spellDelay;
 
 	setStance(owner, IS_CASTING);
 	setFutureStanceToRemove(owner, IS_CASTING);

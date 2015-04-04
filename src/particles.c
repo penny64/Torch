@@ -30,9 +30,9 @@ void createBullet(unsigned int ownerId, int x, int y, int chr, int direction, fl
 	light *lght = createDynamicLight(x, y, NULL);
 
 	lightComponent->lightId = lght->entityId;
-	lght->r_tint = 255;
-	lght->g_tint = 40;
-	lght->b_tint = 40;
+	lght->r_tint = foreColor.r;
+	lght->g_tint = foreColor.g;
+	lght->b_tint = foreColor.b;
 	lght->brightness = .9;
 	lght->size = 3;
 	lght->fuel = 20;
