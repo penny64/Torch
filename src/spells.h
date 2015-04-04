@@ -9,7 +9,9 @@ enum {
 
 typedef struct {
 	char *name;
-	void (*castSpell)(World*, unsigned int, unsigned int);
+	void (*castSpell)(World*, unsigned int);
+	void (*tickSpell)(World*, unsigned int);
+	void (*exitSpell)(World*, unsigned int);
 	unsigned int spellMask;
 	int parentItem;
 	int castDelay;

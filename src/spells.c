@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <assert.h>
 
 #include "framework/actors.h"
 #include "framework/display.h"
@@ -15,16 +16,21 @@
 
 void createCastingMenu(World*, unsigned int);
 void spellHandler(World*, unsigned int);
+void spellTickHandler(World*, unsigned int);
 void spellInputHandler(World*, unsigned int);
 void spellCollisionWithSolidHandler(World*, unsigned int);
 void spellCollisionWithActorHandler(World*, unsigned int);
 void spellDeleteHandler(World*, unsigned int);
 void spellMovementHandler(World*, unsigned int);
-void fireball(World*, unsigned int, unsigned int);
+void spellAddStanceHandler(World*, unsigned int);
+void spellRemoveStanceHandler(World*, unsigned int);
+void fireball(World*, unsigned int);
+void fireballTick(World*, unsigned int);
+void fireballExit(World*, unsigned int);
 void _spellTargetCursorCallback(int, int);
 void createTargetCursor(World*, unsigned int, void (*)(int, int));
 
-Spell SPELL_FIREBALL = {"Fireball", &fireball, SPELL_IS_FLAME | SPELL_IS_AIMABLE, -1, DELAY_SHORT};
+Spell SPELL_FIREBALL = {"Fireball", &fireball, &fireballTick, &fireballExit, SPELL_IS_FLAME | SPELL_IS_AIMABLE | SPELL_CAST_ON_EXIT, -1, DELAY_SHORT};
 
 int UI_OWNER_ID;
 World *UI_WORLD_PTR;
@@ -33,16 +39,51 @@ World *UI_WORLD_PTR;
 void startSpells() {
 	World *world = getWorld();
 
-	createSystemHandler(world, COMPONENT_SPELL, &spellHandler);
-	createSystemHandler(world, COMPONENT_INPUT, &spellInputHandler);
-	createSystemHandler(world, COMPONENT_SPELL_BULLET | COMPONENT_COLLISION_SOLID, &spellCollisionWithSolidHandler);
-	createSystemHandler(world, COMPONENT_SPELL_BULLET | COMPONENT_COLLISION_ACTOR, &spellCollisionWithActorHandler);
-	createSystemHandler(world, COMPONENT_SPELL_BULLET | COMPONENT_MOVED, &spellMovementHandler);
-	createSystemHandler(world, COMPONENT_SPELL_BULLET | COMPONENT_DELETED, &spellDeleteHandler);
+	//createSystemHandler(world, COMPONENT_SPELL, 0x0, &spellHandler);
+	createSystemHandler(world, EVENT_INPUT, COMPONENT_SPELL | COMPONENT_PLAYER, &spellInputHandler);
+	createSystemHandler(world, EVENT_COLLISION_SOLID, COMPONENT_SPELL_BULLET, &spellCollisionWithSolidHandler);
+	createSystemHandler(world, EVENT_COLLISION_ACTOR, COMPONENT_SPELL_BULLET, &spellCollisionWithActorHandler);
+	createSystemHandler(world, EVENT_MOVED, COMPONENT_SPELL_BULLET, &spellMovementHandler);
+	createSystemHandler(world, EVENT_DELETED, COMPONENT_SPELL_BULLET, &spellDeleteHandler);
+	createSystemHandler(world, EVENT_ADD_STANCE, COMPONENT_SPELL, &spellAddStanceHandler);
+	createSystemHandler(world, EVENT_TICK, COMPONENT_SPELL, &spellTickHandler);
+	createSystemHandler(world, EVENT_REMOVE_STANCE, COMPONENT_SPELL, &spellRemoveStanceHandler);
+}
+
+void registerSpellSystem(World *world, unsigned int entityId) {
+	world->mask[entityId] |= COMPONENT_SPELL;
+
+	SpellComponent *spellComponent = &world->spell[entityId];
+	spellComponent->activeSpell = -1;
+
+	printf("Added entity ID=%i to system `spells`.\n", entityId);
+}
+
+void addSpell(World *world, unsigned int entityId, Spell spell) {
+	SpellComponent *spellComponent = &world->spell[entityId];
+
+	spellComponent->name[spellComponent->spellCount] = spell.name;
+	spellComponent->castSpell[spellComponent->spellCount] = spell.castSpell;
+	spellComponent->tickSpell[spellComponent->spellCount] = spell.tickSpell;
+	spellComponent->exitSpell[spellComponent->spellCount] = spell.exitSpell;
+	spellComponent->spellTraits[spellComponent->spellCount] = spell.spellMask;
+	spellComponent->castDelay[spellComponent->spellCount] = spell.castDelay;
+
+	spellComponent->spellCount ++;
 }
 
 void spellHandler(World *world, unsigned int entityId) {
 	//SpellComponent *spellComponent = &world->spell[entityId];
+
+}
+
+void spellTickHandler(World *world, unsigned int entityId) {
+	character *owner = getActorViaId(entityId);
+	SpellComponent *spellComponent = &world->spell[entityId];
+
+	if (owner->stanceFlags & IS_CASTING && spellComponent->tickSpell[spellComponent->activeSpell] != NULL) {
+		spellComponent->tickSpell[spellComponent->activeSpell](world, entityId);
+	}
 
 }
 
@@ -101,29 +142,22 @@ void spellDeleteHandler(World *world, unsigned int entityId) {
 	lightComponent->lightId = -1;
 }
 
-void registerSpellSystem(World *world, unsigned int entityId) {
-	world->mask[entityId] |= COMPONENT_SPELL | COMPONENT_INPUT;
+void spellAddStanceHandler(World *world, unsigned int entityId) {
 
-	printf("Added entity ID=%i to system `spells`.\n", entityId);
 }
 
-void addSpell(World *world, unsigned int entityId, Spell spell) {
+void spellRemoveStanceHandler(World *world, unsigned int entityId) {
+	character *owner = getActorViaId(entityId);
 	SpellComponent *spellComponent = &world->spell[entityId];
 
-	spellComponent->name[spellComponent->spellCount] = spell.name;
-	spellComponent->castSpell[spellComponent->spellCount] = spell.castSpell;
-	spellComponent->spellTraits[spellComponent->spellCount] = spell.spellMask;
-	spellComponent->castDelay[spellComponent->spellCount] = spell.castDelay;
-	spellComponent->activeSpell = -1;
-
-	spellComponent->spellCount ++;
+	if (owner->nextStanceFlagsToRemove & IS_CASTING) {
+		spellComponent->exitSpell[spellComponent->activeSpell](world, entityId);
+	}
 }
-
 
 void castSpell(World *world, unsigned int entityId) {
 	SpellComponent *spellComponent = &world->spell[entityId];
 	unsigned int owner = entityId;
-	unsigned int target = entityId;
 
 	if (!spellComponent->spellCount) {
 		showMessage(10, "No spells known.", NULL);
@@ -142,18 +176,17 @@ void castSpell(World *world, unsigned int entityId) {
 	if (spellComponent->spellTraits[spellComponent->activeSpell] & SPELL_IS_AIMABLE) {
 		createTargetCursor(world, entityId, &_spellTargetCursorCallback);
 	} else {
-		spellComponent->castSpell[spellComponent->activeSpell](world, owner, target);
+		spellComponent->castSpell[spellComponent->activeSpell](world, owner);
 	}
 }
 
 void _spellTargetCursorCallback(int x, int y) {
 	character *owner = getActorViaId((unsigned int)UI_OWNER_ID);
 	SpellComponent *spellComponent = &UI_WORLD_PTR->spell[UI_OWNER_ID];
-	int direction = directionTo(owner->x, owner->y, x, y);
 
-	createBullet(UI_OWNER_ID, owner->x, owner->y, '*', direction, 3.1, TCOD_color_RGB(200, 200, 200), TCOD_color_RGB(20, 20, 20));
-
-	spellComponent->castSpell[spellComponent->activeSpell](UI_WORLD_PTR, owner->entityId, owner->entityId);
+	spellComponent->targetX = x;
+	spellComponent->targetY = y;
+	spellComponent->castSpell[spellComponent->activeSpell](UI_WORLD_PTR, owner->entityId);
 
 	UI_WORLD_PTR = NULL;
 	UI_OWNER_ID = -1;
@@ -196,7 +229,7 @@ void createCastingMenu(World *world, unsigned int entityId) {
 
 //Spells
 
-void fireball(World *world, unsigned int ownerId, unsigned int targetId) {
+void fireball(World *world, unsigned int ownerId) {
 	character *owner = getActorViaId(ownerId);
 	SpellComponent *spellComponent = &world->spell[ownerId];
 	int x, y, spellDelay;
@@ -214,5 +247,26 @@ void fireball(World *world, unsigned int ownerId, unsigned int targetId) {
 
 	setStance(owner, IS_CASTING);
 	setFutureStanceToRemove(owner, IS_CASTING);
+	setDelay(owner, spellDelay);
+}
+
+void fireballTick(World *world, unsigned int ownerId) {
+	character *owner = getActorViaId(ownerId);
+	SpellComponent *spellComponent = &world->spell[ownerId];
+
+	printf("Ticking fireball\n");
+}
+
+void fireballExit(World *world, unsigned int ownerId) {
+	character *owner = getActorViaId(ownerId);
+	SpellComponent *spellComponent = &world->spell[ownerId];
+
+	int spellDelay = 2;
+	int direction = directionTo(owner->x, owner->y, spellComponent->targetX, spellComponent->targetY);
+
+	createBullet(ownerId, owner->x, owner->y, '*', direction, 3.1, TCOD_color_RGB(200, 200, 200), TCOD_color_RGB(20, 20, 20));
+
+	setStance(owner, IS_RECOVERING);
+	setFutureStanceToRemove(owner, IS_RECOVERING);
 	setDelay(owner, spellDelay);
 }

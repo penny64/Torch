@@ -18,12 +18,12 @@ int isCollidingWithActor(int, int, unsigned int);
 void startRects() {
 	World *world = getWorld();
 
-	createSystemHandler(world, COMPONENT_TICK, &rectTickHandler);
-	createSystemHandler(world, COMPONENT_DRAW, &rectDrawHandler);
+	createSystemHandler(world, EVENT_TICK, COMPONENT_RECT, &rectTickHandler);
+	createSystemHandler(world, EVENT_DRAW, COMPONENT_RECT, &rectDrawHandler);
 }
 
 void registerRectSystem(World *world, unsigned int entityId, int x, int y, int chr, int direction, float speed, TCOD_color_t foreColor, TCOD_color_t backColor) {
-	world->mask[entityId] |= COMPONENT_RECT | COMPONENT_TICK | COMPONENT_DRAW;
+	world->mask[entityId] |= COMPONENT_RECT;
 
 	RectComponent *rectComponent = &world->rect[entityId];
 
@@ -43,7 +43,7 @@ void registerRectSystem(World *world, unsigned int entityId, int x, int y, int c
 }
 
 void registerRectCollisionSystem(World *world, unsigned int entityId) {
-	world->mask[entityId] |= COMPONENT_COLLISION_SOLID | COMPONENT_COLLISION_ACTOR;
+	world->mask[entityId] |= COMPONENT_COLLIDABLE_SOLID | COMPONENT_COLLIDABLE_ACTOR;
 
 	printf("Added entity ID=%i to system `rects-collisions`.\n", entityId);
 }
@@ -58,18 +58,18 @@ void rectTickHandler(World *world, unsigned int entityId) {
 	vy =  rectComponent->velocity[1];
 
 	while (vx || vy) {
-		if ((world->mask[entityId] & COMPONENT_COLLISION_SOLID) && isCollidingWithSolid(rectComponent->x, rectComponent->y)) {
-			collisionType = COMPONENT_COLLISION_SOLID;
+		if ((world->mask[entityId] & COMPONENT_COLLIDABLE_SOLID) && isCollidingWithSolid(rectComponent->x, rectComponent->y)) {
+			collisionType = EVENT_COLLISION_SOLID;
 
-			tickSystemsWithMaskForEntity(world, entityId, COMPONENT_COLLISION_SOLID);
+			tickSystemsWithMaskForEntity(world, entityId, EVENT_COLLISION_SOLID);
 
-		} else if (world->mask[entityId] & COMPONENT_COLLISION_ACTOR) {
+		} else if (world->mask[entityId] & COMPONENT_COLLIDABLE_ACTOR) {
 			rectComponent->collidingWithEntityId = isCollidingWithActor(rectComponent->x, rectComponent->y, rectComponent->ownerId);
 
 			if (rectComponent->collidingWithEntityId != -1){
-				collisionType = COMPONENT_COLLISION_ACTOR;
+				collisionType = EVENT_COLLISION_ACTOR;
 
-				tickSystemsWithMaskForEntity(world, entityId, COMPONENT_COLLISION_ACTOR);
+				tickSystemsWithMaskForEntity(world, entityId, EVENT_COLLISION_ACTOR);
 			}
 		}
 
@@ -106,7 +106,7 @@ void rectTickHandler(World *world, unsigned int entityId) {
 		rectComponent->x = x;
 		rectComponent->y = y;
 
-		tickSystemsWithMaskForEntity(world, entityId, COMPONENT_MOVED);
+		tickSystemsWithMaskForEntity(world, entityId, EVENT_MOVED);
 
 		vx -= tvx;
 		vy -= tvy;

@@ -13,11 +13,12 @@ void startSystems() {
 	SYSTEMS = calloc(sizeof(System), 1);
 }
 
-unsigned int createSystemHandler(World *world, unsigned int entityMask, void (*callback)(World*, unsigned int)) {
+unsigned int createSystemHandler(World *world, unsigned int eventMask, unsigned int entityMask, void (*callback)(World*, unsigned int)) {
 	unsigned int systemId;
 
 	for (systemId = 0; systemId < MAX_SYSTEMS; systemId ++) {
 		if (SYSTEMS->entityMask[systemId] == COMPONENT_NONE) {
+			SYSTEMS->eventMask[systemId] = eventMask;
 			SYSTEMS->entityMask[systemId] = entityMask;
 			SYSTEMS->callback[systemId] = callback;
 
@@ -36,9 +37,9 @@ void tickSystems(World *world) {
 	unsigned int systemId, entityId;
 
 	for (systemId = 0; systemId < MAX_SYSTEMS; systemId ++) {
-		if (SYSTEMS->entityMask[systemId] != COMPONENT_NONE) {
+		if (SYSTEMS->eventMask[systemId] != EVENT_NONE) {
 			for (entityId = 0; entityId < MAX_ENTITIES; entityId ++) {
-				if (world->mask[entityId] & SYSTEMS->entityMask[systemId]) {
+				if ((world->mask[entityId] & SYSTEMS->entityMask[systemId]) == SYSTEMS->entityMask[systemId]) {
 					SYSTEMS->callback[systemId](world, entityId);
 				}
 			}
@@ -50,9 +51,9 @@ void tickSystemsWithMask(World *world, unsigned int mask) {
 	unsigned int systemId, entityId;
 
 	for (systemId = 0; systemId < MAX_SYSTEMS; systemId ++) {
-		if (SYSTEMS->entityMask[systemId] != COMPONENT_NONE && SYSTEMS->entityMask[systemId] & mask) {
+		if (SYSTEMS->eventMask[systemId] != EVENT_NONE && SYSTEMS->eventMask[systemId] & mask) {
 			for (entityId = 0; entityId < MAX_ENTITIES; entityId ++) {
-				if (world->mask[entityId] & SYSTEMS->entityMask[systemId]) {
+				if ((world->mask[entityId] & SYSTEMS->entityMask[systemId]) == SYSTEMS->entityMask[systemId]) {
 					SYSTEMS->callback[systemId](world, entityId);
 				}
 			}
@@ -64,8 +65,8 @@ void tickSystemsWithMaskForEntity(World *world, unsigned int entityId, unsigned 
 	unsigned int systemId;
 
 	for (systemId = 0; systemId < MAX_SYSTEMS; systemId ++) {
-		if (SYSTEMS->entityMask[systemId] != COMPONENT_NONE && SYSTEMS->entityMask[systemId] & mask) {
-			if (world->mask[entityId] & SYSTEMS->entityMask[systemId]) {
+		if (SYSTEMS->eventMask[systemId] != EVENT_NONE && SYSTEMS->eventMask[systemId] & mask) {
+			if ((world->mask[entityId] & SYSTEMS->entityMask[systemId]) == SYSTEMS->entityMask[systemId]) {
 				SYSTEMS->callback[systemId](world, entityId);
 			}
 		}

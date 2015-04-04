@@ -895,8 +895,8 @@ void placeTunnels() {
 			}
 		}
 
-		for (y = 2; y < WINDOW_HEIGHT - 1; y++) {
-			for (x = 2; x < WINDOW_WIDTH - 1; x++) {
+		for (y = 2; y < WINDOW_HEIGHT - 2; y++) {
+			for (x = 2; x < WINDOW_WIDTH - 2; x++) {
 				invalid = 0;
 				neighborCollision = 0;
 				

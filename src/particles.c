@@ -1,3 +1,5 @@
+#include <stdio.h>
+
 #include "libtcod.h"
 #include "entities.h"
 #include "particles.h"
@@ -20,7 +22,7 @@ void createBullet(unsigned int ownerId, int x, int y, int chr, int direction, fl
 	registerRectSystem(world, entityId, x, y, chr, direction, speed, foreColor, backColor);
 	registerRectCollisionSystem(world, entityId);
 
-	world->mask[entityId] |= COMPONENT_SPELL_BULLET | COMPONENT_LIGHT | COMPONENT_DELETED;
+	world->mask[entityId] |= COMPONENT_SPELL_BULLET | COMPONENT_LIGHT;
 
 	RectComponent *rectComponent = &world->rect[entityId];
 	rectComponent->ownerId = ownerId;

@@ -33,7 +33,9 @@ unsigned int createEntity(World *world) {
 }
 
 void deleteEntity(World *world, unsigned int entityId) {
-	tickSystemsWithMaskForEntity(world, entityId, COMPONENT_DELETED);
+	tickSystemsWithMaskForEntity(world, entityId, EVENT_DELETED);
+
+	printf("Deleted entity ID=%i\n", entityId);
 
 	world->mask[entityId] = COMPONENT_NONE;
 }

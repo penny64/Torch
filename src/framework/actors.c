@@ -16,6 +16,8 @@
 #include "draw.h"
 #include "../enemies.h"
 #include "../entities.h"
+#include "../systems.h"
+#include "../components.h"
 
 
 TCOD_console_t ACTOR_CONSOLE;
@@ -166,6 +168,8 @@ character *getActorViaId(unsigned int entityId) {
 	}
 
 	printf("*FATAL* Could not find entity ID=%i\n", entityId);
+
+	assert(ptr != NULL);
 
 	return NULL;
 }
@@ -520,12 +524,17 @@ void _actorLogic(character *actor) {
 	actor->delay = 0;
 
 	if (actor->nextStanceFlagsToAdd) {
+		tickSystemsWithMaskForEntity(getWorld(), actor->entityId, EVENT_ADD_STANCE);
+
 		actor->stanceFlags |= actor->nextStanceFlagsToAdd;
-		
 		actor->nextStanceFlagsToAdd = 0x0;
 	}
 
 	if (actor->nextStanceFlagsToRemove) {
+		tickSystemsWithMaskForEntity(getWorld(), actor->entityId, EVENT_REMOVE_STANCE);
+
+		printf("Removing!\n");
+
 		actor->stanceFlags ^= actor->nextStanceFlagsToRemove;
 		
 		if (actor->nextStanceFlagsToRemove & IS_STUNNED) {

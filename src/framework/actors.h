@@ -37,6 +37,7 @@ enum {
 	IS_STUCK_WITH_LODGED_WEAPON = 0x01 << 8,
 	IS_MOVING = 0x01 << 9,
 	IS_CASTING = 0x01 << 10,
+	IS_RECOVERING = 0x01 << 11,
 } stanceFlags_t;
 
 typedef struct character character;

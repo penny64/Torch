@@ -33,6 +33,8 @@ void createPlayer() {
 
 	registerSpellSystem(getWorld(), PLAYER_ACTOR->entityId);
 	addSpell(getWorld(), PLAYER_ACTOR->entityId, SPELL_FIREBALL);
+
+	getWorld()->mask[PLAYER_ACTOR->entityId] |= COMPONENT_PLAYER;
 	
 	printf("Created player.\n");
 }

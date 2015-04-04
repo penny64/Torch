@@ -114,6 +114,8 @@ void _drawStance() {
 
 	if (player->stanceFlags & IS_CASTING) {
 		stanceText = "Casting";
+	} else if (player->stanceFlags & IS_RECOVERING) {
+		stanceText = "Recovering";
 	} else if (weapon) {
 		if (weapon->itemFlags & IS_SWORD) {
 			if (player->stanceFlags & IS_MOVING) {

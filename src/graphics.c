@@ -210,7 +210,7 @@ void composeScene() {
 	applyFov();
 	drawUi();
 	drawItems();
-	tickSystemsWithMask(getWorld(), COMPONENT_DRAW);
+	tickSystemsWithMask(getWorld(), EVENT_DRAW);
 	
 	TCOD_console_blit(levelConsole, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, NULL, 0, 0, 1, 1);
 	//TCOD_console_blit(lightConsole, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, NULL, 0, 0, 0, .9f);
