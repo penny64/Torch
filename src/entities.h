@@ -13,6 +13,7 @@ struct World {
 	SpellComponent spell[MAX_ENTITIES];
 	RectComponent rect[MAX_ENTITIES];
 	LightComponent light[MAX_ENTITIES];
+	ParticleComponent particle[MAX_ENTITIES];
 };
 
 #endif

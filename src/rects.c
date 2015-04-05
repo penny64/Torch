@@ -36,6 +36,7 @@ void registerRectSystem(World *world, unsigned int entityId, int x, int y, int c
 	rectComponent->backColor = backColor;
 	rectComponent->ownerId = -1;
 	rectComponent->collidingWithEntityId = -1;
+	rectComponent->backgroundFlag = TCOD_BKGND_ALPHA(.1);
 
 	velocity(rectComponent->velocity, direction, speed);
 
@@ -119,7 +120,7 @@ void rectTickHandler(World *world, unsigned int entityId) {
 void rectDrawHandler(World *world, unsigned int entityId) {
 	RectComponent *rectComponent = &world->rect[entityId];
 
-	drawChar(getUiConsole(), rectComponent->x, rectComponent->y, rectComponent->chr, rectComponent->foreColor, rectComponent->backColor);
+	drawCharEx(getUiConsole(), rectComponent->x, rectComponent->y, rectComponent->chr, rectComponent->foreColor, rectComponent->backColor, rectComponent->backgroundFlag);
 }
 
 int isCollidingWithSolid(int x, int y) {

@@ -9,6 +9,7 @@
 #include "spells.h"
 #include "rects.h"
 #include "graphics.h"
+#include "particles.h"
 #include "lights.h"
 #include "player.h"
 #include "level.h"
@@ -38,6 +39,7 @@ void setup() {
 	startSystems();
 	startSpells();
 	startRects();
+	startParticles();
 
 	//Attract screen
 	generateLevel();

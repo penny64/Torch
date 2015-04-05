@@ -202,7 +202,7 @@ void composeScene() {
 	TCOD_console_t itemConsole = getItemConsole();
 	TCOD_console_t seenConsole = getSeenConsole();
 	TCOD_console_t shadowConsole = getShadowConsole();
-	TCOD_console_t fogConsole = getFogConsole();
+	//TCOD_console_t fogConsole = getFogConsole();
 	TCOD_console_t UiConsole = getUiConsole();
 
 	drawActors();
@@ -217,7 +217,7 @@ void composeScene() {
 	TCOD_console_blit(dynamicLightConsole, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, NULL, 0, 0, 0, .7f);
 	TCOD_console_blit(itemConsole, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, NULL, 0, 0, 1, 0);
 	TCOD_console_blit(actorConsole, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, NULL, 0, 0, 1, 0);
-	TCOD_console_blit(fogConsole, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, NULL, 0, 0, 1, 0.3f);
+	//TCOD_console_blit(fogConsole, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, NULL, 0, 0, 1, 0.3f);
 	TCOD_console_blit(seenConsole, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, NULL, 0, 0, 1, 1);
 	TCOD_console_blit(shadowConsole, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, NULL, 0, 0, 1, 0.55f);
 	TCOD_console_blit(UiConsole, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, NULL, 0, 0, 1, 1);

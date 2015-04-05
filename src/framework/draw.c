@@ -20,6 +20,12 @@ void drawChar(TCOD_console_t console, int x, int y, int chr, TCOD_color_t foreCo
 	TCOD_console_put_char_ex(console, x, y, chr, foreColor, backColor);
 }
 
+void drawCharEx(TCOD_console_t console, int x, int y, int chr, TCOD_color_t foreColor, TCOD_color_t backColor, TCOD_bkgnd_flag_t flag) {
+	TCOD_console_set_char_foreground(console, x, y, foreColor);
+	TCOD_console_set_char_background(console, x, y, backColor, flag);
+	TCOD_console_set_char(console, x, y, chr);
+}
+
 void drawCharBack(TCOD_console_t console, int x, int y, TCOD_color_t color) {
 	TCOD_console_set_char_background(console, x, y, color, TCOD_BKGND_SET);
 }

@@ -127,6 +127,8 @@ void spellMovementHandler(World *world, unsigned int entityId) {
 
 	lightPtr->x = rectComponent->x;
 	lightPtr->y = rectComponent->y;
+
+	createParticle(rectComponent->x, rectComponent->y, 129, 0, 0, 1.f, .85, TCOD_color_RGB(128, 0, 0), TCOD_color_RGB(228, 0, 0));
 }
 
 void spellDeleteHandler(World *world, unsigned int entityId) {
@@ -253,8 +255,6 @@ void fireball(World *world, unsigned int ownerId) {
 void fireballTick(World *world, unsigned int ownerId) {
 	character *owner = getActorViaId(ownerId);
 	SpellComponent *spellComponent = &world->spell[ownerId];
-
-	printf("Ticking fireball\n");
 }
 
 void fireballExit(World *world, unsigned int ownerId) {

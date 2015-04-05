@@ -18,6 +18,7 @@ typedef enum {
 	COMPONENT_COLLIDABLE_SOLID = 1 << 5,
 	COMPONENT_COLLIDABLE_ACTOR = 1 << 6,
 	COMPONENT_PLAYER = 1 << 7,
+	COMPONENT_PARTICLE = 1 << 8,
 } Component;
 
 typedef enum {
@@ -57,10 +58,16 @@ typedef struct {
 	int x, y, ownerId, collidingWithEntityId;
 	double exactX, exactY, velocity[2];
 	TCOD_color_t foreColor, backColor;
+	TCOD_bkgnd_flag_t backgroundFlag;
 } RectComponent;
 
 typedef struct {
 	unsigned int lightId;
 } LightComponent;
+
+typedef struct {
+	float alpha, fadeRate;
+	TCOD_color_t foreColor, backColor;
+} ParticleComponent;
 
 #endif
