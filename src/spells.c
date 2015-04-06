@@ -10,6 +10,8 @@
 #include "particles.h"
 #include "entities.h"
 #include "components.h"
+#include "effects.h"
+#include "level.h"
 #include "lights.h"
 #include "ui.h"
 
@@ -289,8 +291,25 @@ void fireballHitSolid(World *world, unsigned int entityId) {
 }
 
 void fireballHitActor(World *world, unsigned int entityId) {
+	int x1, y1;
+	float fx, fy, distance, distanceMod;
 	RectComponent *rectComponent = &world->rect[entityId];
 
 	character *target = getActorViaId((unsigned int) rectComponent->collidingWithEntityId);
 	target->hp -= 100;
+
+	fx = target->x;
+	fy = target->y;
+	float size = get
+
+	for (y1 = -5; y1 < 5; y1 ++) {
+		for (x1 = -5; x1 < 5; x1 ++) {
+			distanceMod = 1 - (distanceFloat(fx, fy, fx + x1, fy + y1) / 6.f);
+			if (distanceMod <= .25 || getRandomFloat(0, 1) > distanceMod) {
+				continue;
+			}
+
+			bloodSplatter(fx + x1, fy + y1, distanceMod);
+		}
+	}
 }
