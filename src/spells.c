@@ -300,11 +300,11 @@ void fireballHitActor(World *world, unsigned int entityId) {
 
 	fx = target->x;
 	fy = target->y;
-	float size = get
+	float size = getRandomInt(2, 3);
 
-	for (y1 = -5; y1 < 5; y1 ++) {
-		for (x1 = -5; x1 < 5; x1 ++) {
-			distanceMod = 1 - (distanceFloat(fx, fy, fx + x1, fy + y1) / 6.f);
+	for (y1 = -size; y1 < size; y1 ++) {
+		for (x1 = -size; x1 < size; x1 ++) {
+			distanceMod = 1 - (distanceFloat(fx, fy, fx + x1, fy + y1) / (float)(size + 1));
 			if (distanceMod <= .25 || getRandomFloat(0, 1) > distanceMod) {
 				continue;
 			}
