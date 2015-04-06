@@ -27,10 +27,12 @@ void spellRemoveStanceHandler(World*, unsigned int);
 void fireball(World*, unsigned int);
 void fireballTick(World*, unsigned int);
 void fireballExit(World*, unsigned int);
+void fireballHitSolid(World*, unsigned int);
+void fireballHitActor(World*, unsigned int);
 void _spellTargetCursorCallback(int, int);
 void createTargetCursor(World*, unsigned int, void (*)(int, int));
 
-Spell SPELL_FIREBALL = {"Fireball", &fireball, &fireballTick, &fireballExit, SPELL_IS_FLAME | SPELL_IS_AIMABLE | SPELL_CAST_ON_EXIT, -1, DELAY_SHORT};
+Spell SPELL_FIREBALL = {"Fireball", &fireball, &fireballTick, &fireballExit, &fireballHitSolid, &fireballHitActor, SPELL_IS_FLAME | SPELL_IS_AIMABLE | SPELL_CAST_ON_EXIT, -1, DELAY_SHORT};
 
 int UI_OWNER_ID;
 World *UI_WORLD_PTR;
@@ -66,6 +68,8 @@ void addSpell(World *world, unsigned int entityId, Spell spell) {
 	spellComponent->castSpell[spellComponent->spellCount] = spell.castSpell;
 	spellComponent->tickSpell[spellComponent->spellCount] = spell.tickSpell;
 	spellComponent->exitSpell[spellComponent->spellCount] = spell.exitSpell;
+	spellComponent->hitSolidSpell[spellComponent->spellCount] = spell.hitSolidSpell;
+	spellComponent->hitActorSpell[spellComponent->spellCount] = spell.hitActorSpell;
 	spellComponent->spellTraits[spellComponent->spellCount] = spell.spellMask;
 	spellComponent->castDelay[spellComponent->spellCount] = spell.castDelay;
 
@@ -98,19 +102,28 @@ void spellInputHandler(World *world, unsigned int entityId) {
 }
 
 void spellCollisionWithSolidHandler(World *world, unsigned int entityId) {
-	SpellComponent *spellComponent = &world->spell[entityId];
 	RectComponent *rectComponent = &world->rect[entityId];
+	SpellComponent *spellComponent = &world->spell[rectComponent->ownerId];
+
+	if (spellComponent->hitSolidSpell[spellComponent->activeSpell]) {
+		spellComponent->hitSolidSpell[spellComponent->activeSpell](world, entityId);
+	}
 
 	deleteEntity(world, entityId);
 }
 
 void spellCollisionWithActorHandler(World *world, unsigned int entityId) {
-	SpellComponent *spellComponent = &world->spell[entityId];
 	RectComponent *rectComponent = &world->rect[entityId];
+	SpellComponent *spellComponent = &world->spell[rectComponent->ownerId];
+	//character *owner = getActorViaId(rectComponent->ownerId);
 
-	character *target = getActorViaId((unsigned int)rectComponent->collidingWithEntityId);
+	printf("Hereee\n");
+	if (spellComponent->hitActorSpell[spellComponent->activeSpell]) {
+		spellComponent->hitActorSpell[spellComponent->activeSpell](world, entityId);
+	}
+	//character *target = getActorViaId((unsigned int)rectComponent->collidingWithEntityId);
 
-	target->hp -= 100;
+	//target->hp -= 100;
 
 	deleteEntity(world, entityId);
 }
@@ -128,7 +141,7 @@ void spellMovementHandler(World *world, unsigned int entityId) {
 	lightPtr->x = rectComponent->x;
 	lightPtr->y = rectComponent->y;
 
-	createParticle(rectComponent->x, rectComponent->y, 129, 0, 0, 1.f, .85, TCOD_color_RGB(128, 0, 0), TCOD_color_RGB(228, 0, 0));
+	//createParticle(rectComponent->x, rectComponent->y, 176, 0, 0, 1.f, .85, TCOD_color_RGB(128, 0, 0), TCOD_color_RGB(228, 0, 0));
 }
 
 void spellDeleteHandler(World *world, unsigned int entityId) {
@@ -152,7 +165,7 @@ void spellRemoveStanceHandler(World *world, unsigned int entityId) {
 	character *owner = getActorViaId(entityId);
 	SpellComponent *spellComponent = &world->spell[entityId];
 
-	if (owner->nextStanceFlagsToRemove & IS_CASTING) {
+	if (owner->nextStanceFlagsToRemove & IS_CASTING && spellComponent->exitSpell[spellComponent->activeSpell]) {
 		spellComponent->exitSpell[spellComponent->activeSpell](world, entityId);
 	}
 }
@@ -241,7 +254,7 @@ void fireball(World *world, unsigned int ownerId) {
 	spellDelay = spellComponent->castDelay[spellComponent->activeSpell];
 
 	light *lght = createDynamicLight(x, y, owner);
-	lght->r_tint = 200;
+	lght->r_tint = 255;
 	lght->g_tint = 40;
 	lght->b_tint = 40;
 	lght->fuel = spellDelay;
@@ -264,9 +277,20 @@ void fireballExit(World *world, unsigned int ownerId) {
 	int spellDelay = 2;
 	int direction = directionTo(owner->x, owner->y, spellComponent->targetX, spellComponent->targetY);
 
-	createBullet(ownerId, owner->x, owner->y, '*', direction, 3.1, TCOD_color_RGB(200, 200, 200), TCOD_color_RGB(20, 20, 20));
+	createBullet(ownerId, owner->x, owner->y, '*', direction, 3.1, TCOD_color_RGB(200, 40, 40), TCOD_color_RGB(20, 20, 20));
 
 	setStance(owner, IS_RECOVERING);
 	setFutureStanceToRemove(owner, IS_RECOVERING);
 	setDelay(owner, spellDelay);
+}
+
+void fireballHitSolid(World *world, unsigned int entityId) {
+	printf("Fireball hit solid\n");
+}
+
+void fireballHitActor(World *world, unsigned int entityId) {
+	RectComponent *rectComponent = &world->rect[entityId];
+
+	character *target = getActorViaId((unsigned int) rectComponent->collidingWithEntityId);
+	target->hp -= 100;
 }

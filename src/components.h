@@ -48,6 +48,8 @@ typedef struct {
 	void (*castSpell[MAX_SPELLS])(struct World*, unsigned int);
 	void (*tickSpell[MAX_SPELLS])(struct World*, unsigned int);
 	void (*exitSpell[MAX_SPELLS])(struct World*, unsigned int);
+	void (*hitSolidSpell[MAX_SPELLS])(struct World*, unsigned int);
+	void (*hitActorSpell[MAX_SPELLS])(struct World*, unsigned int);
 	unsigned int spellTraits[MAX_SPELLS];
 	int spellCount, activeSpell, castDelay[MAX_SPELLS];
 	int targetX, targetY, targetEntityId;

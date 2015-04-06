@@ -12,6 +12,8 @@ typedef struct {
 	void (*castSpell)(World*, unsigned int);
 	void (*tickSpell)(World*, unsigned int);
 	void (*exitSpell)(World*, unsigned int);
+	void (*hitSolidSpell)(World*, unsigned int);
+	void (*hitActorSpell)(World*, unsigned int);
 	unsigned int spellMask;
 	int parentItem;
 	int castDelay;
