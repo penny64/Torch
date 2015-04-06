@@ -292,7 +292,7 @@ void fireballHitSolid(World *world, unsigned int entityId) {
 
 void fireballHitActor(World *world, unsigned int entityId) {
 	int x1, y1;
-	float fx, fy, distance, distanceMod;
+	float fx, fy, distanceMod;
 	RectComponent *rectComponent = &world->rect[entityId];
 
 	character *target = getActorViaId((unsigned int) rectComponent->collidingWithEntityId);
@@ -308,8 +308,9 @@ void fireballHitActor(World *world, unsigned int entityId) {
 			if (distanceMod <= .25 || getRandomFloat(0, 1) > distanceMod) {
 				continue;
 			}
-
+			//createParticle(int x, int y, int chr, int direction, float speed, float alpha, float fadeRate, unsigned int effectFlags, TCOD_color_t foreColor, TCOD_color_t backColor) {
 			bloodSplatter(fx + x1, fy + y1, distanceMod);
+			createParticle(fx + x1, fy + y1, 177, 0, 0, getRandomFloat(.75, 85), .85, EFFECT_FADE | EFFECT_FLICKER, TCOD_color_RGB(255, 20, 20), TCOD_color_RGB(255, 20, 20));
 		}
 	}
 }

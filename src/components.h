@@ -70,6 +70,7 @@ typedef struct {
 typedef struct {
 	float alpha, fadeRate;
 	TCOD_color_t foreColor, backColor;
+	unsigned int effectFlags;
 } ParticleComponent;
 
 #endif

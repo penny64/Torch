@@ -16,7 +16,6 @@ void startParticles() {
 	World *world = getWorld();
 
 	createSystemHandler(world, EVENT_TICK, COMPONENT_PARTICLE, &particleTickHandler);
-	//createSystemHandler(world, EVENT_DRAW, COMPONENT_RECT, &rectDrawHandler);
 }
 
 void registerParticle(World *world, unsigned int entityId, float alpha, float fadeRate) {
@@ -29,14 +28,18 @@ void registerParticle(World *world, unsigned int entityId, float alpha, float fa
 	particleComponent->fadeRate = fadeRate;
 	particleComponent->foreColor = rectComponent->foreColor;
 	particleComponent->backColor = rectComponent->backColor;
+	particleComponent->effectFlags = EFFECT_FADE;
 }
 
-void createParticle(int x, int y, int chr, int direction, float speed, float alpha, float fadeRate, TCOD_color_t foreColor, TCOD_color_t backColor) {
+void createParticle(int x, int y, int chr, int direction, float speed, float alpha, float fadeRate, unsigned int effectFlags, TCOD_color_t foreColor, TCOD_color_t backColor) {
 	unsigned int entityId = createEntity(getWorld());
 	World *world = getWorld();
 
 	registerRectSystem(world, entityId, x, y, chr, direction, speed, foreColor, backColor);
 	registerParticle(world, entityId, alpha, fadeRate);
+
+	ParticleComponent *particleComponent = &world->particle[entityId];
+	particleComponent->effectFlags = effectFlags;
 }
 
 void createBullet(unsigned int ownerId, int x, int y, int chr, int direction, float speed, TCOD_color_t foreColor, TCOD_color_t backColor) {
@@ -70,22 +73,30 @@ void particleTickHandler(World *world, unsigned int entityId) {
 	ParticleComponent *particleComponent = &world->particle[entityId];
 	RectComponent *rectComponent = &world->rect[entityId];
 
-	particleComponent->alpha *= particleComponent->fadeRate;
+	float alpha = particleComponent->alpha;
 
-	if (particleComponent->alpha < .35) {
-		deleteEntity(world, entityId);
+	if (particleComponent->effectFlags & EFFECT_FADE) {
+		particleComponent->alpha *= particleComponent->fadeRate;
 
-		return;
+		if (particleComponent->alpha < .35) {
+			deleteEntity(world, entityId);
+
+			return;
+		}
+	}
+
+	if (particleComponent->effectFlags & EFFECT_FLICKER) {
+		alpha = clipFloat(alpha * getRandomFloat(.75, 1.25), .35, 1);
 	}
 
 	TCOD_color_t fadeForeColor;// = TCOD_console_get_char_foreground(getLevelConsole(), rectComponent->x, rectComponent->y);
 	TCOD_color_t fadeBackColor = TCOD_console_get_char_background(getLevelConsole(), rectComponent->x, rectComponent->y);
 	fadeForeColor = fadeBackColor;
 
-	fadeForeColor = TCOD_color_lerp(fadeForeColor, TCOD_console_get_char_background(getShadowConsole(), rectComponent->x, rectComponent->y), clipFloat(particleComponent->alpha, .55, 1));
-	fadeBackColor = TCOD_color_lerp(fadeBackColor, TCOD_console_get_char_background(getShadowConsole(), rectComponent->x, rectComponent->y), clipFloat(particleComponent->alpha, .55, 1));
-	rectComponent->foreColor = TCOD_color_lerp(particleComponent->foreColor, fadeForeColor, clipFloat(1 - particleComponent->alpha, .55, 1));
-	rectComponent->backColor = TCOD_color_lerp(particleComponent->backColor, fadeBackColor, clipFloat(1 - particleComponent->alpha, .55, 1));
+	fadeForeColor = TCOD_color_lerp(fadeForeColor, TCOD_console_get_char_background(getShadowConsole(), rectComponent->x, rectComponent->y), clipFloat(alpha, .55, 1));
+	fadeBackColor = TCOD_color_lerp(fadeBackColor, TCOD_console_get_char_background(getShadowConsole(), rectComponent->x, rectComponent->y), clipFloat(alpha, .55, 1));
+	rectComponent->foreColor = TCOD_color_lerp(particleComponent->foreColor, fadeForeColor, clipFloat(1 - alpha, .55, 1));
+	rectComponent->backColor = TCOD_color_lerp(particleComponent->backColor, fadeBackColor, clipFloat(1 - alpha, .55, 1));
 
 	rectComponent->backgroundFlag = TCOD_BKGND_ALPHA(particleComponent->alpha);
 }
