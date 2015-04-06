@@ -50,7 +50,7 @@ void registerRectCollisionSystem(World *world, unsigned int entityId) {
 }
 
 void rectTickHandler(World *world, unsigned int entityId) {
-	int x, y, collisionType = 0;
+	int x, y, pX, pY, collisionType = 0;
 	float vx, vy, tvx, tvy, ratio;
 
 	RectComponent *rectComponent = &world->rect[entityId];
@@ -104,10 +104,14 @@ void rectTickHandler(World *world, unsigned int entityId) {
 
 		rectComponent->exactX += tvx;
 		rectComponent->exactY += tvy;
+		pX = rectComponent->x;
+		pY = rectComponent->y;
 		rectComponent->x = x;
 		rectComponent->y = y;
 
-		tickSystemsWithMaskForEntity(world, entityId, EVENT_MOVED);
+		if (pX != x || pY != y) {
+			tickSystemsWithMaskForEntity(world, entityId, EVENT_MOVED);
+		}
 
 		vx -= tvx;
 		vy -= tvy;
