@@ -98,5 +98,5 @@ void particleTickHandler(World *world, unsigned int entityId) {
 	rectComponent->foreColor = TCOD_color_lerp(particleComponent->foreColor, fadeForeColor, clipFloat(1 - alpha, .55, 1));
 	rectComponent->backColor = TCOD_color_lerp(particleComponent->backColor, fadeBackColor, clipFloat(1 - alpha, .55, 1));
 
-	rectComponent->backgroundFlag = TCOD_BKGND_ALPHA(particleComponent->alpha);
+	rectComponent->backgroundFlag = TCOD_BKGND_ALPHA(alpha);
 }

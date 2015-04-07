@@ -310,7 +310,7 @@ void fireballHitActor(World *world, unsigned int entityId) {
 			}
 			//createParticle(int x, int y, int chr, int direction, float speed, float alpha, float fadeRate, unsigned int effectFlags, TCOD_color_t foreColor, TCOD_color_t backColor) {
 			bloodSplatter(fx + x1, fy + y1, distanceMod);
-			createParticle(fx + x1, fy + y1, 177, 0, 0, getRandomFloat(.75, 85), .85, EFFECT_FADE | EFFECT_FLICKER, TCOD_color_RGB(255, 20, 20), TCOD_color_RGB(255, 20, 20));
+			createParticle(fx + x1, fy + y1, 177, 0, 0, getRandomFloat(.85, .9), .95, EFFECT_FADE | EFFECT_FLICKER, TCOD_color_RGB(255, 20, 20), TCOD_color_RGB(255, 20, 20));
 		}
 	}
 }
