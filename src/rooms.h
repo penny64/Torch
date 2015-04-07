@@ -16,6 +16,12 @@ struct room {
 	struct room *next, *prev;
 };
 
+typedef struct roomProto roomProto;
+
+struct roomProto {
+	int id, x, y, width, height, size;
+};
+
 #endif
 
 void placeItemInRoom(room*, item*);
@@ -27,7 +33,11 @@ void getNewSpawnPosition(room*, int[]);
 void connectRooms(room*, room*);
 int isRoomConnectedTo(room*, room*);
 int isRoomConnectedToId(room*, int);
-room *getRooms(void);
+
 room *createRoom(int, int, unsigned int);
+room *getRooms(void);
 room *getRoomViaId(int);
 room *getRoomWithFlags(unsigned int);
+
+roomProto *createProtoRoom(int, int, int, int);
+roomProto *splitProtoRoom(roomProto*, int);

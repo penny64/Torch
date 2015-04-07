@@ -1426,13 +1426,8 @@ void pickRoomType() {
 	LEVEL_TYPE = getRandomInt(0, 1);
 }
 
-void generateLevel() {
-	int x, y, i, ii, foundPlot, plotDist, spawnPosition[2], plotPoints[MAX_ROOMS][2];
-	float fogValue;
-	float p[2];
-	TCOD_noise_t fog = getFogNoise();
+void resetLevel() {
 	TCOD_console_t dynamicLightConsole = getDynamicLightConsole();
-	character *player = getPlayer();
 
 	EXIT_OPEN = 0;
 	EXIT_WAVE_DIST = 0;
@@ -1454,7 +1449,126 @@ void generateLevel() {
 	deleteAllRooms();
 	deleteEnemies();
 	deleteAllOwnerlessItems();
+}
 
+void paintLevel() {
+	int x, y;
+	float fogValue, p[2];
+	TCOD_noise_t fog = getFogNoise();
+
+	for (y = 0; y < WINDOW_HEIGHT; y++) {
+		for (x = 0; x < WINDOW_WIDTH; x++) {
+			p[0] = (float) x / WINDOW_WIDTH;
+			p[1] = (float) y / WINDOW_HEIGHT;
+
+			fogValue = TCOD_noise_get_fbm_ex(fog, p, 32.0f, TCOD_NOISE_PERLIN) + .2f;
+
+			if (fogValue < .3) {
+				fogValue = .3;
+			}
+
+			if (fogValue > .6) {
+				fogValue = .6;
+			}
+
+			EFFECTS_MAP[x][y] = getRandomFloat(.65, .8);
+
+			if (!TCOD_map_is_walkable(LEVEL_MAP, x, y)) {
+				if (TCOD_map_is_walkable(TUNNEL_WALLS, x, y)) {
+					//drawChar(LEVEL_CONSOLE, x, y, 128, TCOD_color_RGB(125, 16, 16), TCOD_color_RGB(115, 6, 6));
+					//drawCharBackEx(LEVEL_CONSOLE, x, y, TCOD_color_RGB(125, 16, 16), TCOD_BKGND_SET);
+					drawChar(LEVEL_CONSOLE, x, y, 176, TCOD_color_RGB(200, 36, 36), TCOD_color_RGB(105, 26, 105));
+				} else {
+					drawChar(LEVEL_CONSOLE, x, y, 177 + getRandomInt(0, 1), TCOD_color_RGB(175, 36, 36), TCOD_color_RGB(105, 26, 26));
+					//drawCharBackEx(LEVEL_CONSOLE, x, y, TCOD_color_RGB(95, 8, 8), TCOD_BKGND_SET);
+				}
+			} else if (!TCOD_map_is_walkable(LAVA_MAP, x, y)) {
+				//colorMod = (int)(fogValue * 120);
+
+				//if (!TCOD_random_get_int(RANDOM, 0, 4)) {
+				//	setCharEx(LEVEL_CONSOLE, x, y, ',' + TCOD_random_get_int(RANDOM, 0, 4), TCOD_color_RGB(155 - colorMod, 290 - colorMod, 190 - colorMod));
+				//}
+
+				//drawCharBackEx(FOG_CONSOLE, x, y, TCOD_color_RGB(135 - colorMod, 120 - colorMod, 120 - colorMod), TCOD_BKGND_ALPHA(1));
+			}
+		}
+	}
+}
+
+void buildDungeon() {
+	int i, horizSplit, mapUpdated = 1, roomCount = 0, nRoomCount, minRoomSize = 64;
+	int MAX_ROOMS_TEMP = 50;
+	roomProto *roomWalker, *roomList[MAX_ROOMS_TEMP];
+	roomProto *rootRoom = createProtoRoom(2, 2, WINDOW_WIDTH - 2, WINDOW_HEIGHT - 2);
+
+	roomList[0] = rootRoom;
+	roomCount ++;
+
+	while (mapUpdated) {
+		mapUpdated = 0;
+		nRoomCount = roomCount;
+
+		for (i = 0; i < nRoomCount; i ++) {
+			roomWalker = roomList[i];
+
+			if (roomWalker->size <= minRoomSize) {
+				continue;
+			}
+
+			if (roomWalker->width < 8 && roomWalker->height < 8) {
+				continue;
+			}
+
+			if (roomWalker->width > roomWalker->height) {
+				horizSplit = 0;
+			} else if (roomWalker->width < roomWalker->height) {
+				horizSplit = 1;
+			} else {
+				horizSplit = getRandomInt(0, 1);
+			}
+
+			roomProto *childRoom = splitProtoRoom(roomWalker, horizSplit);
+
+			if (!childRoom) {
+				continue;
+			}
+
+			roomList[roomCount] = childRoom;
+			roomCount ++;
+			mapUpdated = 1;
+
+			assert(roomCount < MAX_ROOMS_TEMP);
+		}
+	}
+
+	printf("Total room count: %i\n", roomCount);
+
+	int x, y;
+
+	for (i = 0; i < roomCount; i ++) {
+		roomWalker = roomList[i];
+
+		for (y = roomWalker->y; y < roomWalker->y + roomWalker->height; y ++) {
+			for (x = roomWalker->x; x < roomWalker->x + roomWalker->width; x ++) {
+
+				drawCharBackEx(LEVEL_CONSOLE, x, y, TCOD_color_RGB(255, i * 30, 255), TCOD_BKGND_SET);
+				TCOD_map_set_properties(LEVEL_MAP, x, y, 1, 1);
+			}
+		}
+	}
+}
+
+void generateLevel() {
+	resetLevel();
+	buildDungeon();
+	//paintLevel();
+}
+
+void generateLevelOld() {
+	int x, y, i, ii, foundPlot, plotDist, spawnPosition[2], plotPoints[MAX_ROOMS][2];
+	character *player = getPlayer();
+
+	resetLevel();
 	pickRoomType();
 	
 	for (i = 0; i <= MAX_ROOMS; i++) {
@@ -1534,42 +1648,6 @@ void generateLevel() {
 	resetAllActorsForNewLevel();
 	refreshAllLights();
 	fadeBackIn();
-	
-	for (y = 0; y < WINDOW_HEIGHT; y++) {
-		for (x = 0; x < WINDOW_WIDTH; x++) {
-			p[0] = (float) x / WINDOW_WIDTH;
-			p[1] = (float) y / WINDOW_HEIGHT;
 
-			fogValue = TCOD_noise_get_fbm_ex(fog, p, 32.0f, TCOD_NOISE_PERLIN) + .2f;
-
-			if (fogValue < .3) {
-				fogValue = .3;
-			}
-
-			if (fogValue > .6) {
-				fogValue = .6;
-			}
-
-			EFFECTS_MAP[x][y] = getRandomFloat(.65, .8);
-
-			if (!TCOD_map_is_walkable(LEVEL_MAP, x, y)) {
-				if (TCOD_map_is_walkable(TUNNEL_WALLS, x, y)) {
-					//drawChar(LEVEL_CONSOLE, x, y, 128, TCOD_color_RGB(125, 16, 16), TCOD_color_RGB(115, 6, 6));
-					//drawCharBackEx(LEVEL_CONSOLE, x, y, TCOD_color_RGB(125, 16, 16), TCOD_BKGND_SET);
-					drawChar(LEVEL_CONSOLE, x, y, 176, TCOD_color_RGB(200, 36, 36), TCOD_color_RGB(105, 26, 105));
-				} else {
-					drawChar(LEVEL_CONSOLE, x, y, 177 + getRandomInt(0, 1), TCOD_color_RGB(175, 36, 36), TCOD_color_RGB(105, 26, 26));
-					//drawCharBackEx(LEVEL_CONSOLE, x, y, TCOD_color_RGB(95, 8, 8), TCOD_BKGND_SET);
-				}
-			} else if (!TCOD_map_is_walkable(LAVA_MAP, x, y)) {
-				//colorMod = (int)(fogValue * 120);
-				
-				//if (!TCOD_random_get_int(RANDOM, 0, 4)) {
-				//	setCharEx(LEVEL_CONSOLE, x, y, ',' + TCOD_random_get_int(RANDOM, 0, 4), TCOD_color_RGB(155 - colorMod, 290 - colorMod, 190 - colorMod));
-				//}
-				
-				//drawCharBackEx(FOG_CONSOLE, x, y, TCOD_color_RGB(135 - colorMod, 120 - colorMod, 120 - colorMod), TCOD_BKGND_ALPHA(1));
-			}
-		}
-	}
+	paintLevel();
 }

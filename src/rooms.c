@@ -8,6 +8,52 @@
 room *ROOMS = NULL;
 
 
+roomProto *createProtoRoom(int x, int y, int width, int height) {
+	roomProto *rm = calloc(1, sizeof(roomProto));
+
+	rm->x = x;
+	rm->y = y;
+	rm->width = width;
+	rm->height = height;
+	rm->size = width * height;
+
+	return rm;
+}
+
+roomProto *splitProtoRoom(roomProto *parentRoomProto, int horizSplit) {
+	int nx, ny, nWidth, nHeight, splitAmount;
+
+	if (horizSplit) {
+		splitAmount = (int)((parentRoomProto->height * getRandomFloat(.45, .55)) + .5);
+		nHeight = parentRoomProto->height - splitAmount;
+		parentRoomProto->height = splitAmount;
+
+		nWidth = parentRoomProto->width;
+		nx = parentRoomProto->x;
+		ny = parentRoomProto->y + parentRoomProto->height;
+	} else {
+		splitAmount = (int)((parentRoomProto->width * getRandomFloat(.45, .55)) + .5);
+
+		nWidth = parentRoomProto->width - splitAmount;
+		parentRoomProto->width = splitAmount;
+		nHeight = parentRoomProto->height;
+		nx = parentRoomProto->x + parentRoomProto->width;
+		ny = parentRoomProto->y;
+	}
+
+	if (nx + nWidth > WINDOW_WIDTH - 2) {
+		nWidth -= (nx + nWidth) - (WINDOW_WIDTH - 2);
+	}
+
+	if (ny + nHeight > WINDOW_HEIGHT - 2) {
+		nHeight -= (ny + nHeight) - (WINDOW_HEIGHT - 2);
+	}
+
+	parentRoomProto->size = parentRoomProto->width * parentRoomProto->height;
+
+	return createProtoRoom(nx, ny, nWidth, nHeight);
+}
+
 room *createRoom(int id, int roomSize, unsigned int flags) {
 	room *ptr, *rm = calloc(1, sizeof(room));
 	int i, x, y, addPosition, positionIndex = 0, xAvg = 0, yAvg = 0, xAvgLen = 0, yAvgLen = 0;
