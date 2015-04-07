@@ -4,6 +4,7 @@
 #include "framework/actors.h"
 #include "framework/display.h"
 #include "framework/input.h"
+#include "framework/numbers.h"
 #include "systems.h"
 #include "entities.h"
 #include "spells.h"
@@ -28,6 +29,7 @@ void setup() {
 	startLogging(LOGGING_DEBUG);
 	logString(LOGGING_DEBUG, WINDOW_TITLE);
 
+	startNumbers();
 	startInput();
 	createDisplay();
 	setupUi();

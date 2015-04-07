@@ -1,7 +1,6 @@
 #include "libtcod.h"
 #include "items.h"
-#define MAX_ROOMS 6
-#define MAX_CONNECTED_ROOMS 5
+#include "rooms.h"
 
 
 enum {
@@ -21,15 +20,6 @@ enum {
 	LEVEL_KEYTORCH = 1,
 } levelType_t;
 
-typedef struct room room;
-
-struct room {
-	int id, centerX, centerY, size, numberOfDoorPositions, numberOfConnectedRooms, numberOfOccupiedSpawnPositions;
-	int *connectedRooms, *spawnPositions, **positionList, **doorPositions;
-	unsigned int flags;
-	struct room *next, *prev;
-};
-
 
 TCOD_console_t getLevelConsole(void);
 TCOD_console_t getLightConsole(void);
@@ -42,7 +32,6 @@ TCOD_map_t copyLevelMap(void);
 TCOD_noise_t getFogNoise(void);
 void levelSetup(void);
 void levelShutdown(void);
-void deleteAllRooms(void);
 void generateLevel(void);
 void completeLevel(void);
 void exitLevel(void);
@@ -50,21 +39,13 @@ void transitionIsComplete(void);
 void setLevel(int);
 void blockPosition(int, int);
 void unblockPosition(int, int);
-void placeItemInRoom(room*, item*);
-void createAndPlaceItemInRoom(room*, void(*)(int, int));
 int levelLogic(void);
 int isPositionWalkable(int, int);
 int isLevelComplete(void);
 int isTransitionInProgress(void);
 int isLevelValid();
-int getRandomInt(int, int);
 int getLevel(void);
-int isRoomConnectedTo(room*, room*);
-int isRoomConnectedToId(room*, int);
 int *getExitLocation(void);
+int *getRoomMap(void);
 float getExitWaveDistance(void);
 float *getEffectsMap(void);
-float getRandomFloat(float, float);
-room *createRoom(int, int, unsigned int);
-room *getRoomViaId(int);
-room *getRoomWithFlags(unsigned int);

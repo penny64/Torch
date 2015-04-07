@@ -2,8 +2,23 @@
 #include <math.h>
 #include <stdio.h>
 
+#include "libtcod.h"
 #include "numbers.h"
 
+TCOD_random_t RANDOM;
+
+void startNumbers() {
+	RANDOM = TCOD_random_get_instance();
+}
+
+
+int getRandomInt(int min, int max) {
+	return TCOD_random_get_int(RANDOM, min, max);
+}
+
+float getRandomFloat(float min, float max) {
+	return TCOD_random_get_float(RANDOM, min, max);
+}
 
 int distance(int x1, int y1, int x2, int y2) {
 	return abs(x2 - x1) + abs(y2 - y1);

@@ -1,3 +1,6 @@
+void startNumbers(void);
+int getRandomInt(int, int);
+float getRandomFloat(float, float);
 int clip(int, int, int);
 float clipFloat(float, float, float);
 int distance(int, int, int, int);
