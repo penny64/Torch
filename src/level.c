@@ -39,7 +39,7 @@ int EXIT_IN_PROGRESS;
 int START_LOCATION[2];
 int EXIT_LOCATION[2];
 int LEVEL_NUMBER;
-int LEVEL_TYPE;
+int LEVEL_TYPE = LEVEL_KEYTORCH;
 int (*openList)[WINDOW_WIDTH * WINDOW_HEIGHT];
 int (*START_POSITIONS)[WINDOW_WIDTH * WINDOW_HEIGHT];
 
@@ -1307,14 +1307,17 @@ void colorRooms() {
 		bMod = 0;
 
 		if (roomPtr->flags & IS_TREASURE_ROOM) { //CHECKED
+			printf("Treasure\n");
 			r = 120;
 			g = 101;
 			b = 23;
 		} else if (roomPtr->flags & IS_LAVA_ROOM) { //CHECKED
+			printf("Lava\n");
 			r = 200;
 			g = 200;
 			b = 200;
 		} else if (roomPtr->flags & IS_TORCH_ROOM) { //CHECKED
+			printf("Torch\n");
 			r = 140 - RED_SHIFT;
 			g = 0;
 			b = 140;
@@ -1365,15 +1368,15 @@ void colorRooms() {
 			}
 		}
 
-		for (y = 2; y < WINDOW_HEIGHT - 2; y ++) {
+		/*for (y = 2; y < WINDOW_HEIGHT - 2; y ++) {
 			for (x = 2; x < WINDOW_WIDTH - 2; x ++) {
-				if (TUNNEL_ROOM_MAP[x][y] == roomPtr->id) {
+				if (!TCOD_map_is_walkable(TUNNEL_MAP, x, y)) {
 					colorMod = getRandomInt(0, 15);
 
 					drawCharBackEx(LEVEL_CONSOLE, x, y, TCOD_color_RGB(200 + RED_SHIFT - colorMod, 200 - colorMod, 200 - colorMod), TCOD_BKGND_SET);
 				}
 			}
-		}
+		}*/
 
 		roomPtr = roomPtr->next;
 	}
@@ -1496,8 +1499,8 @@ void paintLevel() {
 }
 
 void buildDungeon() {
-	int i, horizSplit, mapUpdated = 1, roomCount = 0, nRoomCount, minRoomSize = 54;
-	int MAX_ROOMS_TEMP = 50;
+	int x, y, positionIndex, i, horizSplit, nRoomCount, mapUpdated = 1, roomCount = 0, minRoomSize = 220;
+	int MAX_ROOMS_TEMP = 60;
 	roomProto *roomWalker, *roomList[MAX_ROOMS_TEMP];
 	roomProto *rootRoom = createProtoRoom(2, 2, WINDOW_WIDTH - 2, WINDOW_HEIGHT - 2, NULL);
 
@@ -1515,9 +1518,9 @@ void buildDungeon() {
 				continue;
 			}
 
-			if (roomWalker->width < 3 && roomWalker->height < 3) {
-				continue;
-			}
+			//if (roomWalker->width <= 13 && roomWalker->height <= 13) {
+			//	continue;
+			//}
 
 			if (roomWalker->width > roomWalker->height) {
 				horizSplit = 0;
@@ -1539,39 +1542,133 @@ void buildDungeon() {
 
 	printf("Total room count: %i\n", roomCount);
 
-	int x, y;
-
-	/*for (i = 0; i < roomCount; i ++) {
-		roomWalker = roomList[i];
-
-		for (y = roomWalker->y; y < roomWalker->y + roomWalker->height; y ++) {
-			for (x = roomWalker->x; x < roomWalker->x + roomWalker->width; x ++) {
-
-				drawCharBackEx(LEVEL_CONSOLE, x, y, TCOD_color_RGB(255, i * 30, 255), TCOD_BKGND_SET);
-				TCOD_map_set_properties(LEVEL_MAP, x, y, 1, 1);
-			}
-		}
-	}*/
-
 	//Place rooms
 	for (i = 0; i < roomCount; i ++) {
 		//roomWalker = roomList[i];
 		room *rm = createRoom(roomList[i], 0x0);
 
-		for (y = rm->y; y < rm->y + rm->height; y ++) {
-			for (x = rm->x; x < rm->x + rm->width; x ++) {
+		for (positionIndex = 0; positionIndex < rm->size; positionIndex ++) {
+			x = rm->positionList[positionIndex][0];
+			y = rm->positionList[positionIndex][1];
 
-				drawCharBackEx(LEVEL_CONSOLE, x, y, TCOD_color_RGB(255, 30, 255), TCOD_BKGND_SET);
-				TCOD_map_set_properties(LEVEL_MAP, x, y, 1, 1);
+			drawCharBackEx(LEVEL_CONSOLE, x, y, TCOD_color_RGB(255, 30, 255), TCOD_BKGND_SET);
+			TCOD_map_set_properties(LEVEL_MAP, x, y, 1, 1);
+		}
+	}
+}
+
+void generateLayout() {
+	int tempDistance, cloestRoomDistance;
+	room *nearestChildPtr, *childPtr, *parentPtr = getRooms();
+
+	while (parentPtr) {
+		childPtr = getRooms();
+		nearestChildPtr = NULL;
+		cloestRoomDistance = WINDOW_WIDTH * WINDOW_HEIGHT;
+
+		while (childPtr) {
+			if (parentPtr == childPtr || isRoomConnectedTo(parentPtr, childPtr)) {
+				childPtr = childPtr->next;
+
+				continue;
+			}
+
+			tempDistance = distance(parentPtr->centerX, parentPtr->centerY, childPtr->centerX, childPtr->centerY);
+
+			if (tempDistance < cloestRoomDistance) {
+				cloestRoomDistance = tempDistance;
+
+				nearestChildPtr = childPtr;
+			}
+
+			childPtr = childPtr->next;
+		}
+
+		connectRooms(parentPtr, nearestChildPtr);
+
+		parentPtr = parentPtr->next;
+	}
+}
+
+void carveTunnels() {
+	int i, x, y, wX, wY, isNeighborRoom, positionIndex;
+	room *neighborPtr, *tempRoom, *parentPtr = getRooms();
+	TCOD_path_t pathfinder;
+	TCOD_map_t roomMap = TCOD_map_new(WINDOW_WIDTH, WINDOW_HEIGHT);
+
+	while (parentPtr) {
+		TCOD_map_clear(roomMap, 1, 1);
+
+		tempRoom = getRooms();
+
+		while (tempRoom) {
+			isNeighborRoom = 0;
+
+			TCOD_map_set_properties(roomMap, tempRoom->x, tempRoom->y - 1, 0, 0);
+			TCOD_map_set_properties(roomMap, tempRoom->x + tempRoom->width - 1, tempRoom->y, 0, 0);
+			TCOD_map_set_properties(roomMap, tempRoom->x + tempRoom->width - 1, tempRoom->y + tempRoom->height - 1, 0, 0);
+			TCOD_map_set_properties(roomMap, tempRoom->x, tempRoom->y + tempRoom->height - 1, 0, 0);
+
+			if (parentPtr == tempRoom) {
+				tempRoom = tempRoom->next;
+
+				continue;
+			}
+
+			for (i = 0; i < parentPtr->numberOfConnectedRooms; i ++) {
+				neighborPtr = getRoomViaId(parentPtr->connectedRooms[i]);
+
+				if (tempRoom == neighborPtr) {
+					isNeighborRoom = 1;
+
+					break;
+				}
+			}
+
+			if (!isNeighborRoom) {
+				for (positionIndex = 0; positionIndex < tempRoom->size; positionIndex ++) {
+					x = tempRoom->positionList[positionIndex][0];
+					y = tempRoom->positionList[positionIndex][1];
+
+					//drawCharBackEx(LEVEL_CONSOLE, x, y, TCOD_color_RGB(255, 30, 255), TCOD_BKGND_SET);
+					TCOD_map_set_properties(ROOM_MAP, x, y, 0, 0);
+				}
+			}
+
+			tempRoom = tempRoom->next;
+		}
+
+		pathfinder = TCOD_path_new_using_map(roomMap, 0.f);
+
+		for (i = 0; i < parentPtr->numberOfConnectedRooms; i ++) {
+			neighborPtr = getRoomViaId(parentPtr->connectedRooms[i]);
+
+			if (!TCOD_path_compute(pathfinder, parentPtr->centerX, parentPtr->centerY, neighborPtr->centerX, neighborPtr->centerY)) {
+				printf("*FATAL* Can't make a path here.\n");
+			}
+
+			while (TCOD_path_walk(pathfinder, &wX, &wY, 0)) {
+				TCOD_map_set_properties(LEVEL_MAP, wX, wY, 1, 1);
+				TCOD_map_set_properties(TUNNEL_MAP, wX, wY, 1, 1);
 			}
 		}
+
+		parentPtr = parentPtr->next;
 	}
 }
 
 void generateLevel() {
 	resetLevel();
 	buildDungeon();
-	//paintLevel();
+	generateLayout();
+	generatePuzzles();
+	decorateRooms();
+	carveTunnels();
+	paintLevel();
+	placeItems();
+	//generateKeys();
+	colorRooms();
+	placeGrass();
 }
 
 void generateLevelOld() {
@@ -1644,9 +1741,7 @@ void generateLevelOld() {
 		ptr->itemEffectFlags = IS_FLAMING;
 		
 		moveActor(player, 1, 0);
-	}
 
-	if (player) {
 		if (LEVEL_NUMBER == 1) {
 			plantTorch(player);
 		} else {

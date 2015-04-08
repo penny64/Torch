@@ -51,7 +51,7 @@ int main() {
 	character *player = NULL;
 	setup();
 
-	showIntro();
+	//showIntro();
 	
 	while (!TCOD_console_is_window_closed()) {
 		inputLogic();

@@ -6,6 +6,7 @@
 #include "rooms.h"
 
 room *ROOMS = NULL;
+int NEXT_ROOM_ID = 0;
 
 
 roomProto *createProtoRoom(int x, int y, int width, int height, roomProto *parentRoomProto) {
@@ -59,38 +60,43 @@ room *createRoom(roomProto *prototypeRoom, unsigned int flags) {
 	room *ptr, *rm = calloc(1, sizeof(room));
 	int i, x, y, width, height;
 
-	width = prototypeRoom->width;
-	height = prototypeRoom->height;
+	width = prototypeRoom->width - 1;
+	height = prototypeRoom->height - 1;
 
-	rm->x = prototypeRoom->x;
-	rm->y = prototypeRoom->y;
+	rm->id = NEXT_ROOM_ID;
+	NEXT_ROOM_ID ++;
+
+	rm->x = prototypeRoom->x + 1;
+	rm->y = prototypeRoom->y + 1;
 
 	if (width > 5) {
-		width = (int)((width * getRandomFloat(.75, 1)) + .5) - 1;
+		width = (int)((width * getRandomFloat(.65, .75)) + .5);
 	}
 
 	if (height > 5) {
-		height = (int)((height * getRandomFloat(.75, 1)) + .5) - 1;
+		height = (int)((height * getRandomFloat(.65, .75)) + .5);
 	}
 
 	if (width < prototypeRoom->width) {
-		rm->x += getRandomInt(1, prototypeRoom->width - width);
+		rm->x += getRandomInt(0, (prototypeRoom->width - width) - 1);
 	}
 
 	if (height < prototypeRoom->height) {
-		rm->y += getRandomInt(1, prototypeRoom->height - height);
+		rm->y += getRandomInt(0, (prototypeRoom->height - height) - 1);
 	}
 
 	rm->size = width * height;
 	rm->width = width;
 	rm->height = height;
+	rm->centerX = rm->x + rm->width / 2;
+	rm->centerY = rm->y + rm->height / 2;
 	rm->numberOfConnectedRooms = 0;
 	rm->numberOfDoorPositions = 0;
 	rm->numberOfOccupiedSpawnPositions = 0;
 	rm->flags = flags;
 	rm->prev = NULL;
 	rm->next = NULL;
-	//rm->connectedRooms = (int*)malloc((4) * sizeof(int));
+	rm->connectedRooms = (int*)malloc((4) * sizeof(int));
 	rm->spawnPositions = malloc(sizeof(int) * rm->size);
 
 	//TODO: Use memcpy in the future
