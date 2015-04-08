@@ -442,7 +442,7 @@ void findRooms() {
 				roomFlags = IS_TORCH_ROOM | IS_EXIT_ROOM;
 			}*/
 
-			createRoom(ROOM_COUNT, oLen, 0x0);
+			//createRoom(ROOM_COUNT, oLen, 0x0);
 
 			//printf("Found new room: %i (%i)\n", ROOM_COUNT, oLen);
 		}
@@ -1496,10 +1496,10 @@ void paintLevel() {
 }
 
 void buildDungeon() {
-	int i, horizSplit, mapUpdated = 1, roomCount = 0, nRoomCount, minRoomSize = 64;
+	int i, horizSplit, mapUpdated = 1, roomCount = 0, nRoomCount, minRoomSize = 54;
 	int MAX_ROOMS_TEMP = 50;
 	roomProto *roomWalker, *roomList[MAX_ROOMS_TEMP];
-	roomProto *rootRoom = createProtoRoom(2, 2, WINDOW_WIDTH - 2, WINDOW_HEIGHT - 2);
+	roomProto *rootRoom = createProtoRoom(2, 2, WINDOW_WIDTH - 2, WINDOW_HEIGHT - 2, NULL);
 
 	roomList[0] = rootRoom;
 	roomCount ++;
@@ -1515,7 +1515,7 @@ void buildDungeon() {
 				continue;
 			}
 
-			if (roomWalker->width < 8 && roomWalker->height < 8) {
+			if (roomWalker->width < 3 && roomWalker->height < 3) {
 				continue;
 			}
 
@@ -1529,10 +1529,6 @@ void buildDungeon() {
 
 			roomProto *childRoom = splitProtoRoom(roomWalker, horizSplit);
 
-			if (!childRoom) {
-				continue;
-			}
-
 			roomList[roomCount] = childRoom;
 			roomCount ++;
 			mapUpdated = 1;
@@ -1545,13 +1541,27 @@ void buildDungeon() {
 
 	int x, y;
 
-	for (i = 0; i < roomCount; i ++) {
+	/*for (i = 0; i < roomCount; i ++) {
 		roomWalker = roomList[i];
 
 		for (y = roomWalker->y; y < roomWalker->y + roomWalker->height; y ++) {
 			for (x = roomWalker->x; x < roomWalker->x + roomWalker->width; x ++) {
 
 				drawCharBackEx(LEVEL_CONSOLE, x, y, TCOD_color_RGB(255, i * 30, 255), TCOD_BKGND_SET);
+				TCOD_map_set_properties(LEVEL_MAP, x, y, 1, 1);
+			}
+		}
+	}*/
+
+	//Place rooms
+	for (i = 0; i < roomCount; i ++) {
+		//roomWalker = roomList[i];
+		room *rm = createRoom(roomList[i], 0x0);
+
+		for (y = rm->y; y < rm->y + rm->height; y ++) {
+			for (x = rm->x; x < rm->x + rm->width; x ++) {
+
+				drawCharBackEx(LEVEL_CONSOLE, x, y, TCOD_color_RGB(255, 30, 255), TCOD_BKGND_SET);
 				TCOD_map_set_properties(LEVEL_MAP, x, y, 1, 1);
 			}
 		}

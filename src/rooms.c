@@ -8,7 +8,7 @@
 room *ROOMS = NULL;
 
 
-roomProto *createProtoRoom(int x, int y, int width, int height) {
+roomProto *createProtoRoom(int x, int y, int width, int height, roomProto *parentRoomProto) {
 	roomProto *rm = calloc(1, sizeof(roomProto));
 
 	rm->x = x;
@@ -16,6 +16,7 @@ roomProto *createProtoRoom(int x, int y, int width, int height) {
 	rm->width = width;
 	rm->height = height;
 	rm->size = width * height;
+	rm->parent = parentRoomProto;
 
 	return rm;
 }
@@ -24,7 +25,7 @@ roomProto *splitProtoRoom(roomProto *parentRoomProto, int horizSplit) {
 	int nx, ny, nWidth, nHeight, splitAmount;
 
 	if (horizSplit) {
-		splitAmount = (int)((parentRoomProto->height * getRandomFloat(.45, .55)) + .5);
+		splitAmount = (int)((parentRoomProto->height * getRandomFloat(.40, .6)) + .5);
 		nHeight = parentRoomProto->height - splitAmount;
 		parentRoomProto->height = splitAmount;
 
@@ -32,7 +33,7 @@ roomProto *splitProtoRoom(roomProto *parentRoomProto, int horizSplit) {
 		nx = parentRoomProto->x;
 		ny = parentRoomProto->y + parentRoomProto->height;
 	} else {
-		splitAmount = (int)((parentRoomProto->width * getRandomFloat(.45, .55)) + .5);
+		splitAmount = (int)((parentRoomProto->width * getRandomFloat(.4, .6)) + .5);
 
 		nWidth = parentRoomProto->width - splitAmount;
 		parentRoomProto->width = splitAmount;
@@ -51,49 +52,78 @@ roomProto *splitProtoRoom(roomProto *parentRoomProto, int horizSplit) {
 
 	parentRoomProto->size = parentRoomProto->width * parentRoomProto->height;
 
-	return createProtoRoom(nx, ny, nWidth, nHeight);
+	return createProtoRoom(nx, ny, nWidth, nHeight, parentRoomProto);
 }
 
-room *createRoom(int id, int roomSize, unsigned int flags) {
+room *createRoom(roomProto *prototypeRoom, unsigned int flags) {
 	room *ptr, *rm = calloc(1, sizeof(room));
-	int i, x, y, addPosition, positionIndex = 0, xAvg = 0, yAvg = 0, xAvgLen = 0, yAvgLen = 0;
-	int (*roomMap)[255] = getRoomMap();
+	int i, x, y, width, height;
 
-	if (roomSize == 0) {
-		printf("*FATAL* Invalid room: Empty\n");
+	width = prototypeRoom->width;
+	height = prototypeRoom->height;
+
+	rm->x = prototypeRoom->x;
+	rm->y = prototypeRoom->y;
+
+	if (width > 5) {
+		width = (int)((width * getRandomFloat(.75, 1)) + .5) - 1;
 	}
 
-	rm->id = id;
-	rm->size = roomSize;
+	if (height > 5) {
+		height = (int)((height * getRandomFloat(.75, 1)) + .5) - 1;
+	}
+
+	if (width < prototypeRoom->width) {
+		rm->x += getRandomInt(1, prototypeRoom->width - width);
+	}
+
+	if (height < prototypeRoom->height) {
+		rm->y += getRandomInt(1, prototypeRoom->height - height);
+	}
+
+	rm->size = width * height;
+	rm->width = width;
+	rm->height = height;
 	rm->numberOfConnectedRooms = 0;
 	rm->numberOfDoorPositions = 0;
 	rm->numberOfOccupiedSpawnPositions = 0;
 	rm->flags = flags;
 	rm->prev = NULL;
 	rm->next = NULL;
-	rm->connectedRooms = (int*)malloc((MAX_ROOMS + 1) * sizeof(int));
-	rm->spawnPositions = malloc(sizeof(int) * roomSize);
+	//rm->connectedRooms = (int*)malloc((4) * sizeof(int));
+	rm->spawnPositions = malloc(sizeof(int) * rm->size);
 
 	//TODO: Use memcpy in the future
-	rm->positionList = malloc(sizeof *rm->positionList * roomSize);
+	rm->positionList = malloc(sizeof *rm->positionList * rm->size);
 	if (rm->positionList)
 	{
-		for (i = 0; i < roomSize; i++)
+		for (i = 0; i < rm->size; i++)
 		{
 			rm->positionList[i] = malloc(sizeof(int) * 2);
 		}
 	}
 
-	rm->doorPositions = malloc(sizeof *rm->doorPositions * roomSize);
+	rm->doorPositions = malloc(sizeof *rm->doorPositions * rm->size);
 	if (rm->doorPositions)
 	{
-		for (i = 0; i < roomSize; i++)
+		for (i = 0; i < rm->size; i++)
 		{
 			rm->doorPositions[i] = malloc(sizeof(int) * 2);
 		}
 	}
 
-	for (y = 0; y < WINDOW_HEIGHT; y ++) {
+	i = 0;
+
+	for (y = rm->y; y < rm->y + rm->height; y ++) {
+		for (x = rm->x; x < rm->x + rm->width; x ++) {
+			rm->positionList[i][0] = x;
+			rm->positionList[i][1] = y;
+
+			i ++;
+		}
+	}
+
+	/*for (y = 0; y < WINDOW_HEIGHT; y ++) {
 		addPosition = 0;
 
 		for (x = 0; x < WINDOW_WIDTH; x ++) {
@@ -112,10 +142,10 @@ room *createRoom(int id, int roomSize, unsigned int flags) {
 			yAvg += y;
 			yAvgLen ++;
 		}
-	}
+	}*/
 
-	rm->centerX = xAvg / xAvgLen;
-	rm->centerY = yAvg / yAvgLen;
+	//rm->centerX = xAvg / xAvgLen;
+	//rm->centerY = yAvg / yAvgLen;
 
 	if (ROOMS == NULL) {
 		ROOMS = rm;
