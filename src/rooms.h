@@ -10,9 +10,9 @@
 typedef struct room room;
 
 struct room {
-	int id, centerX, centerY, size, numberOfDoorPositions, numberOfConnectedRooms, numberOfOccupiedSpawnPositions;
+	int id, centerX, centerY, size, numberOfDoorPositions, numberOfConnectedRooms, numberOfNeighborRooms, numberOfOccupiedSpawnPositions;
 	int x, y, width, height;
-	int *connectedRooms, *spawnPositions, **positionList, **doorPositions;
+	int *connectedRoomIds, *neighborRoomIds, *spawnPositions, **positionList, **doorPositions;
 	unsigned int flags;
 	struct room *next, *prev;
 };
@@ -32,9 +32,11 @@ void deleteAllRooms(void);
 void addRoomDoorPosition(room*, int, int);
 void claimSpawnPositionInRoom(room*, int, int);
 void getNewSpawnPosition(room*, int[]);
+void addNeighbor(room*, room*);
 void connectRooms(room*, room*);
-int isRoomConnectedTo(room*, room*);
-int isRoomConnectedToId(room*, int);
+int isNeighborWith(room *, room*);
+int isNeighborWithId(room*, int);
+int isConnectedWith(room*, room*);
 int isPositionInRoom(room*, int, int);
 
 room *createRoom(roomProto*, unsigned int);

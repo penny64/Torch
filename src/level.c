@@ -465,11 +465,11 @@ int isLevelValid() {
 		closedList[connectedRoomsIndex] = roomPtr->id;
 		connectedRoomsIndex ++;
 
-		for (i = 0; i < roomPtr->numberOfConnectedRooms; i++) {
+		for (i = 0; i < roomPtr->numberOfNeighborRooms; i++) {
 			invalid = 0;
 			
 			for (ii = 0; ii < connectedRoomsIndex; ii++) {
-				if (roomPtr->connectedRooms[i] == closedList[ii]) {
+				if (roomPtr->neighborRoomIds[i] == closedList[ii]) {
 					invalid = 1;
 					
 					break;
@@ -478,7 +478,7 @@ int isLevelValid() {
 
 			if (!invalid) {
 				for (ii = 0; ii < openListIndex; ii++) {
-					if (roomPtr->connectedRooms[i] == openList[ii]) {
+					if (roomPtr->neighborRoomIds[i] == openList[ii]) {
 						invalid = 1;
 
 						break;
@@ -487,7 +487,7 @@ int isLevelValid() {
 			}
 
 			if (!invalid) {
-				openList[openListIndex] = roomPtr->connectedRooms[i];
+				openList[openListIndex] = roomPtr->neighborRoomIds[i];
 				openListIndex ++;
 			}
 		}
@@ -539,7 +539,7 @@ void placeTunnels() {
 				dstRoomIndex = getRandomInt(1, ROOM_COUNT_MAX);
 				tempDestRoom = getRoomViaId(dstRoomIndex);
 				
-				if (isRoomConnectedTo(srcRoom, tempDestRoom)) {
+				if (isNeighborWith(srcRoom, tempDestRoom)) {
 					numberOfFailedAttemptsToFindADestRoom ++;
 
 					continue;
@@ -851,7 +851,7 @@ void placeTunnels() {
 		}
 
 		if (ROOM_MAP[w_x][w_y] == dstRoom->id || exitEarly) {
-			connectRooms(srcRoom, dstRoom);
+			addNeighbor(srcRoom, dstRoom);
 
 			if (isLevelValid()) {
 				break;
@@ -888,11 +888,11 @@ void generateKeys() {
 			spawnItemWithRarity(spawnPosition[0], spawnPosition[1], IS_KEY, RARITY_KEY, RARITY_KEY);
 		}
 
-		for (i = 0; i < roomPtr->numberOfConnectedRooms; i++) {
+		for (i = 0; i < roomPtr->numberOfNeighborRooms; i++) {
 			invalid = 0;
 			
 			for (ii = 0; ii < connectedRoomsIndex; ii++) {
-				if (roomPtr->connectedRooms[i] == closedList[ii]) {
+				if (roomPtr->neighborRoomIds[i] == closedList[ii]) {
 					invalid = 1;
 					
 					break;
@@ -901,7 +901,7 @@ void generateKeys() {
 
 			if (!invalid) {
 				for (ii = 0; ii < openListIndex; ii++) {
-					if (roomPtr->connectedRooms[i] == openList[ii]) {
+					if (roomPtr->neighborRoomIds[i] == openList[ii]) {
 						invalid = 1;
 
 						break;
@@ -910,7 +910,7 @@ void generateKeys() {
 			}
 
 			if (!invalid) {
-				openList[openListIndex] = roomPtr->connectedRooms[i];
+				openList[openListIndex] = roomPtr->neighborRoomIds[i];
 				openListIndex ++;
 			}
 		}
@@ -924,9 +924,9 @@ void generatePuzzles() {
 	STARTING_ROOM = NULL;
 
 	while (roomPtr) {
-		printf("Conned: %i, size: %i\n", roomPtr->numberOfConnectedRooms, roomPtr->size);
+		printf("Conned: %i, size: %i\n", roomPtr->numberOfNeighborRooms, roomPtr->size);
 
-		if (treasureRooms < 2 && roomPtr->numberOfConnectedRooms <= 2 && roomPtr->size >= 20 && roomPtr->size < 45) {
+		if (treasureRooms < 2 && roomPtr->numberOfNeighborRooms <= 2 && roomPtr->size >= 20 && roomPtr->size < 45) {
 			roomPtr->flags |= IS_TREASURE_ROOM;
 			roomPtr->flags |= NEEDS_DOORS;
 
@@ -934,14 +934,14 @@ void generatePuzzles() {
 		} else if (LEVEL_TYPE == LEVEL_KEYTORCH && roomPtr->size >= 45 && roomPtr->size <= 65) {
 			roomPtr->flags |= IS_TORCH_ROOM;
 		} else if (roomPtr->size >= 80 && roomPtr->size <= 90) {
-			if (roomPtr->numberOfConnectedRooms == 2) {
+			if (roomPtr->numberOfNeighborRooms == 2) {
 				roomPtr->flags |= IS_LAVA_ROOM;
 			} else {
 				roomPtr->flags |= NEEDS_DOORS;
 			}
 		}
 		
-		if (roomPtr->numberOfConnectedRooms == 1) {
+		if (roomPtr->numberOfNeighborRooms == 1) {
 			roomPtr->flags |= IS_RARE_SPAWN;
 		}
 
@@ -951,8 +951,8 @@ void generatePuzzles() {
 	roomPtr = getRooms();
 
 	while (roomPtr && !numberOfFurances) {
-		for (i = 0; i < roomPtr->numberOfConnectedRooms; i ++) {
-			neighborRoomPtr = getRoomViaId(roomPtr->connectedRooms[i]);
+		for (i = 0; i < roomPtr->numberOfNeighborRooms; i ++) {
+			neighborRoomPtr = getRoomViaId(roomPtr->neighborRoomIds[i]);
 
 			if (neighborRoomPtr->flags & IS_LAVA_ROOM) {
 				roomPtr->flags |= IS_FURNACE_ROOM;
@@ -977,8 +977,8 @@ void placeItems() {
 		invalidStartRoom = 0;
 
 		if (!startPlaced && !(roomPtr->flags & NEEDS_DOORS)) {
-			for (i = 0; i < roomPtr->numberOfConnectedRooms; i++) {
-				if (getRoomViaId(roomPtr->connectedRooms[i])->flags & NEEDS_DOORS) {
+			for (i = 0; i < roomPtr->numberOfNeighborRooms; i++) {
+				if (getRoomViaId(roomPtr->neighborRoomIds[i])->flags & NEEDS_DOORS) {
 					invalidStartRoom = 1;
 
 					break;
@@ -1333,7 +1333,7 @@ void colorRooms() {
 			rMod = 10;
 			gMod = 60;
 			bMod = 80;
-		} else if (roomPtr->numberOfConnectedRooms >= 3) {
+		} else if (roomPtr->numberOfNeighborRooms >= 3) {
 			if (roomPtr->size <= 30) { //CHECKED
 				r = 0 - RED_SHIFT;
 				g = 155;
@@ -1579,7 +1579,7 @@ void generateLayout() {
 		cloestRoomDistance = WINDOW_WIDTH * WINDOW_HEIGHT;
 
 		while (childPtr) {
-			if (parentPtr == childPtr || isRoomConnectedTo(parentPtr, childPtr)) {
+			if (parentPtr == childPtr || isNeighborWith(parentPtr, childPtr)) {
 				childPtr = childPtr->next;
 
 				continue;
@@ -1596,14 +1596,14 @@ void generateLayout() {
 			childPtr = childPtr->next;
 		}
 
-		connectRooms(parentPtr, nearestChildPtr);
+		addNeighbor(parentPtr, nearestChildPtr);
 
 		parentPtr = parentPtr->next;
 	}
 }
 
 void carveTunnels() {
-	int i, x, y, wX, wY, isNeighborRoom, positionIndex;
+	int i, x, y, wX, wY, lastWX, lastWY, isNeighborRoom, positionIndex;
 	room *neighborPtr, *tempRoom, *parentPtr = getRooms();
 	TCOD_path_t pathfinder;
 	TCOD_map_t roomMap = TCOD_map_new(WINDOW_WIDTH, WINDOW_HEIGHT);
@@ -1621,14 +1621,14 @@ void carveTunnels() {
 			TCOD_map_set_properties(roomMap, tempRoom->x + tempRoom->width - 1, tempRoom->y + tempRoom->height - 1, 0, 0);
 			TCOD_map_set_properties(roomMap, tempRoom->x, tempRoom->y + tempRoom->height - 1, 0, 0);
 
-			if (parentPtr == tempRoom) {
+			if (parentPtr == tempRoom || isConnectedWith(parentPtr, tempRoom)) {
 				tempRoom = tempRoom->next;
 
 				continue;
 			}
 
-			for (i = 0; i < parentPtr->numberOfConnectedRooms; i ++) {
-				neighborPtr = getRoomViaId(parentPtr->connectedRooms[i]);
+			for (i = 0; i < parentPtr->numberOfNeighborRooms; i ++) {
+				neighborPtr = getRoomViaId(parentPtr->neighborRoomIds[i]);
 
 				if (tempRoom == neighborPtr) {
 					isNeighborRoom = 1;
@@ -1643,7 +1643,7 @@ void carveTunnels() {
 					y = tempRoom->positionList[positionIndex][1];
 
 					//drawCharBackEx(LEVEL_CONSOLE, x, y, TCOD_color_RGB(255, 30, 255), TCOD_BKGND_SET);
-					TCOD_map_set_properties(ROOM_MAP, x, y, 0, 0);
+					TCOD_map_set_properties(roomMap, x, y, 0, 0);
 				}
 			}
 
@@ -1652,23 +1652,39 @@ void carveTunnels() {
 
 		pathfinder = TCOD_path_new_using_map(roomMap, 0.f);
 
-		for (i = 0; i < parentPtr->numberOfConnectedRooms; i ++) {
-			neighborPtr = getRoomViaId(parentPtr->connectedRooms[i]);
+		for (i = 0; i < parentPtr->numberOfNeighborRooms; i ++) {
+			neighborPtr = getRoomViaId(parentPtr->neighborRoomIds[i]);
+
+			if (isConnectedWith(parentPtr, neighborPtr)) {
+				continue;
+			}
 
 			if (!TCOD_path_compute(pathfinder, parentPtr->centerX, parentPtr->centerY, neighborPtr->centerX, neighborPtr->centerY)) {
 				printf("*FATAL* Can't make a path here.\n");
 			}
 
+			lastWX = parentPtr->centerX;
+			lastWY = parentPtr->centerY;
+
 			while (TCOD_path_walk(pathfinder, &wX, &wY, 0)) {
+				TCOD_map_set_properties(LEVEL_MAP, wX, wY, 1, 1);
+
 				if (isPositionInRoom(neighborPtr, wX, wY)) {
-					addRoomDoorPosition(neighborPtr, wX, wY);
+					TCOD_map_set_properties(TUNNEL_MAP, wX, wY, 1, 1);
+					addRoomDoorPosition(neighborPtr, lastWX, lastWY);
 
 					break;
 				}
 
-				TCOD_map_set_properties(LEVEL_MAP, wX, wY, 1, 1);
-				TCOD_map_set_properties(TUNNEL_MAP, wX, wY, 1, 1);
+				if (!isPositionInRoom(parentPtr, wX, wY)) {
+					TCOD_map_set_properties(TUNNEL_MAP, wX, wY, 1, 1);
+				}
+
+				lastWX = wX;
+				lastWY = wY;
 			}
+
+			connectRooms(parentPtr, neighborPtr);
 		}
 
 		parentPtr = parentPtr->next;
@@ -1676,6 +1692,9 @@ void carveTunnels() {
 }
 
 void generateLevel() {
+	int spawnPosition[2];
+	character *player = getPlayer();
+
 	resetLevel();
 	buildDungeon();
 	generateLayout();
@@ -1684,10 +1703,43 @@ void generateLevel() {
 	decorateRooms();
 	paintLevel();
 	placeItems();
-	//generateKeys();
+	generateKeys();
+	spawnEnemies();
+	activateDoors();
 	colorRooms();
 	placeGrass();
 	colorItems();
+
+	if (!STARTING_ROOM) {
+		printf("*FATAL* No starting room\n");
+
+		assert(STARTING_ROOM);
+	}
+
+	if (player) {
+		player->x = START_LOCATION[0];
+		player->y = START_LOCATION[1];
+		player->itemLight->x = player->x;
+		player->itemLight->y = player->y;
+
+		createBoots(player->x, player->y);
+		item *ptr = getNewestItem();
+
+		ptr->itemEffectFlags = IS_FLAMING;
+
+		moveActor(player, 1, 0);
+
+		if (LEVEL_NUMBER == 1) {
+			plantTorch(player);
+		} else {
+			getNewSpawnPosition(STARTING_ROOM, spawnPosition);
+			createBonfire(spawnPosition[0], spawnPosition[1]);
+		}
+	}
+
+	resetAllActorsForNewLevel();
+	refreshAllLights();
+	fadeBackIn();
 }
 
 void generateLevelOld() {

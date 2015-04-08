@@ -92,12 +92,14 @@ room *createRoom(roomProto *prototypeRoom, unsigned int flags) {
 	rm->centerX = rm->x + rm->width / 2;
 	rm->centerY = rm->y + rm->height / 2;
 	rm->numberOfConnectedRooms = 0;
+	rm->numberOfNeighborRooms = 0;
 	rm->numberOfDoorPositions = 0;
 	rm->numberOfOccupiedSpawnPositions = 0;
 	rm->flags = flags;
 	rm->prev = NULL;
 	rm->next = NULL;
-	rm->connectedRooms = (int*)malloc((4) * sizeof(int));
+	rm->neighborRoomIds = (int*)malloc((4) * sizeof(int));
+	rm->connectedRoomIds = (int*)malloc((4) * sizeof(int));
 	rm->spawnPositions = malloc(sizeof(int) * rm->size);
 
 	//TODO: Use memcpy in the future
@@ -217,7 +219,7 @@ void deleteRoom(room *rm) {
 		}
 	}
 
-	free(rm->connectedRooms);
+	free(rm->neighborRoomIds);
 	free(rm);
 }
 
@@ -244,17 +246,31 @@ void addRoomDoorPosition(room *srcRoom, int x, int y) {
 	srcRoom->numberOfDoorPositions ++;
 }
 
-void connectRooms(room *srcRoom, room *dstRoom) {
-	if (!isRoomConnectedTo(srcRoom, dstRoom)) {
-		srcRoom->connectedRooms[srcRoom->numberOfConnectedRooms] = dstRoom->id;
+void addNeighbor(room *srcRoom, room *dstRoom) {
+	if (!isNeighborWith(srcRoom, dstRoom)) {
+		srcRoom->neighborRoomIds[srcRoom->numberOfNeighborRooms] = dstRoom->id;
 
-		srcRoom->numberOfConnectedRooms ++;
+		srcRoom->numberOfNeighborRooms++;
 	}
 
-	if (!isRoomConnectedTo(dstRoom, srcRoom)) {
-		dstRoom->connectedRooms[dstRoom->numberOfConnectedRooms] = srcRoom->id;
+	if (!isNeighborWith(dstRoom, srcRoom)) {
+		dstRoom->neighborRoomIds[dstRoom->numberOfNeighborRooms] = srcRoom->id;
 
-		dstRoom->numberOfConnectedRooms ++;
+		dstRoom->numberOfNeighborRooms++;
+	}
+}
+
+void connectRooms(room *srcRoom, room *dstRoom) {
+	if (!isConnectedWith(srcRoom, dstRoom)) {
+		srcRoom->connectedRoomIds[srcRoom->numberOfConnectedRooms] = dstRoom->id;
+
+		srcRoom->numberOfConnectedRooms++;
+	}
+
+	if (!isConnectedWith(dstRoom, srcRoom)) {
+		dstRoom->connectedRoomIds[dstRoom->numberOfConnectedRooms] = srcRoom->id;
+
+		dstRoom->numberOfConnectedRooms++;
 	}
 }
 
@@ -353,15 +369,15 @@ void createAndPlaceItemInRoom(room *srcRoom, void (*createItem)(int, int)) {
 	createItem(pos[0], pos[1]);
 }
 
-int isRoomConnectedTo(room *srcRoom, room *dstRoom) {
+int isNeighborWith(room *srcRoom, room *dstRoom) {
 	int i;
 
 	if (srcRoom->id == dstRoom->id) {
 		return 1;
 	}
 
-	for (i = 0; i < srcRoom->numberOfConnectedRooms; i++) {
-		if (srcRoom->connectedRooms[i] == dstRoom->id) {
+	for (i = 0; i < srcRoom->numberOfNeighborRooms; i++) {
+		if (srcRoom->neighborRoomIds[i] == dstRoom->id) {
 			return 1;
 		}
 	}
@@ -369,15 +385,31 @@ int isRoomConnectedTo(room *srcRoom, room *dstRoom) {
 	return 0;
 }
 
-int isRoomConnectedToId(room *srcRoom, int dstRoomId) {
+int isNeighborWithId(room *srcRoom, int dstRoomId) {
 	int i;
 
 	if (srcRoom->id == dstRoomId) {
 		return 1;
 	}
 
+	for (i = 0; i < srcRoom->numberOfNeighborRooms; i++) {
+		if (srcRoom->neighborRoomIds[i] == dstRoomId) {
+			return 1;
+		}
+	}
+
+	return 0;
+}
+
+int isConnectedWith(room *srcRoom, room *dstRoom) {
+	int i;
+
+	if (srcRoom->id == dstRoom->id) {
+		return 1;
+	}
+
 	for (i = 0; i < srcRoom->numberOfConnectedRooms; i++) {
-		if (srcRoom->connectedRooms[i] == dstRoomId) {
+		if (srcRoom->connectedRoomIds[i] == dstRoom->id) {
 			return 1;
 		}
 	}
