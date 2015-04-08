@@ -35,6 +35,7 @@ void getNewSpawnPosition(room*, int[]);
 void connectRooms(room*, room*);
 int isRoomConnectedTo(room*, room*);
 int isRoomConnectedToId(room*, int);
+int isPositionInRoom(room*, int, int);
 
 room *createRoom(roomProto*, unsigned int);
 room *getRooms(void);

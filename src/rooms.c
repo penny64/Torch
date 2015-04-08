@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <assert.h>
 
 #include "framework/display.h"
@@ -377,6 +378,18 @@ int isRoomConnectedToId(room *srcRoom, int dstRoomId) {
 
 	for (i = 0; i < srcRoom->numberOfConnectedRooms; i++) {
 		if (srcRoom->connectedRooms[i] == dstRoomId) {
+			return 1;
+		}
+	}
+
+	return 0;
+}
+
+int isPositionInRoom(room *roomPtr, int x, int y) {
+	int positionIndex;
+
+	for (positionIndex = 0; positionIndex < roomPtr->size; positionIndex ++) {
+		if (x == roomPtr->positionList[positionIndex][0] && y == roomPtr->positionList[positionIndex][1]) {
 			return 1;
 		}
 	}

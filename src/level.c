@@ -1114,11 +1114,11 @@ void decorateRooms() {
 
 				for (x1 = -1; x1 <= 1; x1 ++) {
 					for (y1 = -1; y1 <= 1; y1 ++) {
-						if (TCOD_map_is_walkable(TUNNEL_MAP, x + x1, y + y1)) {
-							invalid = 1;
+						//if (TCOD_map_is_walkable(TUNNEL_MAP, x + x1, y + y1)) {
+						//	invalid = 1;
 
-							break;
-						}
+						//	break;
+						//}
 
 						if (x + x1 < 0 || x + x1 >= WINDOW_WIDTH || y + y1 < 0 || y + y1 >= WINDOW_HEIGHT) {
 							continue;
@@ -1379,6 +1379,18 @@ void colorRooms() {
 		}*/
 
 		roomPtr = roomPtr->next;
+	}
+}
+
+void colorItems() {
+	item *itemPtr = getItems();
+
+	while (itemPtr) {
+		if (itemPtr->itemFlags & IS_KEYTORCH) {
+			drawCharBackEx(getLevelConsole(), itemPtr->x, itemPtr->y, TCOD_color_RGB(50, 50, 50), TCOD_BKGND_SET);
+		}
+
+		itemPtr = itemPtr->next;
 	}
 }
 
@@ -1648,6 +1660,12 @@ void carveTunnels() {
 			}
 
 			while (TCOD_path_walk(pathfinder, &wX, &wY, 0)) {
+				if (isPositionInRoom(neighborPtr, wX, wY)) {
+					addRoomDoorPosition(neighborPtr, wX, wY);
+
+					break;
+				}
+
 				TCOD_map_set_properties(LEVEL_MAP, wX, wY, 1, 1);
 				TCOD_map_set_properties(TUNNEL_MAP, wX, wY, 1, 1);
 			}
@@ -1661,14 +1679,15 @@ void generateLevel() {
 	resetLevel();
 	buildDungeon();
 	generateLayout();
+	carveTunnels();
 	generatePuzzles();
 	decorateRooms();
-	carveTunnels();
 	paintLevel();
 	placeItems();
 	//generateKeys();
 	colorRooms();
 	placeGrass();
+	colorItems();
 }
 
 void generateLevelOld() {
