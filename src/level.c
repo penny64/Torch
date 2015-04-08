@@ -556,7 +556,7 @@ void generateKeys() {
 }
 
 void generatePuzzles() {
-	int i, treasureRooms = 0, numberOfFurances = 0;
+	int i, numberOfTorchRooms = 0, numberOfTreasureRooms = 0, numberOfFurances = 0;
 	room *neighborRoomPtr, *roomPtr = getRooms();
 
 	STARTING_ROOM = NULL;
@@ -564,12 +564,12 @@ void generatePuzzles() {
 	while (roomPtr) {
 		printf("Conned: %i, size: %i\n", roomPtr->numberOfNeighborRooms, roomPtr->size);
 
-		if (treasureRooms < 2 && roomPtr->numberOfNeighborRooms <= 2 && roomPtr->size >= 20 && roomPtr->size < 45) {
+		if (numberOfTreasureRooms < 2 && roomPtr->numberOfNeighborRooms <= 2 && roomPtr->size >= 20 && roomPtr->size < 45) {
 			roomPtr->flags |= IS_TREASURE_ROOM;
 			roomPtr->flags |= NEEDS_DOORS;
 
-			treasureRooms ++;
-		} else if (LEVEL_TYPE == LEVEL_KEYTORCH && roomPtr->size >= 45 && roomPtr->size <= 65) {
+			numberOfTreasureRooms++;
+		} else if (LEVEL_TYPE == LEVEL_KEYTORCH && roomPtr->size >= 45 && roomPtr->size <= 65 && numberOfTorchRooms <= 3) {
 			roomPtr->flags |= IS_TORCH_ROOM;
 		} else if (roomPtr->size >= 80 && roomPtr->size <= 90) {
 			if (roomPtr->numberOfNeighborRooms == 2) {
@@ -1151,7 +1151,7 @@ void paintLevel() {
 }
 
 void buildDungeon() {
-	int x, y, positionIndex, i, horizSplit, nRoomCount, mapUpdated = 1, roomCount = 0, minRoomSize = 150;
+	int x, y, positionIndex, i, horizSplit, nRoomCount, mapUpdated = 1, roomCount = 0, minRoomSize = 110;
 	int MAX_ROOMS_TEMP = 60;
 	roomProto *roomWalker, *roomList[MAX_ROOMS_TEMP];
 	roomProto *rootRoom = createProtoRoom(2, 2, WINDOW_WIDTH - 2, WINDOW_HEIGHT - 2, NULL);
@@ -1243,7 +1243,7 @@ void generateLayout() {
 }
 
 void carveTunnels() {
-	int i, x, y, x1, y1, wX, wY, placedDoor, isNeighborRoom, positionIndex;
+	int i, x, y, x1, y1, wX, wY, placedDoor, isNeighborRoom, positionIndex, nearNeighbor;
 	room *neighborPtr, *tempRoom, *parentPtr = getRooms();
 	TCOD_path_t pathfinder;
 	TCOD_map_t roomMap = TCOD_map_new(WINDOW_WIDTH, WINDOW_HEIGHT);
@@ -1282,8 +1282,8 @@ void carveTunnels() {
 					x = tempRoom->positionList[positionIndex][0];
 					y = tempRoom->positionList[positionIndex][1];
 
-					for (y1 = -1; y1 < 1; y1 ++) {
-						for (x1 = -1; x1 < 1; x1 ++) {
+					for (y1 = -1; y1 <= 1; y1 ++) {
+						for (x1 = -1; x1 <= 1; x1 ++) {
 							TCOD_map_set_properties(roomMap, x + x1, y + y1, 0, 0);
 						}
 					}
@@ -1309,31 +1309,42 @@ void carveTunnels() {
 			}
 
 			placedDoor = 0;
+			nearNeighbor = 0;
 
 			while (TCOD_path_walk(pathfinder, &wX, &wY, 0)) {
 				TCOD_map_set_properties(LEVEL_MAP, wX, wY, 1, 1);
 
 				for (y1 = -1; y1 < 1; y1 ++) {
 					for (x1 = -1; x1 < 1; x1 ++) {
-						if (isPositionInRoom(neighborPtr, wX + x1, wY + y1)) {
-							TCOD_map_set_properties(TUNNEL_MAP, wX, wY, 1, 1);
-							addRoomDoorPosition(parentPtr, wX, wY);
+						if ((x1 == -1 && y1 == -1) && (x1 == 1 && y1 == -1) && (x1 == -1 && y1 == 1) & (x1 == 1 && y1 == 1)) {
+							continue;
+						}
 
-							placedDoor = 1;
+						if (isPositionInRoom(neighborPtr, wX + x1, wY + y1)) {
+							nearNeighbor = 1;
 						}
 					}
 
-					if (placedDoor) {
+					if (nearNeighbor) {
 						break;
 					}
 				}
 
-				if (placedDoor) {
-					break;
-				}
-
 				if (!isPositionInRoom(parentPtr, wX, wY)) {
 					TCOD_map_set_properties(TUNNEL_MAP, wX, wY, 1, 1);
+
+					if (!placedDoor) {
+						//if (isPositionInRoom(neighborPtr, wX + x1, wY + y1)) {
+						TCOD_map_set_properties(TUNNEL_MAP, wX, wY, 1, 1);
+						addRoomDoorPosition(parentPtr, wX, wY);
+
+						placedDoor = 1;
+						//}
+					}
+				}
+
+				if (nearNeighbor) {
+					break;
 				}
 			}
 

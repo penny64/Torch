@@ -27,7 +27,7 @@ roomProto *splitProtoRoom(roomProto *parentRoomProto, int horizSplit) {
 	int nx, ny, nWidth, nHeight, splitAmount;
 
 	if (horizSplit) {
-		splitAmount = (int)((parentRoomProto->height * getRandomFloat(.30, .7)) + .5);
+		splitAmount = (int)((parentRoomProto->height * getRandomFloat(.30, .8)) + .5);
 		nHeight = parentRoomProto->height - splitAmount;
 		parentRoomProto->height = splitAmount;
 
@@ -35,7 +35,7 @@ roomProto *splitProtoRoom(roomProto *parentRoomProto, int horizSplit) {
 		nx = parentRoomProto->x;
 		ny = parentRoomProto->y + parentRoomProto->height;
 	} else {
-		splitAmount = (int)((parentRoomProto->width * getRandomFloat(.3, .7)) + .5);
+		splitAmount = (int)((parentRoomProto->width * getRandomFloat(.3, .8)) + .5);
 
 		nWidth = parentRoomProto->width - splitAmount;
 		parentRoomProto->width = splitAmount;
@@ -242,6 +242,10 @@ void deleteAllRooms() {
 void addRoomDoorPosition(room *srcRoom, int x, int y) {
 	srcRoom->doorPositions[srcRoom->numberOfDoorPositions][0] = x;
 	srcRoom->doorPositions[srcRoom->numberOfDoorPositions][1] = y;
+
+	if (isPositionInRoom(srcRoom, x, y)) {
+		claimSpawnPositionInRoom(srcRoom, x, y);
+	}
 
 	srcRoom->numberOfDoorPositions ++;
 }
