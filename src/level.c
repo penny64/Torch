@@ -1151,10 +1151,11 @@ void paintLevel() {
 }
 
 void buildDungeon() {
-	int x, y, positionIndex, i, horizSplit, nRoomCount, mapUpdated = 1, roomCount = 0, minRoomSize = 110;
+	int x, y, positionIndex, i, invalidRoom, horizSplit, nRoomCount, mapUpdated = 1, roomCount = 0, minRoomSize = 210, bannedRoomCount = 0;
 	int MAX_ROOMS_TEMP = 60;
 	roomProto *roomWalker, *roomList[MAX_ROOMS_TEMP];
 	roomProto *rootRoom = createProtoRoom(2, 2, WINDOW_WIDTH - 2, WINDOW_HEIGHT - 2, NULL);
+	roomProto *bannedRooms[MAX_ROOMS_TEMP];
 
 	roomList[0] = rootRoom;
 	roomCount ++;
@@ -1166,7 +1167,26 @@ void buildDungeon() {
 		for (i = 0; i < nRoomCount; i ++) {
 			roomWalker = roomList[i];
 
-			if (roomWalker->size <= minRoomSize) {
+			if (roomWalker->size <= minRoomSize * 2 && !getRandomInt(0, 25)) {
+				bannedRooms[bannedRoomCount] = roomWalker;
+				bannedRoomCount ++;
+
+				break;
+			}
+
+			for (i = 0; i < bannedRoomCount; i ++) {
+				if (roomWalker == bannedRooms[bannedRoomCount]) {
+					invalidRoom = 0;
+
+					break;
+				}
+			}
+
+			if (invalidRoom) {
+				break;
+			}
+
+			if (roomWalker->size <= minRoomSize || roomWalker->width <= 8 || roomWalker->height <= 8) {
 				continue;
 			}
 
