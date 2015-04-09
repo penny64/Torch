@@ -1151,7 +1151,7 @@ void paintLevel() {
 }
 
 void buildDungeon() {
-	int x, y, positionIndex, i, invalidRoom, horizSplit, nRoomCount, mapUpdated = 1, roomCount = 0, minRoomSize = 210, bannedRoomCount = 0;
+	int x, y, positionIndex, i, invalidRoom, horizSplit, nRoomCount, mapUpdated = 1, roomCount = 0, minRoomSize = 120, bannedRoomCount = 0;
 	int MAX_ROOMS_TEMP = 60;
 	roomProto *roomWalker, *roomList[MAX_ROOMS_TEMP];
 	roomProto *rootRoom = createProtoRoom(2, 2, WINDOW_WIDTH - 2, WINDOW_HEIGHT - 2, NULL);
@@ -1167,20 +1167,20 @@ void buildDungeon() {
 		for (i = 0; i < nRoomCount; i ++) {
 			roomWalker = roomList[i];
 
-			if (roomWalker->size <= minRoomSize * 2 && !getRandomInt(0, 25)) {
+			if (1 == 3 && roomWalker->size <= minRoomSize && !getRandomInt(0, 25)) {
 				bannedRooms[bannedRoomCount] = roomWalker;
 				bannedRoomCount ++;
 
 				break;
 			}
 
-			for (i = 0; i < bannedRoomCount; i ++) {
-				if (roomWalker == bannedRooms[bannedRoomCount]) {
+			/*for (i = 0; i < bannedRoomCount; i ++) {
+				if (roomWalker == bannedRooms[i]) {
 					invalidRoom = 0;
 
 					break;
 				}
-			}
+			}*/
 
 			if (invalidRoom) {
 				break;
@@ -1229,9 +1229,14 @@ void buildDungeon() {
 	}
 }
 
+float getPositionCost(int xFrom, int yFrom, int xTo, int yTo, void *user_data) {
+	printf("%i, %i -> %i, %i\n", xFrom, yFrom, xTo, yTo);
+}
+
 void generateLayout() {
 	int tempDistance, cloestRoomDistance;
 	room *nearestChildPtr, *childPtr, *parentPtr = getRooms();
+	//TCOD_path_t pathfinder = TCOD_path_new_using_function(WINDOW_WIDTH, WINDOW_HEIGHT, getPositionCost, NULL, 0);
 
 	while (parentPtr) {
 		childPtr = getRooms();
@@ -1256,7 +1261,9 @@ void generateLayout() {
 			childPtr = childPtr->next;
 		}
 
-		addNeighbor(parentPtr, nearestChildPtr);
+		if (nearestChildPtr) {
+			addNeighbor(parentPtr, nearestChildPtr);
+		}
 
 		parentPtr = parentPtr->next;
 	}
