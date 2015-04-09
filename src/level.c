@@ -234,273 +234,6 @@ int levelLogic() {
 	return 0;
 }
 
-void carve(int x, int y) {
-	int x1, y1, x2, y2, nx, ny, xMod, yMod, invalidPos, lastXMod = -3, lastYMod = -3;
-	int i, ii;
-
-	TCOD_map_t existingLevel = copyLevelMap();
-	
-	for (i = 0; i < getRandomInt(9, 12 + getRandomInt(5, 25)); i++) {
-		for (ii = 0; ii <= 0; ii++) { //Useless
-			for (y1 = -1 - ii; y1 <= 1 + ii; y1++) {
-				for (x1 = -1 - ii; x1 <= 1 + ii; x1++) {
-					if (x + x1 <= 1 || x + x1 >= WINDOW_WIDTH - 2 || y + y1 <= 1 || y + y1 >= WINDOW_HEIGHT - 2) {
-						continue;
-					}
-
-					invalidPos = 0;
-
-					for (y2 = -1; y2 <= 1; y2++) {
-						for (x2 = -1; x2 <= 1; x2++) {
-							nx = x + x1 + x2;
-							ny = y + y1 + y2;
-
-							if (TCOD_map_is_walkable(existingLevel, nx, ny)) {
-								invalidPos = 1;
-
-								break;
-							}
-						}
-
-						if (invalidPos) {
-							break;
-						}
-					}
-
-					if (invalidPos) {
-						continue;
-					}
-					
-					TCOD_map_set_properties(LEVEL_MAP, x + x1, y + y1, 1, 1);
-				}
-			}
-		}
-		
-		while (TCOD_map_is_walkable(LEVEL_MAP, x, y)) {
-			xMod = getRandomInt(-1, 1);
-
-			while (xMod == lastXMod) {
-				xMod = getRandomInt(-1, 1);
-			}
-
-			x += xMod;
-			lastXMod = xMod;
-
-			yMod = getRandomInt(-1, 1);
-
-			while (yMod == lastYMod) {
-				yMod = getRandomInt(-1, 1);
-			}
-
-			y += yMod;
-			lastYMod = yMod;
-		}
-	}
-}
-
-void smooth() {
-	int x, y, i, x1, y1, count;
-	
-	for (i = 0; i < 32; i++) {
-		TCOD_map_t mapCopy = copyLevelMap();
-		
-		for (y = 0; y < WINDOW_HEIGHT; y++) {
-			for (x = 0; x < WINDOW_WIDTH; x++) {
-				if (TCOD_map_is_walkable(mapCopy, x, y)) {
-					continue;
-				}
-				
-				count = 0;
-				
-				for (y1 = -1; y1 <= 1; y1++) {
-					for (x1 = -1; x1 <= 1; x1++) {
-						if ((y1 == -1 && x1 == 1) || (y1 == -1 && x1 == -1) || (y1 == 1 && x1 == 1) || (y1 == 1 && x1 == -1)) {
-							continue;
-						}
-						
-						if (TCOD_map_is_walkable(mapCopy, x, y)) {
-							count ++;
-						}
-					}
-				}
-				
-				if (count == 4) {
-					TCOD_map_set_properties(LEVEL_MAP, x, y, 1, 1);
-				}
-			}
-		}
-		
-		TCOD_map_delete(mapCopy);
-	}
-}
-
-void findRooms() {
-	int i, x, y, x1, y1, w_x, w_y, oLen, cLen, added = 1;
-	ROOM_COUNT = 0;
-
-	for (y = 0; y <= WINDOW_HEIGHT; y++) {
-		for (x = 0; x <= WINDOW_WIDTH; x++) {
-			CLOSED_MAP[x][y] = 0;
-			ROOM_MAP[x][y] = 0;
-			TUNNEL_ROOM_MAP[x][y] = 0;
-			EFFECTS_MAP[x][y] = 0.1f;
-			openList[x][y] = 0;
-		}
-	}
-	
-	while (added) {
-		cLen = 0;
-		oLen = 0;
-		added = 0;
-
-		//Find starting position
-		for (y = 0; y < WINDOW_HEIGHT; y++) {
-			for (x = 0; x < WINDOW_WIDTH; x++) {
-				if (!TCOD_map_is_walkable(LEVEL_MAP, x, y) || ROOM_MAP[x][y]) {
-					continue;
-				}
-
-				if (!x && !y) {
-					printf("Cannot start at origin 0, 0 (pre ERROR)\n");
-
-					assert(x > 0 && y > 0);
-				}
-
-				openList[0][0] = x;
-				openList[0][1] = y;
-				oLen ++;
-
-				break;
-			}
-
-			if (oLen) {
-				break;
-			}
-		}
-
-		while (cLen < oLen) {
-			w_x = openList[cLen][0];
-			w_y = openList[cLen][1];
-
-			cLen ++;
-
-			for (y1 = -1; y1 <= 1; y1++) {
-				for (x1 = -1; x1 <= 1; x1++) {
-					x = w_x + x1;
-					y = w_y + y1;
-					
-					if ((y1 == -1 && x1 == 1) || (y1 == -1 && x1 == -1) || (y1 == 1 && x1 == 1) || (y1 == 1 && x1 == -1)) {
-						continue;
-					}
-
-					if (x <= 1 || x >= WINDOW_WIDTH - 2 || y <= 1 || y >= WINDOW_HEIGHT - 2) {
-						continue;
-					}
-					
-					if (!TCOD_map_is_walkable(LEVEL_MAP, x, y)) {
-						continue;
-					}
-
-					if (ROOM_MAP[x][y]) {
-						continue;
-					}
-					
-					if (CLOSED_MAP[x][y] > 0) {
-						continue;
-					}
-
-					if (!(y1 == 0 && x1 == 0)) {
-						openList[oLen][0] = x;
-						openList[oLen][1] = y;
-						oLen ++;
-					}
-
-					CLOSED_MAP[x][y] = 1;
-					added ++;
-				}
-			}
-		}
-
-		if (added) {
-			ROOM_COUNT ++;
-
-			for (i = 0; i < oLen; i++) {
-				x = openList[i][0];
-				y = openList[i][1];
-
-				if (!x && !y) {
-					printf("Cannot start at origin 0, 0 (post ERROR)\n");
-
-					assert(x > 0 && y > 0);
-				}
-
-				ROOM_MAP[x][y] = ROOM_COUNT;
-			}
-
-			/*if (ROOM_COUNT == ROOM_COUNT_MAX) {
-				roomFlags = IS_TREASURE_ROOM;
-			} else if (getRandomInt(0, 2)) {
-				roomFlags = IS_TORCH_ROOM | IS_EXIT_ROOM;
-			}*/
-
-			//createRoom(ROOM_COUNT, oLen, 0x0);
-
-			//printf("Found new room: %i (%i)\n", ROOM_COUNT, oLen);
-		}
-	}
-
-	ROOM_COUNT_MAX = ROOM_COUNT;
-}
-
-int isLevelValid() {
-	int i, ii, invalid, openList[MAX_CONNECTED_ROOMS], closedList[MAX_CONNECTED_ROOMS];
-	int openListIndex = 0, connectedRoomsIndex = 0;
-	room *roomPtr = getRooms();
-
-	openList[openListIndex] = roomPtr->id;
-	openListIndex ++;
-	
-	while (openListIndex) {
-		openListIndex --;
-		roomPtr = getRoomViaId(openList[openListIndex]);
-		closedList[connectedRoomsIndex] = roomPtr->id;
-		connectedRoomsIndex ++;
-
-		for (i = 0; i < roomPtr->numberOfNeighborRooms; i++) {
-			invalid = 0;
-			
-			for (ii = 0; ii < connectedRoomsIndex; ii++) {
-				if (roomPtr->neighborRoomIds[i] == closedList[ii]) {
-					invalid = 1;
-					
-					break;
-				}
-			}
-
-			if (!invalid) {
-				for (ii = 0; ii < openListIndex; ii++) {
-					if (roomPtr->neighborRoomIds[i] == openList[ii]) {
-						invalid = 1;
-
-						break;
-					}
-				}
-			}
-
-			if (!invalid) {
-				openList[openListIndex] = roomPtr->neighborRoomIds[i];
-				openListIndex ++;
-			}
-		}
-	}
-	
-	if (connectedRoomsIndex == ROOM_COUNT_MAX) {
-		return 1;
-	}
-	
-	return 0;
-}
-
 void generateKeys() {
 	int i, ii, invalid, spawnPosition[2], openList[MAX_CONNECTED_ROOMS], closedList[MAX_CONNECTED_ROOMS];
 	int openListIndex = 0, connectedRoomsIndex = 0;
@@ -560,12 +293,25 @@ void generatePuzzles() {
 	int i, numberOfTorchRooms = 0, numberOfTreasureRooms = 0, numberOfFurances = 0;
 	room *neighborRoomPtr, *roomPtr = getRooms();
 
-	STARTING_ROOM = NULL;
-
 	while (roomPtr) {
 		printf("Conned: %i, size: %i\n", roomPtr->numberOfNeighborRooms, roomPtr->size);
 
-		if (numberOfTreasureRooms < 2 && roomPtr->numberOfNeighborRooms <= 2 && roomPtr->size >= 20 && roomPtr->size < 45) {
+		if (roomPtr->flags & IS_START_ROOM) {
+			roomPtr = roomPtr->next;
+
+			continue;
+		}
+
+		if (roomPtr->flags & IS_SPECIAL_ROOM) {
+			roomPtr->flags |= IS_TREASURE_ROOM;
+			roomPtr->flags |= NEEDS_DOORS;
+
+			roomPtr = roomPtr->next;
+
+			continue;
+		}
+
+		if (!(roomPtr->flags & IS_MAIN_PATH) && numberOfTreasureRooms < 2 && roomPtr->numberOfNeighborRooms <= 2 && roomPtr->size >= 20 && roomPtr->size < 45) {
 			roomPtr->flags |= IS_TREASURE_ROOM;
 			roomPtr->flags |= NEEDS_DOORS;
 
@@ -575,7 +321,7 @@ void generatePuzzles() {
 		} else if (roomPtr->size >= 80 && roomPtr->size <= 90) {
 			if (roomPtr->numberOfNeighborRooms == 2) {
 				roomPtr->flags |= IS_LAVA_ROOM;
-			} else {
+			} else if (!(roomPtr->flags & IS_MAIN_PATH)) {
 				roomPtr->flags |= NEEDS_DOORS;
 			}
 		}
@@ -606,35 +352,13 @@ void generatePuzzles() {
 }
 
 void placeItems() {
-	int x, y, i, invalidStartRoom, lavaWalkerX, lavaWalkerY, doorEnterIndex, doorExitIndex, exitPlaced = 0, startPlaced = 0, placedAllSeeingEye = 0;
+	int x, y, i, invalidStartRoom, lavaWalkerX, lavaWalkerY, doorEnterIndex, doorExitIndex, exitPlaced = 0, placedAllSeeingEye = 0;
 	int spawnPosition[2], doorEnter[2], doorExit[2];
 	TCOD_dijkstra_t lavaWalker = TCOD_dijkstra_new(LEVEL_MAP, 0.0f);
 	room *roomPtr = getRooms();
 	light *lghtPtr;
 
 	while (roomPtr) {
-		invalidStartRoom = 0;
-
-		if (!startPlaced && !(roomPtr->flags & NEEDS_DOORS)) {
-			for (i = 0; i < roomPtr->numberOfNeighborRooms; i++) {
-				if (getRoomViaId(roomPtr->neighborRoomIds[i])->flags & NEEDS_DOORS) {
-					invalidStartRoom = 1;
-
-					break;
-				}
-			}
-
-			if (!invalidStartRoom) {
-				roomPtr->flags |= IS_START_ROOM;
-
-				getNewSpawnPosition(roomPtr, START_LOCATION);
-
-				STARTING_ROOM = roomPtr;
-
-				startPlaced = 1;
-			}
-		}
-
 		if (roomPtr->flags & IS_TORCH_ROOM) {
 			createAndPlaceItemInRoom(roomPtr, &createBonfireKeystone);
 		}
@@ -720,22 +444,6 @@ void placeItems() {
 
 		roomPtr = roomPtr->next;
 	}
-
-	roomPtr = getRooms();
-
-	while (roomPtr) {
-		if (!exitPlaced && roomPtr->size <= 80 && !(roomPtr->flags & IS_START_ROOM)) {
-			roomPtr->flags |= IS_EXIT_ROOM;
-
-			getNewSpawnPosition(roomPtr, EXIT_LOCATION);
-
-			exitPlaced = 1;
-
-			break;
-		}
-
-		roomPtr = roomPtr->next;
-	}
 }
 
 void decorateRooms() {
@@ -776,6 +484,12 @@ void decorateRooms() {
 
 								break;
 							}
+						}
+
+						if (!isPositionSpawnable(roomPtr, x + x1, y + y1)) {
+							invalid = 1;
+
+							break;
 						}
 
 						if (ii == -1) {
@@ -1152,9 +866,9 @@ void paintLevel() {
 }
 
 void buildDungeon() {
-	int x, y, positionIndex, i, invalidRoom, horizSplit, nRoomCount, mapUpdated = 1, minRoomSize = 120, bannedRoomCount = 0;
+	int i, ii, invalidRoom, horizSplit, nRoomCount, mapUpdated = 1, minRoomSize = 140, bannedRoomCount = 0;
 	int MAX_ROOMS_TEMP = 60;
-	roomProto *roomWalker;//, *PROTO_ROOMS = malloc(sizeof(roomProto) * MAX_ROOMS_TEMP);
+	roomProto *roomWalker;
 	roomProto *rootRoom = createProtoRoom(2, 2, WINDOW_WIDTH - 2, WINDOW_HEIGHT - 2, NULL);
 	roomProto *bannedRooms[MAX_ROOMS_TEMP];
 
@@ -1170,15 +884,15 @@ void buildDungeon() {
 			invalidRoom = 0;
 			roomWalker = PROTO_ROOMS[i];
 
-			if (roomWalker->size <= minRoomSize && !getRandomInt(0, 25)) {
+			if (roomWalker->size <= minRoomSize * 1.3 && !getRandomInt(0, 15)) {
 				bannedRooms[bannedRoomCount] = roomWalker;
 				bannedRoomCount ++;
 
 				break;
 			}
 
-			for (i = 0; i < bannedRoomCount; i ++) {
-				if (roomWalker == bannedRooms[i]) {
+			for (ii = 0; ii < bannedRoomCount; ii ++) {
+				if (roomWalker == bannedRooms[ii]) {
 					invalidRoom = 1;
 
 					break;
@@ -1186,7 +900,7 @@ void buildDungeon() {
 			}
 
 			if (invalidRoom) {
-				break;
+				continue;
 			}
 
 			if (roomWalker->size <= minRoomSize || roomWalker->width <= 8 || roomWalker->height <= 8) {
@@ -1216,37 +930,48 @@ void buildDungeon() {
 	}
 
 	printf("Total room count: %i\n", PROTO_ROOM_COUNT);
-
-	//Place rooms
-	/*for (i = 0; i < roomCount; i ++) {
-		//roomWalker = roomList[i];
-		room *rm = createRoom(roomList[i], 0x0);
-
-		for (positionIndex = 0; positionIndex < rm->size; positionIndex ++) {
-			x = rm->positionList[positionIndex][0];
-			y = rm->positionList[positionIndex][1];
-
-			drawCharBackEx(LEVEL_CONSOLE, x, y, TCOD_color_RGB(255, 30, 255), TCOD_BKGND_SET);
-			TCOD_map_set_properties(LEVEL_MAP, x, y, 1, 1);
-		}
-	}*/
 }
 
 float getPositionCost(int xFrom, int yFrom, int xTo, int yTo, void *user_data) {
 	roomProto *roomWalker;
-	int i;
+	int i, fromInRoom, toInRoom;
+	float fromCost = 999, toCost = 999;
 
 	for (i = 0; i < PROTO_ROOM_COUNT; i ++) {
 		roomWalker = PROTO_ROOMS[i];
 
+		fromInRoom = (xFrom >= roomWalker->x &&
+				yFrom >= roomWalker->y &&
+				xFrom < roomWalker->x + roomWalker->width &&
+				yFrom < roomWalker->y + roomWalker->height);
+		toInRoom = (xTo >= roomWalker->x &&
+					  yTo >= roomWalker->y &&
+					  xTo < roomWalker->x + roomWalker->width &&
+					  yTo < roomWalker->y + roomWalker->height);
 
+		if (fromInRoom) {
+			fromCost = roomWalker->cost * roomWalker->timesSplit;
 
+			if (roomWalker->build) {
+				fromCost *= 2;
+			}
+		}
+
+		if (toInRoom) {
+			toCost = roomWalker->cost * roomWalker->timesSplit;
+
+			if (roomWalker->build) {
+				fromCost *= 2;
+			}
+		}
 	}
+
+	return fromCost + toCost;
 }
 
 void designDungeon() {
-	int i, startRoomX, startRoomY, distanceToStart, endRoomScore = 0;
-	roomProto *roomWalker, *startRoom = NULL, *endRoom = NULL;
+	int i, x, y, positionIndex, wX, wY, startRoomX, startRoomY, exitRoomX, exitRoomY, distanceToStart, distanceToExit, inRoom, specialRoomScore = 0, endRoomScore = 0;
+	roomProto *roomWalker, *specialRoom = NULL, *startRoom = NULL, *endRoom = NULL;
 	TCOD_path_t pathfinder;
 
 	pathfinder = TCOD_path_new_using_function(WINDOW_WIDTH, WINDOW_HEIGHT, getPositionCost, NULL, 0);
@@ -1286,26 +1011,176 @@ void designDungeon() {
 			continue;
 		}
 
-		roomWalker->cost = getRandomFloat(1.5f, 2.5f);
+		roomWalker->cost = getRandomFloat(4.5f, 5.5f);
 	}
 
 	startRoom->cost = 1.;
 	startRoom->flags |= IS_PROTO_START;
 
 	endRoom->cost = 1.;
-	endRoom->flags |= IS_PROTO_END;
+	endRoom->flags |= IS_PROTO_EXIT;
+
+	exitRoomX = endRoom->x + (endRoom->width / 2);
+	exitRoomY = endRoom->y + (endRoom->height / 2);
 
 	//Find start and end rooms
 	TCOD_path_compute(pathfinder,
 					  startRoomX,
 					  startRoomY,
-					  endRoom->x + (endRoom->width / 2),
-					  endRoom->y + (endRoom->height / 2));
+					  exitRoomX,
+					  exitRoomY);
+
+	//FIRST WALKTHROUGH: THE DIRECT PATH
+	while (TCOD_path_walk(pathfinder, &wX, &wY, 0)) {
+		for (i = 0; i < PROTO_ROOM_COUNT; i ++) {
+			roomWalker = PROTO_ROOMS[i];
+
+			if (roomWalker->build) {
+				continue;
+			}
+
+			inRoom = (wX >= roomWalker->x &&
+					wY >= roomWalker->y &&
+					wX < roomWalker->x + roomWalker->width &&
+					wY < roomWalker->y + roomWalker->height);
+
+			if (inRoom) {
+				roomWalker->build = 1;
+				roomWalker->flags |= IS_PROTO_MAIN_PATH;
+
+				continue;
+			}
+		}
+	}
+
+	//SECOND WALKTHROUGH: THE HARD WAY
+	TCOD_path_compute(pathfinder,
+					  startRoomX,
+					  startRoomY,
+					  exitRoomX,
+					  exitRoomY);
+
+	while (TCOD_path_walk(pathfinder, &wX, &wY, 0)) {
+		for (i = 0; i < PROTO_ROOM_COUNT; i ++) {
+			roomWalker = PROTO_ROOMS[i];
+
+			inRoom = (wX >= roomWalker->x &&
+					  wY >= roomWalker->y &&
+					  wX < roomWalker->x + roomWalker->width &&
+					  wY < roomWalker->y + roomWalker->height);
+
+			if (inRoom) {
+				roomWalker->build = 1;
+
+				continue;
+			}
+		}
+	}
+
+	for (i = 0; i < PROTO_ROOM_COUNT; i ++) {
+		roomWalker = PROTO_ROOMS[i];
+
+		inRoom = (wX >= roomWalker->x &&
+				  wY >= roomWalker->y &&
+				  wX < roomWalker->x + roomWalker->width &&
+				  wY < roomWalker->y + roomWalker->height);
+
+		if (inRoom) {
+			roomWalker->build = 1;
+
+			continue;
+		}
+	}
+
+	for (i = 0; i < PROTO_ROOM_COUNT; i ++) {
+		roomWalker = PROTO_ROOMS[i];
+
+		if (roomWalker->build) {
+			continue;
+		}
+
+		distanceToStart = distance(roomWalker->x + (roomWalker->width / 2),
+								   roomWalker->y + (roomWalker->height / 2),
+								   startRoomX,
+								   startRoomY);
+		distanceToExit = distance(roomWalker->x + (roomWalker->width / 2),
+								  roomWalker->y + (roomWalker->height / 2),
+								  exitRoomX,
+								  exitRoomY);
+
+		if ((distanceToStart + distanceToExit) > specialRoomScore) {
+			specialRoomScore = distanceToStart + distanceToExit;
+			specialRoom = roomWalker;
+		}
+	}
+
+	//THIRD WALKTHROUGH: THE DANGEROUS WAY
+	TCOD_path_compute(pathfinder,
+					  startRoomX,
+					  startRoomY,
+					  specialRoom->x + (specialRoom->width / 2),
+					  specialRoom->y + (specialRoom->height / 2));
+
+	while (TCOD_path_walk(pathfinder, &wX, &wY, 0)) {
+		for (i = 0; i < PROTO_ROOM_COUNT; i ++) {
+			roomWalker = PROTO_ROOMS[i];
+
+			inRoom = (wX >= roomWalker->x &&
+					  wY >= roomWalker->y &&
+					  wX < roomWalker->x + roomWalker->width &&
+					  wY < roomWalker->y + roomWalker->height);
+
+			if (inRoom) {
+				roomWalker->build = 1;
+
+				continue;
+			}
+		}
+	}
+
+	//Place rooms
+	for (i = 0; i < PROTO_ROOM_COUNT; i ++) {
+		if (!PROTO_ROOMS[i]->build) {
+			continue;
+		}
+
+		room *rm = createRoom(PROTO_ROOMS[i], 0x0);
+
+		if (PROTO_ROOMS[i]->flags & IS_PROTO_START) {
+			rm->flags |= IS_START_ROOM;
+
+			getNewSpawnPosition(rm, START_LOCATION);
+
+			STARTING_ROOM = rm;
+		}
+
+		if (PROTO_ROOMS[i]->flags & IS_PROTO_EXIT) {
+			rm->flags |= IS_EXIT_ROOM;
+
+			getNewSpawnPosition(rm, EXIT_LOCATION);
+		}
+
+		if (PROTO_ROOMS[i]->flags & IS_PROTO_MAIN_PATH) {
+			rm->flags |= IS_MAIN_PATH;
+		}
+
+		if (PROTO_ROOMS[i]->flags & IS_PROTO_SPECIAL_ROOM) {
+			rm->flags |= IS_SPECIAL_ROOM;
+		}
+
+		for (positionIndex = 0; positionIndex < rm->size; positionIndex ++) {
+			x = rm->positionList[positionIndex][0];
+			y = rm->positionList[positionIndex][1];
+
+			drawCharBackEx(LEVEL_CONSOLE, x, y, TCOD_color_RGB(255, 30, 255), TCOD_BKGND_SET);
+			TCOD_map_set_properties(LEVEL_MAP, x, y, 1, 1);
+		}
+	}
 }
 
 void connectNeighbors() {
-	int tempDistance, cloestRoomDistance;
-	room *nearestChildPtr, *childPtr, *parentPtr = getRooms();
+	int i, tempDistance, cloestRoomDistance, hasNeighborOfNeighbor;
+	room *nearestChildPtr, *tempNeighbor, *childPtr, *parentPtr = getRooms();
 
 	while (parentPtr) {
 		childPtr = getRooms();
@@ -1313,7 +1188,26 @@ void connectNeighbors() {
 		cloestRoomDistance = WINDOW_WIDTH * WINDOW_HEIGHT;
 
 		while (childPtr) {
+			hasNeighborOfNeighbor = 0;
+
 			if (parentPtr == childPtr || isNeighborWith(parentPtr, childPtr)) {
+				//for (i = 0; i < )
+				childPtr = childPtr->next;
+
+				continue;
+			}
+
+			for (i = 0; i < parentPtr->numberOfNeighborRooms; i ++) {
+				tempNeighbor = getRoomViaId(parentPtr->neighborRoomIds[i]);
+
+				if (isNeighborWith(tempNeighbor, childPtr)) {
+					hasNeighborOfNeighbor = 1;
+
+					break;
+				}
+			}
+
+			if (hasNeighborOfNeighbor) {
 				childPtr = childPtr->next;
 
 				continue;
@@ -1383,8 +1277,6 @@ void carveTunnels() {
 							TCOD_map_set_properties(roomMap, x + x1, y + y1, 0, 0);
 						}
 					}
-
-					//drawCharBackEx(LEVEL_CONSOLE, x, y, TCOD_color_RGB(255, 30, 255), TCOD_BKGND_SET);
 				}
 			}
 

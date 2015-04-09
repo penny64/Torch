@@ -9,8 +9,24 @@
 
 enum {
 	IS_PROTO_START = 0x01 << 0,
-	IS_PROTO_END = 0x01 << 1,
-} protoRoomTraits;
+	IS_PROTO_EXIT = 0x01 << 1,
+	IS_PROTO_MAIN_PATH = 0x01 << 2,
+	IS_PROTO_SPECIAL_ROOM = 0x01 << 3,
+} protoRoom_t;
+
+enum {
+	IS_TREASURE_ROOM = 0x01 << 0,
+	IS_TORCH_ROOM = 0x01 << 1,
+	IS_EXIT_ROOM = 0x01 << 2,
+	NEEDS_DOORS = 0x01 << 3,
+	IS_RARE_SPAWN = 0x01 << 4,
+	IS_LAVA_ROOM = 0x01 << 5,
+	IS_START_ROOM = 0x01 << 6,
+	IS_PUZZLE_ROOM = 0x01 << 7,
+	IS_FURNACE_ROOM = 0x01 << 8,
+	IS_MAIN_PATH = 0x01 << 9,
+	IS_SPECIAL_ROOM = 0x01 << 10,
+} roomFlag_t;
 
 typedef struct room room;
 
@@ -25,7 +41,7 @@ struct room {
 typedef struct roomProto roomProto;
 
 struct roomProto {
-	int id, x, y, width, height, size;
+	int id, x, y, width, height, size, build, timesSplit;
 	float cost;
 	unsigned int flags; // :)
 	roomProto *parent;
@@ -45,6 +61,7 @@ int isNeighborWith(room *, room*);
 int isNeighborWithId(room*, int);
 int isConnectedWith(room*, room*);
 int isPositionInRoom(room*, int, int);
+int isPositionSpawnable(room*, int, int);
 
 room *createRoom(roomProto*, unsigned int);
 room *getRooms(void);

@@ -19,8 +19,10 @@ roomProto *createProtoRoom(int x, int y, int width, int height, roomProto *paren
 	rm->height = height;
 	rm->size = width * height;
 	rm->parent = parentRoomProto;
+	rm->build = 0;
 	rm->cost = 150;
 	rm->flags = 0x0;
+	rm->timesSplit = 1;
 
 	return rm;
 }
@@ -55,6 +57,7 @@ roomProto *splitProtoRoom(roomProto *parentRoomProto, int horizSplit) {
 	}
 
 	parentRoomProto->size = parentRoomProto->width * parentRoomProto->height;
+	parentRoomProto->timesSplit ++;
 
 	return createProtoRoom(nx, ny, nWidth, nHeight, parentRoomProto);
 }
@@ -73,11 +76,11 @@ room *createRoom(roomProto *prototypeRoom, unsigned int flags) {
 	rm->y = prototypeRoom->y + 1;
 
 	if (width > 5) {
-		width = (int)((width * getRandomFloat(.65, .75)) + .5);
+		width = (int)((width * getRandomFloat(.7, .85)) + .5);
 	}
 
 	if (height > 5) {
-		height = (int)((height * getRandomFloat(.65, .75)) + .5);
+		height = (int)((height * getRandomFloat(.7, .75)) + .5);
 	}
 
 	if (width < prototypeRoom->width) {
@@ -278,6 +281,18 @@ void connectRooms(room *srcRoom, room *dstRoom) {
 
 		dstRoom->numberOfConnectedRooms++;
 	}
+}
+
+int isPositionSpawnable(room *srcRoom, int x, int y) {
+	int i;
+
+	for (i = 0; i < srcRoom->size; i ++) {
+		if (x == srcRoom->positionList[i][0] && y == srcRoom->positionList[i][1]) {
+			return 1;
+		}
+	}
+
+	return 0;
 }
 
 void getNewSpawnPosition(room *srcRoom, int coordArray[]) {
