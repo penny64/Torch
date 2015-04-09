@@ -19,6 +19,8 @@ roomProto *createProtoRoom(int x, int y, int width, int height, roomProto *paren
 	rm->height = height;
 	rm->size = width * height;
 	rm->parent = parentRoomProto;
+	rm->cost = 150;
+	rm->flags = 0x0;
 
 	return rm;
 }
@@ -27,7 +29,7 @@ roomProto *splitProtoRoom(roomProto *parentRoomProto, int horizSplit) {
 	int nx, ny, nWidth, nHeight, splitAmount;
 
 	if (horizSplit) {
-		splitAmount = (int)((parentRoomProto->height * getRandomFloat(.40, .8)) + .5);
+		splitAmount = (int)((parentRoomProto->height * getRandomFloat(.4, .6)) + .5);
 		nHeight = parentRoomProto->height - splitAmount;
 		parentRoomProto->height = splitAmount;
 
@@ -35,7 +37,7 @@ roomProto *splitProtoRoom(roomProto *parentRoomProto, int horizSplit) {
 		nx = parentRoomProto->x;
 		ny = parentRoomProto->y + parentRoomProto->height;
 	} else {
-		splitAmount = (int)((parentRoomProto->width * getRandomFloat(.40, .8)) + .5);
+		splitAmount = (int)((parentRoomProto->width * getRandomFloat(.4, .6)) + .5);
 
 		nWidth = parentRoomProto->width - splitAmount;
 		parentRoomProto->width = splitAmount;

@@ -27,13 +27,14 @@ TCOD_map_t TUNNEL_MAP;
 TCOD_map_t TUNNEL_WALLS;
 TCOD_noise_t FOG_NOISE;
 room *STARTING_ROOM = NULL;
+roomProto *PROTO_ROOMS[255];
 int (*ROOM_MAP)[255];
 int (*TUNNEL_ROOM_MAP)[255];
 int (*DIJKSTRA_MAP)[255];
 int (*CLOSED_MAP)[255];
 float (*EFFECTS_MAP)[255];
 float EXIT_WAVE_DIST;
-int ROOM_COUNT, ROOM_COUNT_MAX;
+int ROOM_COUNT, ROOM_COUNT_MAX, PROTO_ROOM_COUNT;
 int EXIT_OPEN = 0;
 int EXIT_IN_PROGRESS;
 int START_LOCATION[2];
@@ -1151,36 +1152,38 @@ void paintLevel() {
 }
 
 void buildDungeon() {
-	int x, y, positionIndex, i, invalidRoom, horizSplit, nRoomCount, mapUpdated = 1, roomCount = 0, minRoomSize = 120, bannedRoomCount = 0;
+	int x, y, positionIndex, i, invalidRoom, horizSplit, nRoomCount, mapUpdated = 1, minRoomSize = 120, bannedRoomCount = 0;
 	int MAX_ROOMS_TEMP = 60;
-	roomProto *roomWalker, *roomList[MAX_ROOMS_TEMP];
+	roomProto *roomWalker;//, *PROTO_ROOMS = malloc(sizeof(roomProto) * MAX_ROOMS_TEMP);
 	roomProto *rootRoom = createProtoRoom(2, 2, WINDOW_WIDTH - 2, WINDOW_HEIGHT - 2, NULL);
 	roomProto *bannedRooms[MAX_ROOMS_TEMP];
 
-	roomList[0] = rootRoom;
-	roomCount ++;
+	PROTO_ROOM_COUNT = 0;
+	PROTO_ROOMS[0] = rootRoom;
+	PROTO_ROOM_COUNT++;
 
 	while (mapUpdated) {
 		mapUpdated = 0;
-		nRoomCount = roomCount;
+		nRoomCount = PROTO_ROOM_COUNT;
 
 		for (i = 0; i < nRoomCount; i ++) {
-			roomWalker = roomList[i];
+			invalidRoom = 0;
+			roomWalker = PROTO_ROOMS[i];
 
-			if (1 == 3 && roomWalker->size <= minRoomSize && !getRandomInt(0, 25)) {
+			if (roomWalker->size <= minRoomSize && !getRandomInt(0, 25)) {
 				bannedRooms[bannedRoomCount] = roomWalker;
 				bannedRoomCount ++;
 
 				break;
 			}
 
-			/*for (i = 0; i < bannedRoomCount; i ++) {
+			for (i = 0; i < bannedRoomCount; i ++) {
 				if (roomWalker == bannedRooms[i]) {
-					invalidRoom = 0;
+					invalidRoom = 1;
 
 					break;
 				}
-			}*/
+			}
 
 			if (invalidRoom) {
 				break;
@@ -1204,18 +1207,18 @@ void buildDungeon() {
 
 			roomProto *childRoom = splitProtoRoom(roomWalker, horizSplit);
 
-			roomList[roomCount] = childRoom;
-			roomCount ++;
+			PROTO_ROOMS[PROTO_ROOM_COUNT] = childRoom;
+			PROTO_ROOM_COUNT++;
 			mapUpdated = 1;
 
-			assert(roomCount < MAX_ROOMS_TEMP);
+			assert(PROTO_ROOM_COUNT < MAX_ROOMS_TEMP);
 		}
 	}
 
-	printf("Total room count: %i\n", roomCount);
+	printf("Total room count: %i\n", PROTO_ROOM_COUNT);
 
 	//Place rooms
-	for (i = 0; i < roomCount; i ++) {
+	/*for (i = 0; i < roomCount; i ++) {
 		//roomWalker = roomList[i];
 		room *rm = createRoom(roomList[i], 0x0);
 
@@ -1226,17 +1229,83 @@ void buildDungeon() {
 			drawCharBackEx(LEVEL_CONSOLE, x, y, TCOD_color_RGB(255, 30, 255), TCOD_BKGND_SET);
 			TCOD_map_set_properties(LEVEL_MAP, x, y, 1, 1);
 		}
-	}
+	}*/
 }
 
 float getPositionCost(int xFrom, int yFrom, int xTo, int yTo, void *user_data) {
-	printf("%i, %i -> %i, %i\n", xFrom, yFrom, xTo, yTo);
+	roomProto *roomWalker;
+	int i;
+
+	for (i = 0; i < PROTO_ROOM_COUNT; i ++) {
+		roomWalker = PROTO_ROOMS[i];
+
+
+
+	}
 }
 
-void generateLayout() {
+void designDungeon() {
+	int i, startRoomX, startRoomY, distanceToStart, endRoomScore = 0;
+	roomProto *roomWalker, *startRoom = NULL, *endRoom = NULL;
+	TCOD_path_t pathfinder;
+
+	pathfinder = TCOD_path_new_using_function(WINDOW_WIDTH, WINDOW_HEIGHT, getPositionCost, NULL, 0);
+
+	//Find start room
+	for (i = 0; i < PROTO_ROOM_COUNT; i ++) {
+		roomWalker = PROTO_ROOMS[i];
+
+		if (!startRoom || !getRandomInt(0, 15)) {
+			startRoom = roomWalker;
+		}
+	}
+
+	startRoomX = startRoom->x + (startRoom->width / 2);
+	startRoomY = startRoom->y + (startRoom->height / 2);
+
+	//End room
+	for (i = 0; i < PROTO_ROOM_COUNT; i ++) {
+		roomWalker = PROTO_ROOMS[i];
+
+		distanceToStart = distance(roomWalker->x + (roomWalker->width / 2),
+								   roomWalker->y + (roomWalker->height / 2),
+								   startRoomX,
+								   startRoomY);
+
+		if (distanceToStart > endRoomScore) {
+			endRoomScore = distanceToStart;
+			endRoom = roomWalker;
+		}
+	}
+
+	//Cost assignment
+	for (i = 0; i < PROTO_ROOM_COUNT; i ++) {
+		roomWalker = PROTO_ROOMS[i];
+
+		if (roomWalker == startRoom || roomWalker == endRoom) {
+			continue;
+		}
+
+		roomWalker->cost = getRandomFloat(1.5f, 2.5f);
+	}
+
+	startRoom->cost = 1.;
+	startRoom->flags |= IS_PROTO_START;
+
+	endRoom->cost = 1.;
+	endRoom->flags |= IS_PROTO_END;
+
+	//Find start and end rooms
+	TCOD_path_compute(pathfinder,
+					  startRoomX,
+					  startRoomY,
+					  endRoom->x + (endRoom->width / 2),
+					  endRoom->y + (endRoom->height / 2));
+}
+
+void connectNeighbors() {
 	int tempDistance, cloestRoomDistance;
 	room *nearestChildPtr, *childPtr, *parentPtr = getRooms();
-	//TCOD_path_t pathfinder = TCOD_path_new_using_function(WINDOW_WIDTH, WINDOW_HEIGHT, getPositionCost, NULL, 0);
 
 	while (parentPtr) {
 		childPtr = getRooms();
@@ -1388,7 +1457,8 @@ void generateLevel() {
 
 	resetLevel();
 	buildDungeon();
-	generateLayout();
+	designDungeon();
+	connectNeighbors();
 	carveTunnels();
 	generatePuzzles();
 	decorateRooms();

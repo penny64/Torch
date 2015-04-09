@@ -7,6 +7,11 @@
 #define ROOMS_H
 
 
+enum {
+	IS_PROTO_START = 0x01 << 0,
+	IS_PROTO_END = 0x01 << 1,
+} protoRoomTraits;
+
 typedef struct room room;
 
 struct room {
@@ -21,6 +26,8 @@ typedef struct roomProto roomProto;
 
 struct roomProto {
 	int id, x, y, width, height, size;
+	float cost;
+	unsigned int flags; // :)
 	roomProto *parent;
 };
 
