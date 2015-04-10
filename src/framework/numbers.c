@@ -61,3 +61,51 @@ void velocity(double velocityArray[2], int direction, float speed) {
 	velocityArray[0] = (cos(rad) * (double)speed);
 	velocityArray[1] = (sin(rad) * (double)speed);
 }
+
+int **create2dIntArray(int width, int height) {
+	int **array;
+	int i;
+
+	array = malloc(width * sizeof(int *));
+
+	for (i = 0; i < width; i ++) {
+		array[i] = malloc(height * sizeof(int));
+	}
+
+	return array;
+}
+
+float **create2dFloatArray(int width, int height) {
+	float **array;
+	int i;
+
+	array = malloc(width * sizeof(float *));
+
+	for (i = 0; i < width; i ++) {
+		array[i] = malloc(height * sizeof(float));
+	}
+
+	return array;
+}
+
+void delete2dIntArray(int **array, int height) {
+	int i;
+
+
+	for (i = 0; i < height; i ++) {
+		free(array[i]);
+	}
+
+	free(array);
+}
+
+void delete2dFloatArray(float **array, int height) {
+	int i;
+
+
+	for (i = 0; i < height; i ++) {
+		free(array[i]);
+	}
+
+	free(array);
+}

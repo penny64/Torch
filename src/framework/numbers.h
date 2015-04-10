@@ -7,3 +7,7 @@ int distance(int, int, int, int);
 float distanceFloat(float, float, float, float);
 int directionTo(int, int, int, int);
 void velocity(double[2], int, float);
+int **create2dIntArray(int, int);
+void delete2dIntArray(int**, int);
+float **create2dFloatArray(int, int);
+void delete2dFloatArray(float**, int);

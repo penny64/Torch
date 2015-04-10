@@ -28,26 +28,20 @@ TCOD_map_t TUNNEL_WALLS;
 TCOD_noise_t FOG_NOISE;
 room *STARTING_ROOM = NULL;
 roomProto *PROTO_ROOMS[255];
-int (*ROOM_MAP)[255];
-int (*TUNNEL_ROOM_MAP)[255];
-int (*DIJKSTRA_MAP)[255];
-int (*CLOSED_MAP)[255];
+int **ROOM_MAP;
+int **TUNNEL_ROOM_MAP;
 float **EFFECTS_MAP;
 float EXIT_WAVE_DIST;
-int ROOM_COUNT, ROOM_COUNT_MAX, PROTO_ROOM_COUNT;
+int PROTO_ROOM_COUNT;
 int EXIT_OPEN = 0;
 int EXIT_IN_PROGRESS;
 int START_LOCATION[2];
 int EXIT_LOCATION[2];
 int LEVEL_NUMBER;
 int LEVEL_TYPE = LEVEL_KEYTORCH;
-int (*openList)[WINDOW_WIDTH * WINDOW_HEIGHT];
-int (*START_POSITIONS)[WINDOW_WIDTH * WINDOW_HEIGHT];
 
 
 void levelSetup() {
-	int i;
-
 	LEVEL_CONSOLE = TCOD_console_new(WINDOW_WIDTH, WINDOW_HEIGHT);
 	SHADOW_CONSOLE = TCOD_console_new(WINDOW_WIDTH, WINDOW_HEIGHT);
 	FOG_CONSOLE = TCOD_console_new(WINDOW_WIDTH, WINDOW_HEIGHT);
@@ -74,18 +68,11 @@ void levelSetup() {
 	
 	TCOD_noise_set_type(FOG_NOISE, TCOD_NOISE_PERLIN);
 
-	CLOSED_MAP = calloc(1, sizeof(double[255][255]));
-	ROOM_MAP = calloc(1, sizeof(double[255][255]));
-	TUNNEL_ROOM_MAP = calloc(1, sizeof(double[255][255]));
-	openList = calloc(1, sizeof(double[WINDOW_WIDTH * WINDOW_HEIGHT][WINDOW_WIDTH * WINDOW_HEIGHT]));
-	DIJKSTRA_MAP = malloc(sizeof(double[255][255]));
-	START_POSITIONS = malloc(sizeof(double[WINDOW_WIDTH * WINDOW_HEIGHT][WINDOW_WIDTH * WINDOW_HEIGHT]));
-	EFFECTS_MAP = malloc(WINDOW_HEIGHT * sizeof(float *));
-	LEVEL_NUMBER = 1;
+	ROOM_MAP = create2dIntArray(WINDOW_WIDTH, WINDOW_HEIGHT);
+	TUNNEL_ROOM_MAP = create2dIntArray(WINDOW_WIDTH, WINDOW_HEIGHT);
+	EFFECTS_MAP = create2dFloatArray(WINDOW_WIDTH, WINDOW_HEIGHT);
 
-	for (i = 0; i < WINDOW_HEIGHT; i ++) {
-		EFFECTS_MAP[i] = malloc(WINDOW_WIDTH * sizeof(float));
-	}
+	LEVEL_NUMBER = 1;
 	
 	startLights();
 }
@@ -94,12 +81,10 @@ void levelShutdown() {
 	printf("Shutting down level...\n");
 	
 	deleteAllRooms();
-	free(ROOM_MAP);
-	free(TUNNEL_ROOM_MAP);
-	free(CLOSED_MAP);
-	free(START_POSITIONS);
-	free(DIJKSTRA_MAP);
-	free(openList);
+	delete2dIntArray(ROOM_MAP, WINDOW_HEIGHT);
+	delete2dIntArray(TUNNEL_ROOM_MAP, WINDOW_HEIGHT);
+	delete2dFloatArray(EFFECTS_MAP, WINDOW_HEIGHT);
+
 	TCOD_console_delete(LEVEL_CONSOLE);
 	TCOD_console_delete(LIGHT_CONSOLE);
 	TCOD_console_delete(SHADOW_CONSOLE);
@@ -916,8 +901,6 @@ void paintLevel() {
 
 			if (!TCOD_map_is_walkable(LEVEL_MAP, x, y)) {
 				if (TCOD_map_is_walkable(TUNNEL_WALLS, x, y)) {
-					//drawChar(LEVEL_CONSOLE, x, y, 128, TCOD_color_RGB(125, 16, 16), TCOD_color_RGB(115, 6, 6));
-					//drawCharBackEx(LEVEL_CONSOLE, x, y, TCOD_color_RGB(125, 16, 16), TCOD_BKGND_SET);
 					drawChar(LEVEL_CONSOLE, x, y, 176, TCOD_color_RGB(200, 36, 36), TCOD_color_RGB(105, 26, 105));
 				} else {
 					drawChar(LEVEL_CONSOLE, x, y, 177 + getRandomInt(0, 1), TCOD_color_RGB(175, 36, 36), TCOD_color_RGB(105, 26, 26));
