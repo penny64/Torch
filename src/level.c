@@ -311,7 +311,7 @@ void generatePuzzles() {
 			continue;
 		}
 
-		if (!(roomPtr->flags & IS_MAIN_PATH) && numberOfTreasureRooms < 2 && roomPtr->numberOfNeighborRooms <= 2 && roomPtr->size >= 20 && roomPtr->size < 45) {
+		if (!(roomPtr->flags & IS_MAIN_PATH) && numberOfTreasureRooms < 2 && roomPtr->numberOfNeighborRooms <= 2 && roomPtr->size < 80) {
 			roomPtr->flags |= IS_TREASURE_ROOM;
 			roomPtr->flags |= NEEDS_DOORS;
 
@@ -446,11 +446,30 @@ void placeItems() {
 	}
 }
 
+float roomPositionCost(int xFrom, int yFrom, int xTo, int yTo, void *user_data) {
+	int i;
+	room *roomPtr = user_data;
+
+	//printf("%i, %i -> %i, %i\n", xFrom, yFrom, xTo, yTo);
+
+
+
+	return 1.f;
+}
+
 void decorateRooms() {
-	int i, ii, invalid, x, y, nx, ny, x1, y1, isNextToWall;
+	int i, ii, invalid, x, y, wX, wY, relX, relY, nx, ny, x1, y1, isNextToWall;
 	room *roomPtr = getRooms();
+	TCOD_map_t roomMap = NULL;
+	TCOD_dijkstra_t dijkstraPath = NULL;
 
 	while (roomPtr) {
+		roomMap = TCOD_map_new(roomPtr->width, roomPtr->height);
+		//TCOD_map_clear(roomMap, 1, 1);
+
+		//dijkstraPath = TCOD_dijkstra_new_using_function(roomPtr->width, roomPtr->height, roomPositionCost, roomPtr, 0);
+		dijkstraPath = TCOD_dijkstra_new(roomMap, 0);
+
 		if ((roomPtr->flags & IS_TORCH_ROOM) || (roomPtr->flags & IS_FURNACE_ROOM)) {
 			for (i = 0; i < roomPtr->size; i ++) {
 				x = roomPtr->positionList[i][0];
@@ -520,6 +539,55 @@ void decorateRooms() {
 			}
 		}
 
+		if (roomPtr->flags & IS_TREASURE_ROOM) {
+			for (y = roomPtr->y; y < roomPtr->y + roomPtr->height; y++) {
+				for (x = roomPtr->x; x < roomPtr->x + roomPtr->width; x++) {
+					relX = x - roomPtr->x;
+					relY = y - roomPtr->y;
+
+					if (relX <= 1 || relY <= 1 || relX >= roomPtr->width - 2 || relY >= roomPtr->height - 2) {
+						continue;
+					}
+
+					if ((relX % (roomPtr->width / 2)) && !(relY % 2)) {
+						createMetalWall(x, y);
+
+						claimSpawnPositionInRoom(roomPtr, x, y);
+					}
+				}
+			}
+		} else {
+			if (!(roomPtr->flags & IS_MAIN_PATH) && roomPtr->numberOfDoorPositions > 1) {
+				for (i = 1; i < roomPtr->numberOfDoorPositions; i++) {
+					x = roomPtr->x - 1;
+					y = roomPtr->y - 1;
+
+					TCOD_dijkstra_compute(dijkstraPath, roomPtr->doorPositions[i][0] - x, roomPtr->doorPositions[i][1] - y);
+					TCOD_dijkstra_path_set(dijkstraPath, roomPtr->doorPositions[i - 1][0] - x, roomPtr->doorPositions[i - 1][1] - y);
+
+					while (TCOD_dijkstra_path_walk(dijkstraPath, &wX, &wY)) {
+						//TCOD_map_set_properties(roomMap, wX, wY, 0, 0);
+
+						printf("%i, %i\n", wX, wY);
+					}
+				}
+
+				for (y = roomPtr->y; y < roomPtr->y + roomPtr->height; y++) {
+					for (x = roomPtr->x; x < roomPtr->x + roomPtr->width; x++) {
+						relX = x - roomPtr->x;
+						relY = y - roomPtr->y;
+
+						if (TCOD_map_is_walkable(roomMap, relX, relY)) {
+							createWoodWall(x, y);
+						}
+					}
+				}
+			}
+		}
+
+		TCOD_map_delete(roomMap);
+
+		roomMap = NULL;
 		roomPtr = roomPtr->next;
 	}
 }
@@ -864,7 +932,7 @@ void paintLevel() {
 }
 
 void buildDungeon() {
-	int i, ii, invalidRoom, horizSplit, nRoomCount, mapUpdated = 1, minRoomSize = 140, bannedRoomCount = 0;
+	int i, ii, invalidRoom, horizSplit, nRoomCount, mapUpdated = 1, minRoomSize = 190, bannedRoomCount = 0;
 	int MAX_ROOMS_TEMP = 60;
 	roomProto *roomWalker;
 	roomProto *rootRoom = createProtoRoom(2, 2, WINDOW_WIDTH - 2, WINDOW_HEIGHT - 2, NULL);
