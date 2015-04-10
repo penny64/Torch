@@ -32,7 +32,7 @@ int (*ROOM_MAP)[255];
 int (*TUNNEL_ROOM_MAP)[255];
 int (*DIJKSTRA_MAP)[255];
 int (*CLOSED_MAP)[255];
-float (*EFFECTS_MAP)[255];
+float **EFFECTS_MAP;
 float EXIT_WAVE_DIST;
 int ROOM_COUNT, ROOM_COUNT_MAX, PROTO_ROOM_COUNT;
 int EXIT_OPEN = 0;
@@ -46,6 +46,8 @@ int (*START_POSITIONS)[WINDOW_WIDTH * WINDOW_HEIGHT];
 
 
 void levelSetup() {
+	int i;
+
 	LEVEL_CONSOLE = TCOD_console_new(WINDOW_WIDTH, WINDOW_HEIGHT);
 	SHADOW_CONSOLE = TCOD_console_new(WINDOW_WIDTH, WINDOW_HEIGHT);
 	FOG_CONSOLE = TCOD_console_new(WINDOW_WIDTH, WINDOW_HEIGHT);
@@ -75,11 +77,15 @@ void levelSetup() {
 	CLOSED_MAP = calloc(1, sizeof(double[255][255]));
 	ROOM_MAP = calloc(1, sizeof(double[255][255]));
 	TUNNEL_ROOM_MAP = calloc(1, sizeof(double[255][255]));
-	EFFECTS_MAP = calloc(1, sizeof(float[255][255]));
 	openList = calloc(1, sizeof(double[WINDOW_WIDTH * WINDOW_HEIGHT][WINDOW_WIDTH * WINDOW_HEIGHT]));
 	DIJKSTRA_MAP = malloc(sizeof(double[255][255]));
 	START_POSITIONS = malloc(sizeof(double[WINDOW_WIDTH * WINDOW_HEIGHT][WINDOW_WIDTH * WINDOW_HEIGHT]));
+	EFFECTS_MAP = malloc(WINDOW_HEIGHT * sizeof(float *));
 	LEVEL_NUMBER = 1;
+
+	for (i = 0; i < WINDOW_HEIGHT; i ++) {
+		EFFECTS_MAP[i] = malloc(WINDOW_WIDTH * sizeof(float));
+	}
 	
 	startLights();
 }
@@ -90,7 +96,6 @@ void levelShutdown() {
 	deleteAllRooms();
 	free(ROOM_MAP);
 	free(TUNNEL_ROOM_MAP);
-	free(EFFECTS_MAP);
 	free(CLOSED_MAP);
 	free(START_POSITIONS);
 	free(DIJKSTRA_MAP);
@@ -151,8 +156,8 @@ int *getRoomMap() {
 	return ROOM_MAP[0];
 }
 
-float *getEffectsMap() {
-	return *EFFECTS_MAP;
+float **getEffectsMap() {
+	return EFFECTS_MAP;
 }
 
 float getExitWaveDistance() {
@@ -352,7 +357,7 @@ void generatePuzzles() {
 }
 
 void placeItems() {
-	int x, y, i, invalidStartRoom, lavaWalkerX, lavaWalkerY, doorEnterIndex, doorExitIndex, exitPlaced = 0, placedAllSeeingEye = 0;
+	int x, y, i, lavaWalkerX, lavaWalkerY, doorEnterIndex, doorExitIndex, placedAllSeeingEye = 0;
 	int spawnPosition[2], doorEnter[2], doorExit[2];
 	TCOD_dijkstra_t lavaWalker = TCOD_dijkstra_new(LEVEL_MAP, 0.0f);
 	room *roomPtr = getRooms();
@@ -447,13 +452,6 @@ void placeItems() {
 }
 
 float roomPositionCost(int xFrom, int yFrom, int xTo, int yTo, void *user_data) {
-	int i;
-	room *roomPtr = user_data;
-
-	//printf("%i, %i -> %i, %i\n", xFrom, yFrom, xTo, yTo);
-
-
-
 	return 1.f;
 }
 

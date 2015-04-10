@@ -36,4 +36,4 @@ int getLevel(void);
 int *getExitLocation(void);
 int *getRoomMap(void);
 float getExitWaveDistance(void);
-float *getEffectsMap(void);
+float **getEffectsMap(void);

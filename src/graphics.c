@@ -96,7 +96,7 @@ void applyFov() {
 	int visible, visibleToPlayer, isLit;
 	float exitWaveDistance = getExitWaveDistance();
 	float distMod, distToExitWave, fadeValue;
-	float (*effectsMap)[255] = getEffectsMap();
+	float **effectsMap = getEffectsMap();
 	TCOD_map_t map = getLevelMap();
 	TCOD_map_t lightMap = getLightMap();
 	TCOD_console_t actorConsole = getActorConsole();

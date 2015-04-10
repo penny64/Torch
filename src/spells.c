@@ -268,8 +268,8 @@ void fireball(World *world, unsigned int ownerId) {
 }
 
 void fireballTick(World *world, unsigned int ownerId) {
-	character *owner = getActorViaId(ownerId);
-	SpellComponent *spellComponent = &world->spell[ownerId];
+	//character *owner = getActorViaId(ownerId);
+	//SpellComponent *spellComponent = &world->spell[ownerId];
 }
 
 void fireballExit(World *world, unsigned int ownerId) {
