@@ -445,6 +445,7 @@ void createBonfireKeystone(int x, int y) {
 
 	light *lght = createDynamicLight(x, y, NULL);
 	itm->itemLight = lght;
+	itm->chr = 215;
 	lght->r_tint = 5;
 	lght->g_tint = 70;
 	lght->b_tint = 0;
@@ -459,6 +460,7 @@ void createUnkindledBonfire(int x, int y) {
 	item *itm = createItem(x, y, '!', TCOD_color_RGB(55, 55, 15), TCOD_color_RGB(55, 0, 55), IS_FUEL_SOURCE);
 	light *lght = createDynamicLight(x, y, NULL);
 	itm->itemLight = lght;
+	itm->chr = 215;
 	lght->fuel = 0;
 	lght->fuelMax = 120;
 
@@ -603,15 +605,16 @@ void createAllSeeingEye(int x, int y) {
 
 void createWoodWall(int x, int y) {
 	item *itm = createItem(x, y, '#', TCOD_color_RGB(128 - 40, 101 - 40, 23 - 5), TCOD_color_RGB(128 - 50, 101 - 50, 23 - 5), IS_SOLID);
-
-	itm->statDamage = 3;
-	itm->statSpeed = 3;
 }
 
 void createMetalWall(int x, int y) {
 	item *itm = createItem(x, y, '+', TCOD_color_RGB(86, 86, 86), TCOD_color_RGB(118, 118, 118), IS_SOLID);
 
 	itm->chr = 177;
-	itm->statDamage = 3;
-	itm->statSpeed = 3;
+}
+
+void createStoneWall(int x, int y) {
+	item *itm = createItem(x, y, '+', TCOD_color_RGB(46, 46, 46), TCOD_color_RGB(118, 118, 118), IS_SOLID);
+
+	itm->chr = 219;
 }

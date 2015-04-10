@@ -310,7 +310,7 @@ void generatePuzzles() {
 			roomPtr->flags |= IS_TORCH_ROOM;
 		} else if (roomPtr->size >= 80 && roomPtr->size <= 90) {
 			if (roomPtr->numberOfNeighborRooms == 2) {
-				roomPtr->flags |= IS_LAVA_ROOM;
+				//roomPtr->flags |= IS_LAVA_ROOM;
 			} else if (!(roomPtr->flags & IS_MAIN_PATH)) {
 				roomPtr->flags |= NEEDS_DOORS;
 			}
@@ -392,8 +392,6 @@ void placeItems() {
 
 					TCOD_dijkstra_path_set(lavaWalker, doorExit[0], doorExit[1]);
 
-					printf("From: %i, %i, to: %i, %i\n", doorEnter[0], doorEnter[1], doorExit[0], doorExit[1]);
-
 					while (TCOD_dijkstra_path_walk(lavaWalker, &lavaWalkerX, &lavaWalkerY)) {
 						TCOD_map_set_properties(LAVA_MAP, lavaWalkerX, lavaWalkerY, 0, 0);
 					}
@@ -404,9 +402,9 @@ void placeItems() {
 				x = roomPtr->positionList[i][0];
 				y = roomPtr->positionList[i][1];
 
-				if (!TCOD_map_is_walkable(LAVA_MAP, x, y)) {
-					claimSpawnPositionInRoom(roomPtr, x, y);
-				}
+				//if (!TCOD_map_is_walkable(LAVA_MAP, x, y)) {
+				//	claimSpawnPositionInRoom(roomPtr, x, y);
+				//}
 			}
 
 			for (i = 0; i < roomPtr->size; i ++) {
@@ -437,27 +435,42 @@ void placeItems() {
 }
 
 float roomPositionCost(int xFrom, int yFrom, int xTo, int yTo, void *user_data) {
-	return 1.f;
+	room *roomPtr = user_data;
+	int i, tempDistance, closestExitDistance = 999;
+
+	if ((isPositionInRoom(roomPtr, xFrom, yFrom) || TCOD_map_is_walkable(TUNNEL_MAP, xFrom, yFrom))
+			&& (isPositionInRoom(roomPtr, xTo, yTo) || TCOD_map_is_walkable(TUNNEL_MAP, xTo, yTo))) {
+
+		if (xTo >= roomPtr->x + 1 && xTo <= roomPtr->x + (roomPtr->width - 3) &&
+				yTo >= roomPtr->y + 2 && yTo <= roomPtr->y + (roomPtr->height - 3)) {
+			return 0;
+		}
+		/*for (i = 0; i < roomPtr->numberOfDoorPositions; i ++) {
+			tempDistance = distance(xTo, yTo, roomPtr->doorPositions[i][0], roomPtr->doorPositions[i][1]);
+
+			if (tempDistance < closestExitDistance) {
+				closestExitDistance = tempDistance;
+			}
+		}*/
+
+		return getRandomFloat(0.01f, 4.99f);
+	}
+	return 0.f;
 }
 
 void decorateRooms() {
 	int i, ii, invalid, x, y, wX, wY, relX, relY, nx, ny, x1, y1, isNextToWall;
 	room *roomPtr = getRooms();
 	TCOD_map_t roomMap = NULL;
-	TCOD_dijkstra_t dijkstraPath = NULL;
+	//TCOD_dijkstra_t dijkstraPath = NULL;
+	TCOD_path_t astarPath = NULL;
 
 	while (roomPtr) {
 		roomMap = TCOD_map_new(WINDOW_WIDTH, WINDOW_HEIGHT);
-		TCOD_map_copy(LEVEL_MAP, TUNNEL_MAP);
+		TCOD_map_clear(roomMap, 1, 1);
 
-		//#TODO: Make all positions in rooms walkable
-
-		for (i = 0; i < roomPtr->size; i ++) {
-			TCOD_map_set_properties(roomMap, roomPtr->positionList[i][0], roomPtr->positionList[i][1], 1, 1);
-		}
-
-		//dijkstraPath = TCOD_dijkstra_new_using_function(roomPtr->width, roomPtr->height, roomPositionCost, roomPtr, 0);
-		dijkstraPath = TCOD_dijkstra_new(roomMap, 0);
+		//dijkstraPath = TCOD_dijkstra_new_using_function(WINDOW_WIDTH, WINDOW_HEIGHT, roomPositionCost, roomPtr, 0);
+		astarPath = TCOD_path_new_using_function(WINDOW_WIDTH, WINDOW_HEIGHT, &roomPositionCost, roomPtr, 0);
 
 		if ((roomPtr->flags & IS_TORCH_ROOM) || (roomPtr->flags & IS_FURNACE_ROOM)) {
 			for (i = 0; i < roomPtr->size; i ++) {
@@ -494,9 +507,9 @@ void decorateRooms() {
 							}
 						}
 
-						//if (!isPositionSpawnable(roomPtr, nx, ny)) {
-						//	continue;
-						//}
+						if (!isPositionSpawnable(roomPtr, nx, ny)) {
+							continue;
+						}
 
 						if (ii == -1) {
 							invalid = 1;
@@ -545,27 +558,68 @@ void decorateRooms() {
 					}
 				}
 			}
-		} else {
-			if (!(roomPtr->flags & IS_MAIN_PATH) && roomPtr->numberOfDoorPositions > 1) {
-				for (i = 1; i < roomPtr->numberOfDoorPositions; i++) {
-					TCOD_dijkstra_compute(dijkstraPath, roomPtr->doorPositions[i][0], roomPtr->doorPositions[i][1]);
-					TCOD_dijkstra_path_set(dijkstraPath, roomPtr->doorPositions[i - 1][0], roomPtr->doorPositions[i - 1][1]);
+		} else if (!getRandomInt(0, 4)) {
+			for (y = roomPtr->y; y < roomPtr->y + roomPtr->height; y++) {
+				for (x = roomPtr->x; x < roomPtr->x + roomPtr->width; x++) {
+					relX = x - roomPtr->x;
+					relY = y - roomPtr->y;
 
-					printf("%f\n", TCOD_dijkstra_get_distance(dijkstraPath, roomPtr->doorPositions[i - 1][0], roomPtr->doorPositions[i - 1][1]));
+					if (relX < 1 || relY < 1 || relX > roomPtr->width - 2 || relY > roomPtr->height - 2) {
+						continue;
+					}
 
-					while (TCOD_dijkstra_path_walk(dijkstraPath, &wX, &wY)) {
-						//TCOD_map_set_properties(roomMap, wX, wY, 0, 0);
+					if (relX % 2 && relY % 2) {
+						createMetalWall(x, y);
 
-						printf("%i, %i\n", wX, wY);
+						claimSpawnPositionInRoom(roomPtr, x, y);
 					}
 				}
-
+			}
+		} else if (!getRandomInt(0, 4) && roomPtr->size <= 90) {
 				for (y = roomPtr->y; y < roomPtr->y + roomPtr->height; y++) {
 					for (x = roomPtr->x; x < roomPtr->x + roomPtr->width; x++) {
 						relX = x - roomPtr->x;
 						relY = y - roomPtr->y;
 
-						if (TCOD_map_is_walkable(roomMap, relX, relY)) {
+						if (relX < 1 || relY < 1 || relX > roomPtr->width - 2 || relY > roomPtr->height - 2) {
+							continue;
+						}
+
+						if (!(relX % 3 && relY % 3)) {
+							createStoneWall(x, y);
+
+							claimSpawnPositionInRoom(roomPtr, x, y);
+						}
+					}
+				}
+		} else {
+			if (!(roomPtr->flags & IS_MAIN_PATH) && roomPtr->numberOfDoorPositions > 1) {
+				for (i = 1; i < roomPtr->numberOfDoorPositions; i++) {
+					TCOD_path_compute(astarPath, roomPtr->doorPositions[i][0], roomPtr->doorPositions[i][1],
+									  roomPtr->doorPositions[i - 1][0], roomPtr->doorPositions[i - 1][1]);
+
+					while (TCOD_path_walk(astarPath, &wX, &wY, 0)) {
+						for (y1 = -1; y1 <= 1; y1 ++) {
+							for (x1 = -1; x1 <= 1; x1++) {
+								if (wX + x1 <= 0 || wX + x1 >= WINDOW_WIDTH || wY + y1 <= 0 || wY + y1 >= WINDOW_HEIGHT) {
+									continue;
+								}
+
+								if (!isPositionSpawnable(roomPtr, wX + x1, wY + y1)) {
+									continue;
+								}
+
+
+								TCOD_map_set_properties(roomMap, wX + x1, wY + y1, 0, 0);
+							}
+						}
+					}
+				}
+
+				for (y = roomPtr->y; y < roomPtr->y + roomPtr->height; y++) {
+					for (x = roomPtr->x; x < roomPtr->x + roomPtr->width; x++) {
+						if (isPositionInRoom(roomPtr, x, y) && TCOD_map_is_walkable(roomMap, x, y)) {
+							claimSpawnPositionInRoom(roomPtr, x, y);
 							createWoodWall(x, y);
 						}
 					}
@@ -574,10 +628,12 @@ void decorateRooms() {
 		}
 
 		TCOD_map_delete(roomMap);
-		TCOD_dijkstra_delete(dijkstraPath);
+		//TCOD_dijkstra_delete(dijkstraPath);
+		TCOD_path_delete(astarPath);
 
 		roomMap = NULL;
-		dijkstraPath = NULL;
+		//dijkstraPath = NULL;
+		astarPath = NULL;
 		roomPtr = roomPtr->next;
 	}
 }
@@ -920,7 +976,7 @@ void paintLevel() {
 }
 
 void buildDungeon() {
-	int i, ii, invalidRoom, horizSplit, nRoomCount, mapUpdated = 1, minRoomSize = 190, bannedRoomCount = 0;
+	int i, ii, invalidRoom, horizSplit, nRoomCount, mapUpdated = 1, minRoomSize = 120, bannedRoomCount = 0;
 	int MAX_ROOMS_TEMP = 60;
 	roomProto *roomWalker;
 	roomProto *rootRoom = createProtoRoom(2, 2, WINDOW_WIDTH - 2, WINDOW_HEIGHT - 2, NULL);
@@ -938,7 +994,7 @@ void buildDungeon() {
 			invalidRoom = 0;
 			roomWalker = PROTO_ROOMS[i];
 
-			if (roomWalker->size <= minRoomSize * 1.3 && !getRandomInt(0, 15)) {
+			if (bannedRoomCount < 3 && roomWalker->size <= minRoomSize * 1.2 && !getRandomInt(0, 8)) {
 				bannedRooms[bannedRoomCount] = roomWalker;
 				bannedRoomCount ++;
 
@@ -1376,12 +1432,9 @@ void carveTunnels() {
 					TCOD_map_set_properties(TUNNEL_MAP, wX, wY, 1, 1);
 
 					if (!placedDoor) {
-						//if (isPositionInRoom(neighborPtr, wX + x1, wY + y1)) {
-						TCOD_map_set_properties(TUNNEL_MAP, wX, wY, 1, 1);
 						addRoomDoorPosition(parentPtr, wX, wY);
 
 						placedDoor = 1;
-						//}
 					}
 				}
 

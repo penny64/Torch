@@ -72,14 +72,14 @@ room *createRoom(roomProto *prototypeRoom, unsigned int flags) {
 	rm->id = NEXT_ROOM_ID;
 	NEXT_ROOM_ID ++;
 
-	rm->x = prototypeRoom->x + 1;
-	rm->y = prototypeRoom->y + 1;
+	rm->x = prototypeRoom->x;
+	rm->y = prototypeRoom->y;
 
-	if (width > 5) {
+	if (width > 11) {
 		width = (int)((width * getRandomFloat(.8, .9)) + .5);
 	}
 
-	if (height > 5) {
+	if (height > 11) {
 		height = (int)((height * getRandomFloat(.8, .9)) + .5);
 	}
 
@@ -284,15 +284,22 @@ void connectRooms(room *srcRoom, room *dstRoom) {
 }
 
 int isPositionSpawnable(room *srcRoom, int x, int y) {
-	int i;
+	int i, xx, yy;
+
+	if (!isPositionInRoom(srcRoom, x, y)) {
+		return 0;
+	}
 
 	for (i = 0; i < srcRoom->numberOfOccupiedSpawnPositions; i ++) {
-		if (x == srcRoom->positionList[i][0] && y == srcRoom->positionList[i][1]) {
-			return 1;
+		xx = srcRoom->positionList[srcRoom->spawnPositions[i]][0];
+		yy = srcRoom->positionList[srcRoom->spawnPositions[i]][1];
+
+		if (x == xx && y == yy) {
+			return 0;
 		}
 	}
 
-	return 0;
+	return 1;
 }
 
 void getNewSpawnPosition(room *srcRoom, int coordArray[]) {
