@@ -464,8 +464,14 @@ void decorateRooms() {
 	TCOD_dijkstra_t dijkstraPath = NULL;
 
 	while (roomPtr) {
-		roomMap = TCOD_map_new(roomPtr->width, roomPtr->height);
-		//TCOD_map_clear(roomMap, 1, 1);
+		roomMap = TCOD_map_new(WINDOW_WIDTH, WINDOW_HEIGHT);
+		TCOD_map_copy(LEVEL_MAP, TUNNEL_MAP);
+
+		//#TODO: Make all positions in rooms walkable
+
+		for (i = 0; i < roomPtr->size; i ++) {
+			TCOD_map_set_properties(roomMap, roomPtr->positionList[i][0], roomPtr->positionList[i][1], 1, 1);
+		}
 
 		//dijkstraPath = TCOD_dijkstra_new_using_function(roomPtr->width, roomPtr->height, roomPositionCost, roomPtr, 0);
 		dijkstraPath = TCOD_dijkstra_new(roomMap, 0);
@@ -559,11 +565,10 @@ void decorateRooms() {
 		} else {
 			if (!(roomPtr->flags & IS_MAIN_PATH) && roomPtr->numberOfDoorPositions > 1) {
 				for (i = 1; i < roomPtr->numberOfDoorPositions; i++) {
-					x = roomPtr->x - 1;
-					y = roomPtr->y - 1;
+					TCOD_dijkstra_compute(dijkstraPath, roomPtr->doorPositions[i][0], roomPtr->doorPositions[i][1]);
+					TCOD_dijkstra_path_set(dijkstraPath, roomPtr->doorPositions[i - 1][0], roomPtr->doorPositions[i - 1][1]);
 
-					TCOD_dijkstra_compute(dijkstraPath, roomPtr->doorPositions[i][0] - x, roomPtr->doorPositions[i][1] - y);
-					TCOD_dijkstra_path_set(dijkstraPath, roomPtr->doorPositions[i - 1][0] - x, roomPtr->doorPositions[i - 1][1] - y);
+					printf("%f\n", TCOD_dijkstra_get_distance(dijkstraPath, roomPtr->doorPositions[i - 1][0], roomPtr->doorPositions[i - 1][1]));
 
 					while (TCOD_dijkstra_path_walk(dijkstraPath, &wX, &wY)) {
 						//TCOD_map_set_properties(roomMap, wX, wY, 0, 0);
@@ -586,8 +591,10 @@ void decorateRooms() {
 		}
 
 		TCOD_map_delete(roomMap);
+		TCOD_dijkstra_delete(dijkstraPath);
 
 		roomMap = NULL;
+		dijkstraPath = NULL;
 		roomPtr = roomPtr->next;
 	}
 }
