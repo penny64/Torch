@@ -486,11 +486,9 @@ void decorateRooms() {
 							}
 						}
 
-						if (!isPositionSpawnable(roomPtr, x + x1, y + y1)) {
-							invalid = 1;
-
-							break;
-						}
+						//if (!isPositionSpawnable(roomPtr, nx, ny)) {
+						//	continue;
+						//}
 
 						if (ii == -1) {
 							invalid = 1;
