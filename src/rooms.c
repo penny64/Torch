@@ -23,8 +23,14 @@ roomProto *createProtoRoom(int x, int y, int width, int height, roomProto *paren
 	rm->cost = 150;
 	rm->flags = 0x0;
 	rm->timesSplit = 1;
+	rm->merged = 0;
 
 	return rm;
+}
+
+void mergeProtoRooms(roomProto *srcRoom, roomProto *dstRoom) {
+	srcRoom->merged = 1;
+	dstRoom->merged = 1;
 }
 
 roomProto *splitProtoRoom(roomProto *parentRoomProto, int horizSplit) {

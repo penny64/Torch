@@ -1033,6 +1033,112 @@ void buildDungeon() {
 	printf("Total room count: %i\n", PROTO_ROOM_COUNT);
 }
 
+//Credit: http://www.roguebasin.com/index.php?title=Abstract_Dungeons
+int testLines(int p1, int p2, int s1, int s2) {
+	if (((s1 >= p1) && (p2-s1>2)) || ((s1 <= p1) && (s2-p1>2))) {
+		return 1;
+	}
+
+	return 0;
+}
+
+void combineRooms() {
+	//We just split the map up into rooms, now we need to connect
+	//a few rooms to build a more varied (less square) dungeon.
+
+	roomProto *parentRoom, *childRoom;
+	int i, ii, pX1, pX2, pY1, pY2, cX1, cX2, cY1, cY2, potentialNeighbor, roomIndex;
+
+	for (i = 0; i < PROTO_ROOM_COUNT; i ++) {
+		parentRoom = PROTO_ROOMS[i];
+
+		if (parentRoom->merged) {
+			continue;
+		}
+
+		pX1 = parentRoom->x;
+		pX2 = parentRoom->x + parentRoom->width;
+		pY1 = parentRoom->y;
+		pY2 = parentRoom->y + parentRoom->height;
+
+		for (ii = 0; ii < PROTO_ROOM_COUNT; ii ++) {
+			childRoom = PROTO_ROOMS[ii];
+
+			if (i == ii || childRoom->merged) {
+				continue;
+			}
+
+			potentialNeighbor = 1;
+
+			cX1 = childRoom->x;
+			cX2 = childRoom->x + childRoom->width;
+			cY1 = childRoom->y;
+			cY2 = childRoom->x + childRoom->height;
+
+			if ((pX2 < cX1) ||
+				(pY2 < cY1) ||
+				(pX1 > cX2) ||
+				(pY1 > cY2))
+				potentialNeighbor = 0;
+
+			if (!potentialNeighbor) {
+				continue;
+			}
+
+			if (pX1 == cX2) {
+				potentialNeighbor |= testLines(pY1, pY2, cY1, cY2);
+			}
+
+			if (cX1 == pX2) {
+				potentialNeighbor |= testLines(pY1, pY2, cY1, cY2);
+			}
+
+			if (pY1 == cY2) {
+				potentialNeighbor |= testLines(pX1, pX2, cX1, cX2);
+			}
+
+			if (cY1 == pY2) {
+				potentialNeighbor |= testLines(pX1, pX2, cX1, cX2);
+			}
+
+			if (potentialNeighbor) {
+				printf("Yes\n");
+			} else {
+				printf("No\n");
+			}
+
+			if (!getRandomInt(0, 8)) {
+				mergeProtoRooms(parentRoom, childRoom);
+			}
+			//addPotentialCombineRoom(parentRoom, childRoom);
+		}
+	}
+
+	//Found potentials, let's roll
+	/*parentRoom = getRooms();
+
+	while (parentRoom) {
+		if (!parentRoom->numberOfCombinedRooms || parentRoom->wasCombined) {
+			parentRoom = parentRoom->next;
+
+			continue;
+		}
+
+		roomIndex = clip(getRandomInt(0, parentRoom->numberOfCombinedRooms) - 1, 0, parentRoom->numberOfCombinedRooms - 1);
+		childRoom = getRoomViaId(parentRoom->combinedRoomIds[roomIndex]);
+
+		if (childRoom->wasCombined) {
+			parentRoom = parentRoom->next;
+
+			continue;
+		}
+
+		combineRoom(parentRoom, childRoom);
+
+		parentRoom = parentRoom->next;
+	}*/
+}
+
 float getPositionCost(int xFrom, int yFrom, int xTo, int yTo, void *user_data) {
 	roomProto *roomWalker;
 	int i, fromInRoom, toInRoom;
@@ -1040,6 +1146,10 @@ float getPositionCost(int xFrom, int yFrom, int xTo, int yTo, void *user_data) {
 
 	for (i = 0; i < PROTO_ROOM_COUNT; i ++) {
 		roomWalker = PROTO_ROOMS[i];
+
+		if (roomWalker->merged) {
+			continue;
+		}
 
 		fromInRoom = (xFrom >= roomWalker->x &&
 				yFrom >= roomWalker->y &&
@@ -1081,6 +1191,10 @@ void designDungeon() {
 	for (i = 0; i < PROTO_ROOM_COUNT; i ++) {
 		roomWalker = PROTO_ROOMS[i];
 
+		if (roomWalker->merged == 1) {
+			continue;
+		}
+
 		if (!startRoom || !getRandomInt(0, 15)) {
 			startRoom = roomWalker;
 		}
@@ -1092,6 +1206,10 @@ void designDungeon() {
 	//End room
 	for (i = 0; i < PROTO_ROOM_COUNT; i ++) {
 		roomWalker = PROTO_ROOMS[i];
+
+		if (roomWalker->merged == 1) {
+			continue;
+		}
 
 		distanceToStart = distance(roomWalker->x + (roomWalker->width / 2),
 								   roomWalker->y + (roomWalker->height / 2),
@@ -1108,7 +1226,7 @@ void designDungeon() {
 	for (i = 0; i < PROTO_ROOM_COUNT; i ++) {
 		roomWalker = PROTO_ROOMS[i];
 
-		if (roomWalker == startRoom || roomWalker == endRoom) {
+		if (roomWalker == startRoom || roomWalker == endRoom || roomWalker->merged) {
 			continue;
 		}
 
@@ -1136,7 +1254,7 @@ void designDungeon() {
 		for (i = 0; i < PROTO_ROOM_COUNT; i ++) {
 			roomWalker = PROTO_ROOMS[i];
 
-			if (roomWalker->build) {
+			if (roomWalker->build || roomWalker->merged) {
 				continue;
 			}
 
@@ -1165,6 +1283,10 @@ void designDungeon() {
 		for (i = 0; i < PROTO_ROOM_COUNT; i ++) {
 			roomWalker = PROTO_ROOMS[i];
 
+			if (roomWalker->merged == 1) {
+				continue;
+			}
+
 			inRoom = (wX >= roomWalker->x &&
 					  wY >= roomWalker->y &&
 					  wX < roomWalker->x + roomWalker->width &&
@@ -1181,6 +1303,10 @@ void designDungeon() {
 	for (i = 0; i < PROTO_ROOM_COUNT; i ++) {
 		roomWalker = PROTO_ROOMS[i];
 
+		if (roomWalker->merged == 1) {
+			continue;
+		}
+
 		inRoom = (wX >= roomWalker->x &&
 				  wY >= roomWalker->y &&
 				  wX < roomWalker->x + roomWalker->width &&
@@ -1196,7 +1322,7 @@ void designDungeon() {
 	for (i = 0; i < PROTO_ROOM_COUNT; i ++) {
 		roomWalker = PROTO_ROOMS[i];
 
-		if (roomWalker->build) {
+		if (roomWalker->build || roomWalker->merged) {
 			continue;
 		}
 
@@ -1225,6 +1351,10 @@ void designDungeon() {
 	while (TCOD_path_walk(pathfinder, &wX, &wY, 0)) {
 		for (i = 0; i < PROTO_ROOM_COUNT; i ++) {
 			roomWalker = PROTO_ROOMS[i];
+
+			if (roomWalker->merged == 1) {
+				continue;
+			}
 
 			inRoom = (wX >= roomWalker->x &&
 					  wY >= roomWalker->y &&
@@ -1269,112 +1399,6 @@ void designDungeon() {
 			rm->flags |= IS_SPECIAL_ROOM;
 		}
 	}
-}
-
-//Credit: http://www.roguebasin.com/index.php?title=Abstract_Dungeons
-int testLines(int p1, int p2, int s1, int s2) {
-	if (((s1 >= p1) && (p2-s1>2)) || ((s1 <= p1) && (s2-p1>2))) {
-		return 1;
-	}
-
-	return 0;
-}
-
-void combineRooms() {
-	//We just split the map up into rooms, now we need to connect
-	//a few rooms to build a more varied (less square) dungeon.
-
-	room *parentRoom = getRooms(), *childRoom;
-	int i, pX1, pX2, pY1, pY2, cX1, cX2, cY1, cY2, potentialNeighbor, roomIndex;
-
-	while (parentRoom) {
-		pX1 = parentRoom->x;
-		pX2 = parentRoom->x + parentRoom->width;
-		pY1 = parentRoom->y;
-		pY2 = parentRoom->y + parentRoom->height;
-
-		childRoom = getRooms();
-
-		while (childRoom) {
-			if (parentRoom == childRoom) {
-				childRoom = childRoom->next;
-
-				continue;
-			}
-
-			potentialNeighbor = 1;
-
-			cX1 = childRoom->x;
-			cX2 = childRoom->x + childRoom->width;
-			cY1 = childRoom->y;
-			cY2 = childRoom->x + childRoom->height;
-
-			if ((pX2 < cX1) ||
-				(pY2 < cY1) ||
-				(pX1 > cX2) ||
-				(pY1 > cY2))
-				potentialNeighbor = 0;
-
-			if (!potentialNeighbor) {
-				childRoom = childRoom->next;
-
-				continue;
-			}
-
-			if (pX1 == cX2) {
-				potentialNeighbor |= testLines(pY1, pY2, cY1, cY2);
-			}
-
-			if (cX1 == pX2) {
-				potentialNeighbor |= testLines(pY1, pY2, cY1, cY2);
-			}
-
-			if (pY1 == cY2) {
-				potentialNeighbor |= testLines(pX1, pX2, cX1, cX2);
-			}
-
-			if (cY1 == pY2) {
-				potentialNeighbor |= testLines(pX1, pX2, cX1, cX2);
-			}
-
-			if (potentialNeighbor) {
-				printf("Yes\n");
-			} else {
-				printf("No\n");
-			}
-
-			addPotentialCombineRoom(parentRoom, childRoom);
-
-			childRoom = childRoom->next;
-		}
-
-		parentRoom = parentRoom->next;
-	}
-
-	//Found potentials, let's roll
-	parentRoom = getRooms();
-
-	while (parentRoom) {
-		if (!parentRoom->numberOfCombinedRooms || parentRoom->wasCombined) {
-			parentRoom = parentRoom->next;
-
-			continue;
-		}
-
-		roomIndex = clip(getRandomInt(0, parentRoom->numberOfCombinedRooms) - 1, 0, parentRoom->numberOfCombinedRooms - 1);
-		childRoom = getRoomViaId(parentRoom->combinedRoomIds[roomIndex]);
-
-		if (childRoom->wasCombined) {
-			parentRoom = parentRoom->next;
-
-			continue;
-		}
-
-		combineRoom(parentRoom, childRoom);
-
-		parentRoom = parentRoom->next;
-	}
-
 }
 
 void buildRooms() {
@@ -1562,8 +1586,8 @@ void generateLevel() {
 
 	resetLevel();
 	buildDungeon();
-	designDungeon();
 	combineRooms();
+	designDungeon();
 	buildRooms();
 	connectNeighbors();
 	carveTunnels();

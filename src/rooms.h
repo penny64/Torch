@@ -41,7 +41,7 @@ struct room {
 typedef struct roomProto roomProto;
 
 struct roomProto {
-	int id, x, y, width, height, size, build, timesSplit;
+	int id, x, y, width, height, size, build, timesSplit, merged;
 	float cost;
 	unsigned int flags; // :)
 	roomProto *parent;
@@ -59,6 +59,7 @@ void addNeighbor(room*, room*);
 void connectRooms(room*, room*);
 void addPotentialCombineRoom(room*, room*);
 void combineRoom(room*, room*);
+void mergeProtoRooms(roomProto*, roomProto*);
 int isNeighborWith(room *, room*);
 int isNeighborWithId(room*, int);
 int isPotentialCombinedRoom(room*, room*);
