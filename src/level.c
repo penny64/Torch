@@ -1052,10 +1052,6 @@ void combineRooms() {
 	for (i = 0; i < PROTO_ROOM_COUNT; i ++) {
 		parentRoom = PROTO_ROOMS[i];
 
-		if (parentRoom->merged) {
-			continue;
-		}
-
 		pX1 = parentRoom->x;
 		pX2 = parentRoom->x + parentRoom->width;
 		pY1 = parentRoom->y;
@@ -1064,7 +1060,7 @@ void combineRooms() {
 		for (ii = 0; ii < PROTO_ROOM_COUNT; ii ++) {
 			childRoom = PROTO_ROOMS[ii];
 
-			if (i == ii || childRoom->merged) {
+			if (i == ii) {
 				continue;
 			}
 
@@ -1147,10 +1143,6 @@ float getPositionCost(int xFrom, int yFrom, int xTo, int yTo, void *user_data) {
 	for (i = 0; i < PROTO_ROOM_COUNT; i ++) {
 		roomWalker = PROTO_ROOMS[i];
 
-		if (roomWalker->merged) {
-			continue;
-		}
-
 		fromInRoom = (xFrom >= roomWalker->x &&
 				yFrom >= roomWalker->y &&
 				xFrom < roomWalker->x + roomWalker->width &&
@@ -1191,10 +1183,6 @@ void designDungeon() {
 	for (i = 0; i < PROTO_ROOM_COUNT; i ++) {
 		roomWalker = PROTO_ROOMS[i];
 
-		if (roomWalker->merged == 1) {
-			continue;
-		}
-
 		if (!startRoom || !getRandomInt(0, 15)) {
 			startRoom = roomWalker;
 		}
@@ -1206,10 +1194,6 @@ void designDungeon() {
 	//End room
 	for (i = 0; i < PROTO_ROOM_COUNT; i ++) {
 		roomWalker = PROTO_ROOMS[i];
-
-		if (roomWalker->merged == 1) {
-			continue;
-		}
 
 		distanceToStart = distance(roomWalker->x + (roomWalker->width / 2),
 								   roomWalker->y + (roomWalker->height / 2),
@@ -1226,7 +1210,7 @@ void designDungeon() {
 	for (i = 0; i < PROTO_ROOM_COUNT; i ++) {
 		roomWalker = PROTO_ROOMS[i];
 
-		if (roomWalker == startRoom || roomWalker == endRoom || roomWalker->merged) {
+		if (roomWalker == startRoom || roomWalker == endRoom) {
 			continue;
 		}
 
@@ -1254,7 +1238,7 @@ void designDungeon() {
 		for (i = 0; i < PROTO_ROOM_COUNT; i ++) {
 			roomWalker = PROTO_ROOMS[i];
 
-			if (roomWalker->build || roomWalker->merged) {
+			if (roomWalker->build) {
 				continue;
 			}
 
@@ -1283,10 +1267,6 @@ void designDungeon() {
 		for (i = 0; i < PROTO_ROOM_COUNT; i ++) {
 			roomWalker = PROTO_ROOMS[i];
 
-			if (roomWalker->merged == 1) {
-				continue;
-			}
-
 			inRoom = (wX >= roomWalker->x &&
 					  wY >= roomWalker->y &&
 					  wX < roomWalker->x + roomWalker->width &&
@@ -1303,10 +1283,6 @@ void designDungeon() {
 	for (i = 0; i < PROTO_ROOM_COUNT; i ++) {
 		roomWalker = PROTO_ROOMS[i];
 
-		if (roomWalker->merged == 1) {
-			continue;
-		}
-
 		inRoom = (wX >= roomWalker->x &&
 				  wY >= roomWalker->y &&
 				  wX < roomWalker->x + roomWalker->width &&
@@ -1322,7 +1298,7 @@ void designDungeon() {
 	for (i = 0; i < PROTO_ROOM_COUNT; i ++) {
 		roomWalker = PROTO_ROOMS[i];
 
-		if (roomWalker->build || roomWalker->merged) {
+		if (roomWalker->build) {
 			continue;
 		}
 
@@ -1351,10 +1327,6 @@ void designDungeon() {
 	while (TCOD_path_walk(pathfinder, &wX, &wY, 0)) {
 		for (i = 0; i < PROTO_ROOM_COUNT; i ++) {
 			roomWalker = PROTO_ROOMS[i];
-
-			if (roomWalker->merged == 1) {
-				continue;
-			}
 
 			inRoom = (wX >= roomWalker->x &&
 					  wY >= roomWalker->y &&

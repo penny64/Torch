@@ -33,27 +33,7 @@ void mergeProtoRooms(roomProto *srcRoom, roomProto *dstRoom) {
 	dstRoom->merged = 1;
 
 	dstRoom->parent = srcRoom;
-	/*int nX, nY, nWidth, nHeight;
-
-	if (srcRoom->x < dstRoom->x) {
-		nX = srcRoom->x;
-	} else {
-		nX = dstRoom->x;
-	}
-
-	if (srcRoom->y < dstRoom->y) {
-		nY = srcRoom->y;
-	} else {
-		nY = dstRoom->y;
-	}
-
-	nWidth = srcRoom->width + dstRoom->width;
-	nHeight = srcRoom->height + dstRoom->height;
-
-	srcRoom->merged = 1;
-	dstRoom->merged = 1;
-
-	return createProtoRoom(nX, nY, nWidth, nHeight, NULL);*/
+	srcRoom->parent = dstRoom;
 }
 
 roomProto *splitProtoRoom(roomProto *parentRoomProto, int horizSplit) {
@@ -104,20 +84,34 @@ room *createRoom(roomProto *prototypeRoom, unsigned int flags) {
 	rm->x = prototypeRoom->x;
 	rm->y = prototypeRoom->y;
 
-	if (width > 11) {
-		width = (int)((width * getRandomFloat(.8, .9)) + .5);
-	}
+	if (prototypeRoom->parent) {
+		if (prototypeRoom->parent->x < prototypeRoom->x) {
+			rm->x --;
+		} else if (prototypeRoom->parent->x > prototypeRoom->x) {
+			width ++;
+		}
 
-	if (height > 11) {
-		height = (int)((height * getRandomFloat(.8, .9)) + .5);
-	}
+		if (prototypeRoom->parent->y < prototypeRoom->y) {
+			rm->y --;
+		} else if (prototypeRoom->parent->y > prototypeRoom->y) {
+			height ++;
+		}
+	} else {
+		if (width > 11) {
+			width = (int) ((width * getRandomFloat(.8, .9)) + .5);
+		}
 
-	if (width < prototypeRoom->width) {
-		rm->x += getRandomInt(0, (prototypeRoom->width - width) - 1);
-	}
+		if (height > 11) {
+			height = (int) ((height * getRandomFloat(.8, .9)) + .5);
+		}
 
-	if (height < prototypeRoom->height) {
-		rm->y += getRandomInt(0, (prototypeRoom->height - height) - 1);
+		if (width < prototypeRoom->width) {
+			rm->x += getRandomInt(0, (prototypeRoom->width - width) - 1);
+		}
+
+		if (height < prototypeRoom->height) {
+			rm->y += getRandomInt(0, (prototypeRoom->height - height) - 1);
+		}
 	}
 
 	rm->size = width * height;
