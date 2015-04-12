@@ -1101,14 +1101,14 @@ void combineRooms() {
 				potentialNeighbor |= testLines(pX1, pX2, cX1, cX2);
 			}
 
-			if (potentialNeighbor) {
-				printf("Yes\n");
-			} else {
-				printf("No\n");
+			if (!potentialNeighbor) {
+				continue;
 			}
 
 			if (!getRandomInt(0, 8)) {
 				mergeProtoRooms(parentRoom, childRoom);
+
+				printf("Merged, lol\n");
 			}
 			//addPotentialCombineRoom(parentRoom, childRoom);
 		}

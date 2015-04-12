@@ -18,7 +18,7 @@ roomProto *createProtoRoom(int x, int y, int width, int height, roomProto *paren
 	rm->width = width;
 	rm->height = height;
 	rm->size = width * height;
-	rm->parent = parentRoomProto;
+	rm->parent = NULL; //ignore arg...
 	rm->build = 0;
 	rm->cost = 150;
 	rm->flags = 0x0;
@@ -31,6 +31,29 @@ roomProto *createProtoRoom(int x, int y, int width, int height, roomProto *paren
 void mergeProtoRooms(roomProto *srcRoom, roomProto *dstRoom) {
 	srcRoom->merged = 1;
 	dstRoom->merged = 1;
+
+	dstRoom->parent = srcRoom;
+	/*int nX, nY, nWidth, nHeight;
+
+	if (srcRoom->x < dstRoom->x) {
+		nX = srcRoom->x;
+	} else {
+		nX = dstRoom->x;
+	}
+
+	if (srcRoom->y < dstRoom->y) {
+		nY = srcRoom->y;
+	} else {
+		nY = dstRoom->y;
+	}
+
+	nWidth = srcRoom->width + dstRoom->width;
+	nHeight = srcRoom->height + dstRoom->height;
+
+	srcRoom->merged = 1;
+	dstRoom->merged = 1;
+
+	return createProtoRoom(nX, nY, nWidth, nHeight, NULL);*/
 }
 
 roomProto *splitProtoRoom(roomProto *parentRoomProto, int horizSplit) {
