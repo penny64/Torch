@@ -971,7 +971,7 @@ void paintLevel() {
 }
 
 void buildDungeon() {
-	int i, ii, invalidRoom, horizSplit, nRoomCount, mapUpdated = 1, minRoomSize = 120, bannedRoomCount = 0;
+	int i, ii, invalidRoom, horizSplit, nRoomCount, mapUpdated = 1, minRoomSize = 100, bannedRoomCount = 0;
 	int MAX_ROOMS_TEMP = 60;
 	roomProto *roomWalker;
 	roomProto *rootRoom = createProtoRoom(2, 2, WINDOW_WIDTH - 2, WINDOW_HEIGHT - 2, NULL);
@@ -989,7 +989,7 @@ void buildDungeon() {
 			invalidRoom = 0;
 			roomWalker = PROTO_ROOMS[i];
 
-			if (bannedRoomCount < 3 && roomWalker->size <= minRoomSize * 1.2 && !getRandomInt(0, 8)) {
+			if (bannedRoomCount < 3 && roomWalker->size <= minRoomSize * 1.1 && !getRandomInt(0, 8)) {
 				bannedRooms[bannedRoomCount] = roomWalker;
 				bannedRoomCount ++;
 
@@ -1101,38 +1101,11 @@ void combineRooms() {
 				continue;
 			}
 
-			if (!getRandomInt(0, 8)) {
+			if (!(parentRoom->id & 3)) {//(!getRandomInt(0, 8)) {
 				mergeProtoRooms(parentRoom, childRoom);
-
-				printf("Merged, lol\n");
 			}
-			//addPotentialCombineRoom(parentRoom, childRoom);
 		}
 	}
-
-	//Found potentials, let's roll
-	/*parentRoom = getRooms();
-
-	while (parentRoom) {
-		if (!parentRoom->numberOfCombinedRooms || parentRoom->wasCombined) {
-			parentRoom = parentRoom->next;
-
-			continue;
-		}
-
-		roomIndex = clip(getRandomInt(0, parentRoom->numberOfCombinedRooms) - 1, 0, parentRoom->numberOfCombinedRooms - 1);
-		childRoom = getRoomViaId(parentRoom->combinedRoomIds[roomIndex]);
-
-		if (childRoom->wasCombined) {
-			parentRoom = parentRoom->next;
-
-			continue;
-		}
-
-		combineRoom(parentRoom, childRoom);
-
-		parentRoom = parentRoom->next;
-	}*/
 }
 
 float getPositionCost(int xFrom, int yFrom, int xTo, int yTo, void *user_data) {

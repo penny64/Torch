@@ -87,14 +87,18 @@ room *createRoom(roomProto *prototypeRoom, unsigned int flags) {
 	if (prototypeRoom->parent) {
 		if (prototypeRoom->parent->x < prototypeRoom->x) {
 			rm->x --;
+			width = (int) ((width * getRandomFloat(.8, .9)) + .5);
 		} else if (prototypeRoom->parent->x > prototypeRoom->x) {
 			width ++;
+			rm->x += getRandomInt(1, (prototypeRoom->width - width) - 1);
 		}
 
 		if (prototypeRoom->parent->y < prototypeRoom->y) {
 			rm->y --;
+			height = (int) ((height * getRandomFloat(.8, .9)) + .5);
 		} else if (prototypeRoom->parent->y > prototypeRoom->y) {
 			height ++;
+			rm->y += getRandomInt(1, (prototypeRoom->height - height) - 1);
 		}
 	} else {
 		if (width > 11) {
