@@ -558,7 +558,7 @@ void decorateRooms() {
 					}
 				}
 			}
-		} else if (!getRandomInt(0, 4)) {
+		} else if (!getRandomInt(0, 8)) { //Grid room
 			for (y = roomPtr->y; y < roomPtr->y + roomPtr->height; y++) {
 				for (x = roomPtr->x; x < roomPtr->x + roomPtr->width; x++) {
 					relX = x - roomPtr->x;
@@ -835,26 +835,21 @@ void colorRooms() {
 			}
 		}
 
-		/*for (y = 2; y < WINDOW_HEIGHT - 2; y ++) {
-			for (x = 2; x < WINDOW_WIDTH - 2; x ++) {
-				if (!TCOD_map_is_walkable(TUNNEL_MAP, x, y)) {
-					colorMod = getRandomInt(0, 15);
-
-					drawCharBackEx(LEVEL_CONSOLE, x, y, TCOD_color_RGB(200 + RED_SHIFT - colorMod, 200 - colorMod, 200 - colorMod), TCOD_BKGND_SET);
-				}
-			}
-		}*/
-
 		roomPtr = roomPtr->next;
 	}
 }
 
 void colorItems() {
+	int x1, y1;
 	item *itemPtr = getItems();
 
 	while (itemPtr) {
 		if (itemPtr->itemFlags & IS_KEYTORCH) {
-			drawCharBackEx(getLevelConsole(), itemPtr->x, itemPtr->y, TCOD_color_RGB(50, 50, 50), TCOD_BKGND_SET);
+			for (y1 = -1; y1 <= 1; y1 ++) {
+				for (x1 = -1; x1 <= 1; x1 ++) {
+					drawCharBackEx(getLevelConsole(), itemPtr->x + x1, itemPtr->y + y1, TCOD_color_RGB(80 + getRandomInt(0, 50), 80, 80), TCOD_BKGND_SET);
+				}
+			}
 		}
 
 		itemPtr = itemPtr->next;
@@ -1016,10 +1011,6 @@ void buildDungeon() {
 			if (roomWalker->size <= minRoomSize || roomWalker->width <= 8 || roomWalker->height <= 8) {
 				continue;
 			}
-
-			//if (roomWalker->width <= 13 && roomWalker->height <= 13) {
-			//	continue;
-			//}
 
 			if (roomWalker->width > roomWalker->height) {
 				horizSplit = 0;
@@ -1277,14 +1268,129 @@ void designDungeon() {
 		if (PROTO_ROOMS[i]->flags & IS_PROTO_SPECIAL_ROOM) {
 			rm->flags |= IS_SPECIAL_ROOM;
 		}
+	}
+}
 
-		for (positionIndex = 0; positionIndex < rm->size; positionIndex ++) {
+//Credit: http://www.roguebasin.com/index.php?title=Abstract_Dungeons
+int testLines(int p1, int p2, int s1, int s2) {
+	if (((s1 >= p1) && (p2-s1>2)) || ((s1 <= p1) && (s2-p1>2))) {
+		return 1;
+	}
+
+	return 0;
+}
+
+void combineRooms() {
+	//We just split the map up into rooms, now we need to connect
+	//a few rooms to build a more varied (less square) dungeon.
+
+	room *parentRoom = getRooms(), *childRoom;
+	int i, pX1, pX2, pY1, pY2, cX1, cX2, cY1, cY2, potentialNeighbor, roomIndex;
+
+	while (parentRoom) {
+		pX1 = parentRoom->x;
+		pX2 = parentRoom->x + parentRoom->width;
+		pY1 = parentRoom->y;
+		pY2 = parentRoom->y + parentRoom->height;
+
+		childRoom = getRooms();
+
+		while (childRoom) {
+			if (parentRoom == childRoom) {
+				childRoom = childRoom->next;
+
+				continue;
+			}
+
+			potentialNeighbor = 1;
+
+			cX1 = childRoom->x;
+			cX2 = childRoom->x + childRoom->width;
+			cY1 = childRoom->y;
+			cY2 = childRoom->x + childRoom->height;
+
+			if ((pX2 < cX1) ||
+				(pY2 < cY1) ||
+				(pX1 > cX2) ||
+				(pY1 > cY2))
+				potentialNeighbor = 0;
+
+			if (!potentialNeighbor) {
+				childRoom = childRoom->next;
+
+				continue;
+			}
+
+			if (pX1 == cX2) {
+				potentialNeighbor |= testLines(pY1, pY2, cY1, cY2);
+			}
+
+			if (cX1 == pX2) {
+				potentialNeighbor |= testLines(pY1, pY2, cY1, cY2);
+			}
+
+			if (pY1 == cY2) {
+				potentialNeighbor |= testLines(pX1, pX2, cX1, cX2);
+			}
+
+			if (cY1 == pY2) {
+				potentialNeighbor |= testLines(pX1, pX2, cX1, cX2);
+			}
+
+			if (potentialNeighbor) {
+				printf("Yes\n");
+			} else {
+				printf("No\n");
+			}
+
+			addPotentialCombineRoom(parentRoom, childRoom);
+
+			childRoom = childRoom->next;
+		}
+
+		parentRoom = parentRoom->next;
+	}
+
+	//Found potentials, let's roll
+	parentRoom = getRooms();
+
+	while (parentRoom) {
+		if (!parentRoom->numberOfCombinedRooms || parentRoom->wasCombined) {
+			parentRoom = parentRoom->next;
+
+			continue;
+		}
+
+		roomIndex = clip(getRandomInt(0, parentRoom->numberOfCombinedRooms) - 1, 0, parentRoom->numberOfCombinedRooms - 1);
+		childRoom = getRoomViaId(parentRoom->combinedRoomIds[roomIndex]);
+
+		if (childRoom->wasCombined) {
+			parentRoom = parentRoom->next;
+
+			continue;
+		}
+
+		combineRoom(parentRoom, childRoom);
+
+		parentRoom = parentRoom->next;
+	}
+
+}
+
+void buildRooms() {
+	room *rm = getRooms();
+	int x, y, positionIndex;
+
+	while (rm) {
+		for (positionIndex = 0; positionIndex < rm->size; positionIndex++) {
 			x = rm->positionList[positionIndex][0];
 			y = rm->positionList[positionIndex][1];
 
 			drawCharBackEx(LEVEL_CONSOLE, x, y, TCOD_color_RGB(255, 30, 255), TCOD_BKGND_SET);
 			TCOD_map_set_properties(LEVEL_MAP, x, y, 1, 1);
 		}
+
+		rm = rm->next;
 	}
 }
 
@@ -1457,6 +1563,8 @@ void generateLevel() {
 	resetLevel();
 	buildDungeon();
 	designDungeon();
+	combineRooms();
+	buildRooms();
 	connectNeighbors();
 	carveTunnels();
 	generatePuzzles();

@@ -31,9 +31,9 @@ enum {
 typedef struct room room;
 
 struct room {
-	int id, centerX, centerY, size, numberOfDoorPositions, numberOfConnectedRooms, numberOfNeighborRooms, numberOfOccupiedSpawnPositions;
-	int x, y, width, height;
-	int *connectedRoomIds, *neighborRoomIds, *spawnPositions, **positionList, **doorPositions;
+	int id, centerX, centerY, size, numberOfDoorPositions, numberOfCombinedRooms, numberOfConnectedRooms, numberOfNeighborRooms, numberOfOccupiedSpawnPositions;
+	int x, y, width, height, wasCombined;
+	int *connectedRoomIds, *combinedRoomIds,  *neighborRoomIds, *spawnPositions, **positionList, **doorPositions;
 	unsigned int flags;
 	struct room *next, *prev;
 };
@@ -57,8 +57,11 @@ void claimSpawnPositionInRoom(room*, int, int);
 void getNewSpawnPosition(room*, int[]);
 void addNeighbor(room*, room*);
 void connectRooms(room*, room*);
+void addPotentialCombineRoom(room*, room*);
+void combineRoom(room*, room*);
 int isNeighborWith(room *, room*);
 int isNeighborWithId(room*, int);
+int isPotentialCombinedRoom(room*, room*);
 int isConnectedWith(room*, room*);
 int isPositionInRoom(room*, int, int);
 int isPositionSpawnable(room*, int, int);

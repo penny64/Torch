@@ -99,13 +99,16 @@ room *createRoom(roomProto *prototypeRoom, unsigned int flags) {
 	rm->numberOfConnectedRooms = 0;
 	rm->numberOfNeighborRooms = 0;
 	rm->numberOfDoorPositions = 0;
+	rm->numberOfCombinedRooms = 0;
 	rm->numberOfOccupiedSpawnPositions = 0;
 	rm->flags = flags;
 	rm->prev = NULL;
 	rm->next = NULL;
 	rm->neighborRoomIds = (int*)malloc((4) * sizeof(int));
 	rm->connectedRoomIds = (int*)malloc((4) * sizeof(int));
+	rm->combinedRoomIds = (int*)malloc((4) * sizeof(int));
 	rm->spawnPositions = malloc(sizeof(int) * rm->size);
+	rm->wasCombined = 0;
 
 	//TODO: Use memcpy in the future
 	rm->positionList = malloc(sizeof *rm->positionList * rm->size);
@@ -244,6 +247,38 @@ void deleteAllRooms() {
 	ROOMS = NULL; //Just in case...?
 }
 
+void combineRoom(room *srcRoom, room *dstRoom) {
+	int i, newSize, **newPositionList;
+
+	srcRoom->wasCombined = 1;
+	newSize = srcRoom->size + dstRoom->size;
+
+	newPositionList = malloc(sizeof *newPositionList * newSize);
+
+	for (i = 0; i < newSize; i++) {
+		newPositionList[i] = malloc(sizeof(int) * 2);
+	}
+
+	for (i = 0; i < srcRoom->size; i++) {
+		newPositionList[i][0] = srcRoom->positionList[i][0];
+		newPositionList[i][1] = srcRoom->positionList[i][1];
+	}
+
+	for (i = 0; i < dstRoom->size; i++) {
+		newPositionList[srcRoom->size + i][0] = dstRoom->positionList[i][0];
+		newPositionList[srcRoom->size + i][1] = dstRoom->positionList[i][1];
+	}
+
+	for (i = 0; i < srcRoom->size; i++) {
+		free(srcRoom->positionList[i]);
+	}
+
+	free(srcRoom->positionList);
+	srcRoom->positionList = newPositionList;
+
+	//deleteRoom(dstRoom);
+}
+
 void addRoomDoorPosition(room *srcRoom, int x, int y) {
 	srcRoom->doorPositions[srcRoom->numberOfDoorPositions][0] = x;
 	srcRoom->doorPositions[srcRoom->numberOfDoorPositions][1] = y;
@@ -280,6 +315,36 @@ void connectRooms(room *srcRoom, room *dstRoom) {
 		dstRoom->connectedRoomIds[dstRoom->numberOfConnectedRooms] = srcRoom->id;
 
 		dstRoom->numberOfConnectedRooms++;
+	}
+}
+
+int isPotentialCombinedRoom(room *srcRoom, room *dstRoom) {
+	int i;
+
+	if (srcRoom->id == dstRoom->id) {
+		return 1;
+	}
+
+	for (i = 0; i < srcRoom->numberOfCombinedRooms; i++) {
+		if (srcRoom->combinedRoomIds[i] == dstRoom->id) {
+			return 1;
+		}
+	}
+
+	return 0;
+}
+
+void addPotentialCombineRoom(room *srcRoom, room *dstRoom) {
+	if (!isPotentialCombinedRoom(srcRoom, dstRoom)) {
+		srcRoom->combinedRoomIds[srcRoom->numberOfCombinedRooms] = dstRoom->id;
+
+		srcRoom->numberOfCombinedRooms++;
+	}
+
+	if (!isPotentialCombinedRoom(dstRoom, srcRoom)) {
+		dstRoom->combinedRoomIds[dstRoom->numberOfCombinedRooms] = srcRoom->id;
+
+		srcRoom->numberOfCombinedRooms++;
 	}
 }
 
