@@ -28,7 +28,7 @@ void createRagdoll(int x, int y) {
 	actor->hp = 25;
 	actor->hpMax = 25;
 	actor->sightRange = 4;
-	actor->statSpeed = 3;
+	actor->statSpeed = 1.3;
 	actor->aiFlags = TRACK_TARGET | IS_ALIVE | IS_IMMUNE_TO_DARKNESS;
 	actor->chr = (int)'&';
 	actor->foreColor = TCOD_color_RGB(205, 205, 205);

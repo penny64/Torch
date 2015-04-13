@@ -190,7 +190,7 @@ void setFutureStanceToRemove(character *actor, unsigned int stances) {
 	actor->nextStanceFlagsToRemove |= stances;
 }
 
-void setDelay(character *actor, int time) {
+void setDelay(character *actor, float time) {
 	actor->turns = 1;
 	actor->delay = time;
 }
