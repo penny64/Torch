@@ -28,3 +28,7 @@ Collect treasure (c or C) by moving the player character (@) over it.
 * Vi keys: 8-way movement
 * Arrow keys: 4-way movement
 * Space: Plant torch
+
+## License
+
+See `license.txt`.
