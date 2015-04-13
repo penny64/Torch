@@ -436,7 +436,6 @@ void placeItems() {
 
 float roomPositionCost(int xFrom, int yFrom, int xTo, int yTo, void *user_data) {
 	room *roomPtr = user_data;
-	int i, tempDistance, closestExitDistance = 999;
 
 	if ((isPositionInRoom(roomPtr, xFrom, yFrom) || TCOD_map_is_walkable(TUNNEL_MAP, xFrom, yFrom))
 			&& (isPositionInRoom(roomPtr, xTo, yTo) || TCOD_map_is_walkable(TUNNEL_MAP, xTo, yTo))) {
@@ -568,7 +567,7 @@ void decorateRooms() {
 						continue;
 					}
 
-					if (relX % 2 && relY % 2) {
+					if (relX % 2 && relY % 2 && !getRandomInt(0, 4)) {
 						createMetalWall(x, y);
 
 						claimSpawnPositionInRoom(roomPtr, x, y);
@@ -581,7 +580,7 @@ void decorateRooms() {
 						relX = x - roomPtr->x;
 						relY = y - roomPtr->y;
 
-						if (relX < 1 || relY < 1 || relX > roomPtr->width - 2 || relY > roomPtr->height - 2) {
+						if (relX < 1 || relY < 1 || relX > roomPtr->width - 2 || relY > roomPtr->height - 2 || relY == roomPtr->height / 2) {
 							continue;
 						}
 
@@ -1049,7 +1048,7 @@ void combineRooms() {
 	//a few rooms to build a more varied (less square) dungeon.
 
 	roomProto *parentRoom, *childRoom;
-	int i, ii, pX1, pX2, pY1, pY2, cX1, cX2, cY1, cY2, potentialNeighbor, roomIndex;
+	int i, ii, pX1, pX2, pY1, pY2, cX1, cX2, cY1, cY2, potentialNeighbor;
 
 	for (i = 0; i < PROTO_ROOM_COUNT; i ++) {
 		parentRoom = PROTO_ROOMS[i];
@@ -1103,7 +1102,7 @@ void combineRooms() {
 				continue;
 			}
 
-			if (!(parentRoom->id & 3)) {//(!getRandomInt(0, 8)) {
+			if (!getRandomInt(0, 10)) {//(!getRandomInt(0, 8)) {
 				mergeProtoRooms(parentRoom, childRoom);
 			}
 		}
@@ -1148,7 +1147,7 @@ float getPositionCost(int xFrom, int yFrom, int xTo, int yTo, void *user_data) {
 }
 
 void designDungeon() {
-	int i, x, y, positionIndex, wX, wY, startRoomX, startRoomY, exitRoomX, exitRoomY, distanceToStart, distanceToExit, inRoom, specialRoomScore = 0, endRoomScore = 0;
+	int i, wX, wY, startRoomX, startRoomY, exitRoomX, exitRoomY, distanceToStart, distanceToExit, inRoom, specialRoomScore = 0, endRoomScore = 0;
 	roomProto *roomWalker, *specialRoom = NULL, *startRoom = NULL, *endRoom = NULL;
 	TCOD_path_t pathfinder;
 

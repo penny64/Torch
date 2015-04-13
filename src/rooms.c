@@ -24,16 +24,29 @@ roomProto *createProtoRoom(int x, int y, int width, int height, roomProto *paren
 	rm->flags = 0x0;
 	rm->timesSplit = 1;
 	rm->merged = 0;
+	rm->group = NULL;
 
 	return rm;
 }
 
 void mergeProtoRooms(roomProto *srcRoom, roomProto *dstRoom) {
-	srcRoom->merged = 1;
-	dstRoom->merged = 1;
+	//srcRoom->merged = 1;
+	//dstRoom->merged = 1;
 
-	dstRoom->parent = srcRoom;
-	srcRoom->parent = dstRoom;
+	//dstRoom->parent = srcRoom;
+	//srcRoom->parent = dstRoom;
+	roomGroup *group = NULL;
+
+	if (srcRoom->group) {
+		addProtoToRoomGroup(srcRoom->group, dstRoom);
+	} else if (dstRoom->group) {
+		addProtoToRoomGroup(dstRoom->group, srcRoom);
+	} else {
+		group = createRoomGroup();
+
+		addProtoToRoomGroup(group, srcRoom);
+		addProtoToRoomGroup(group, dstRoom);
+	}
 }
 
 roomProto *splitProtoRoom(roomProto *parentRoomProto, int horizSplit) {
@@ -131,10 +144,10 @@ room *createRoom(roomProto *prototypeRoom, unsigned int flags) {
 	rm->flags = flags;
 	rm->prev = NULL;
 	rm->next = NULL;
-	rm->neighborRoomIds = (int*)malloc((4) * sizeof(int));
-	rm->connectedRoomIds = (int*)malloc((4) * sizeof(int));
-	rm->combinedRoomIds = (int*)malloc((4) * sizeof(int));
-	rm->spawnPositions = malloc(sizeof(int) * rm->size);
+	rm->neighborRoomIds = malloc(4 * sizeof(int));
+	rm->connectedRoomIds = malloc(4 * sizeof(int));
+	rm->combinedRoomIds = malloc(4 * sizeof(int));
+	rm->spawnPositions = malloc(rm->size * sizeof(int));
 	rm->wasCombined = 0;
 
 	//TODO: Use memcpy in the future
@@ -167,30 +180,6 @@ room *createRoom(roomProto *prototypeRoom, unsigned int flags) {
 		}
 	}
 
-	/*for (y = 0; y < WINDOW_HEIGHT; y ++) {
-		addPosition = 0;
-
-		for (x = 0; x < WINDOW_WIDTH; x ++) {
-			if (roomMap[x][y] == id) {
-				xAvg += x;
-				xAvgLen ++;
-				addPosition = 1;
-				rm->positionList[positionIndex][0] = x;
-				rm->positionList[positionIndex][1] = y;
-
-				positionIndex ++;
-			}
-		}
-
-		if (addPosition) {
-			yAvg += y;
-			yAvgLen ++;
-		}
-	}*/
-
-	//rm->centerX = xAvg / xAvgLen;
-	//rm->centerY = yAvg / yAvgLen;
-
 	if (ROOMS == NULL) {
 		ROOMS = rm;
 	} else {
@@ -205,6 +194,34 @@ room *createRoom(roomProto *prototypeRoom, unsigned int flags) {
 	}
 
 	return rm;
+}
+
+roomGroup *createRoomGroup() {
+	roomGroup *grp = calloc(1, sizeof(roomGroup));
+
+	grp->roomProtos = malloc(MAX_ROOMS_IN_GROUP * sizeof(roomProto*));
+	grp->rooms = malloc(MAX_ROOMS_IN_GROUP * sizeof(room*));
+	grp->numberOfProtoRooms = 0;
+	grp->numberOfRooms = 0;
+
+	return grp;
+}
+
+void addProtoToRoomGroup(roomGroup *group, roomProto *proto) {
+	printf("%i\n", group->numberOfProtoRooms);
+	assert(group->numberOfProtoRooms < MAX_ROOMS_IN_GROUP);
+
+	group->roomProtos[group->numberOfProtoRooms] = proto;
+	group->numberOfProtoRooms ++;
+	proto->group = group;
+}
+
+void addRoomToRoomGroup(roomGroup *group, room *rm) {
+	assert(group->numberOfRooms < MAX_ROOMS_IN_GROUP);
+
+	group->rooms[group->numberOfRooms] = rm;
+	group->numberOfRooms ++;
+	rm->group = group;
 }
 
 room *getRooms() {

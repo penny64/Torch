@@ -2,6 +2,7 @@
 
 #define MAX_ROOMS 6
 #define MAX_CONNECTED_ROOMS 5
+#define MAX_ROOMS_IN_GROUP 8
 
 #ifndef ROOMS_H
 #define ROOMS_H
@@ -29,22 +30,30 @@ enum {
 } roomFlag_t;
 
 typedef struct room room;
+typedef struct roomProto roomProto;
+typedef struct roomGroup roomGroup;
 
 struct room {
 	int id, centerX, centerY, size, numberOfDoorPositions, numberOfCombinedRooms, numberOfConnectedRooms, numberOfNeighborRooms, numberOfOccupiedSpawnPositions;
 	int x, y, width, height, wasCombined;
 	int *connectedRoomIds, *combinedRoomIds,  *neighborRoomIds, *spawnPositions, **positionList, **doorPositions;
 	unsigned int flags;
-	struct room *next, *prev;
+	room *next, *prev;
+	roomGroup *group;
 };
-
-typedef struct roomProto roomProto;
 
 struct roomProto {
 	int id, x, y, width, height, size, build, timesSplit, merged;
 	float cost;
 	unsigned int flags; // :)
 	roomProto *parent;
+	roomGroup *group;
+};
+
+struct roomGroup {
+	int numberOfRooms, numberOfProtoRooms;
+	roomProto **roomProtos;
+	room **rooms;
 };
 
 #endif
@@ -59,6 +68,8 @@ void addNeighbor(room*, room*);
 void connectRooms(room*, room*);
 void addPotentialCombineRoom(room*, room*);
 void combineRoom(room*, room*);
+void addProtoToRoomGroup(roomGroup*, roomProto*);
+void addRoomToRoomGroup(roomGroup*, room*);
 void mergeProtoRooms(roomProto*, roomProto*);
 int isNeighborWith(room *, room*);
 int isNeighborWithId(room*, int);
@@ -74,3 +85,5 @@ room *getRoomWithFlags(unsigned int);
 
 roomProto *createProtoRoom(int, int, int, int, roomProto*);
 roomProto *splitProtoRoom(roomProto*, int);
+
+roomGroup *createRoomGroup();

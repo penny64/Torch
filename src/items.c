@@ -441,7 +441,6 @@ void createBonfire(int x, int y) {
 }
 
 void createBonfireKeystone(int x, int y) {
-	int x1, y1;
 	item *itm = createItem(x, y, '!', TCOD_color_RGB(95, 95, 95), TCOD_color_RGB(55, 55, 55), IS_FUEL_SOURCE | IS_KEYTORCH);
 
 	light *lght = createDynamicLight(x, y, NULL);
@@ -605,7 +604,7 @@ void createAllSeeingEye(int x, int y) {
 }
 
 void createWoodWall(int x, int y) {
-	item *itm = createItem(x, y, '#', TCOD_color_RGB(128 - 40, 101 - 40, 23 - 5), TCOD_color_RGB(128 - 50, 101 - 50, 23 - 5), IS_SOLID);
+	createItem(x, y, '#', TCOD_color_RGB(128 - 40, 101 - 40, 23 - 5), TCOD_color_RGB(128 - 50, 101 - 50, 23 - 5), IS_SOLID);
 }
 
 void createMetalWall(int x, int y) {
