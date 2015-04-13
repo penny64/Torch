@@ -101,11 +101,11 @@ room *createRoom(roomProto *prototypeRoom, unsigned int flags) {
 			rm->y += getRandomInt(1, (prototypeRoom->height - height) - 1);
 		}
 	} else {
-		if (width > 11) {
+		if (width > 9) {
 			width = (int) ((width * getRandomFloat(.8, .9)) + .5);
 		}
 
-		if (height > 11) {
+		if (height > 9) {
 			height = (int) ((height * getRandomFloat(.8, .9)) + .5);
 		}
 

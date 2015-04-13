@@ -840,14 +840,16 @@ void colorRooms() {
 }
 
 void colorItems() {
-	int x1, y1;
+	int x1, y1, colorMod;
 	item *itemPtr = getItems();
 
 	while (itemPtr) {
 		if (itemPtr->itemFlags & IS_KEYTORCH) {
 			for (y1 = -1; y1 <= 1; y1 ++) {
 				for (x1 = -1; x1 <= 1; x1 ++) {
-					drawCharBackEx(getLevelConsole(), itemPtr->x + x1, itemPtr->y + y1, TCOD_color_RGB(80 + getRandomInt(0, 50), 80, 80), TCOD_BKGND_SET);
+					colorMod = getRandomInt(0, 30);
+
+					drawCharBackEx(getLevelConsole(), itemPtr->x + x1, itemPtr->y + y1, TCOD_color_RGB(80 + colorMod , 80 + colorMod, 80 + colorMod), TCOD_BKGND_SET);
 				}
 			}
 		}

@@ -442,7 +442,7 @@ void createBonfire(int x, int y) {
 
 void createBonfireKeystone(int x, int y) {
 	int x1, y1;
-	item *itm = createItem(x, y, '!', TCOD_color_RGB(15, 15, 15), TCOD_color_RGB(55, 55, 55), IS_FUEL_SOURCE | IS_KEYTORCH);
+	item *itm = createItem(x, y, '!', TCOD_color_RGB(95, 95, 95), TCOD_color_RGB(55, 55, 55), IS_FUEL_SOURCE | IS_KEYTORCH);
 
 	light *lght = createDynamicLight(x, y, NULL);
 	itm->itemLight = lght;
