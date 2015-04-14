@@ -4,6 +4,7 @@
 #include "entities.h"
 #include "particles.h"
 #include "rects.h"
+#include "framework/display.h"
 #include "framework/numbers.h"
 #include "systems.h"
 #include "components.h"
@@ -11,11 +12,23 @@
 
 void particleTickHandler(World*, unsigned int);
 
+TCOD_console_t EFFECTS_CONSOLE;
+
+
+TCOD_console_t getEffectsConsole() {
+	return EFFECTS_CONSOLE;
+}
 
 void startParticles() {
 	World *world = getWorld();
 
 	createSystemHandler(world, EVENT_TICK, COMPONENT_PARTICLE, &particleTickHandler);
+
+	EFFECTS_CONSOLE = TCOD_console_new(WINDOW_WIDTH, WINDOW_HEIGHT);
+
+	TCOD_console_set_default_background(EFFECTS_CONSOLE, TCOD_color_RGB(0, 0, 0));
+	TCOD_console_set_key_color(EFFECTS_CONSOLE, TCOD_color_RGB(0, 0, 0));
+	TCOD_console_clear(EFFECTS_CONSOLE);
 }
 
 void registerParticle(World *world, unsigned int entityId, float alpha, float fadeRate) {
@@ -35,7 +48,7 @@ void createParticle(int x, int y, int chr, int direction, float speed, float alp
 	unsigned int entityId = createEntity(getWorld());
 	World *world = getWorld();
 
-	registerRectSystem(world, entityId, x, y, chr, direction, speed, foreColor, backColor);
+	registerRectSystem(world, entityId, x, y, chr, direction, speed, getEffectsConsole(), foreColor, backColor);
 	registerParticle(world, entityId, alpha, fadeRate);
 
 	ParticleComponent *particleComponent = &world->particle[entityId];
@@ -46,7 +59,7 @@ void createBullet(unsigned int ownerId, int x, int y, int chr, int direction, fl
 	unsigned int entityId = createEntity(getWorld());
 	World *world = getWorld();
 
-	registerRectSystem(world, entityId, x, y, chr, direction, speed, foreColor, backColor);
+	registerRectSystem(world, entityId, x, y, chr, direction, speed, getEffectsConsole(), foreColor, backColor);
 	registerRectCollisionSystem(world, entityId);
 
 	world->mask[entityId] |= COMPONENT_SPELL_BULLET | COMPONENT_LIGHT;

@@ -8,5 +8,5 @@
 #endif
 
 void startRects(void);
-void registerRectSystem(World*, unsigned int, int, int, int, int, float, TCOD_color_t, TCOD_color_t);
+void registerRectSystem(World*, unsigned int, int, int, int, int, float, TCOD_console_t, TCOD_color_t, TCOD_color_t);
 void registerRectCollisionSystem(World*, unsigned int);

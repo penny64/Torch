@@ -61,6 +61,7 @@ typedef struct {
 	double exactX, exactY, velocity[2];
 	TCOD_color_t foreColor, backColor;
 	TCOD_bkgnd_flag_t backgroundFlag;
+	TCOD_console_t console;
 } RectComponent;
 
 typedef struct {

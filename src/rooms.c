@@ -217,7 +217,6 @@ roomGroup *createRoomGroup() {
 }
 
 void addProtoToRoomGroup(roomGroup *group, roomProto *proto) {
-	printf("%i\n", group->numberOfProtoRooms);
 	assert(group->numberOfProtoRooms < MAX_ROOMS_IN_GROUP);
 
 	group->roomProtos[group->numberOfProtoRooms] = proto;

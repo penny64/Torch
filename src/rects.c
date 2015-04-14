@@ -22,7 +22,7 @@ void startRects() {
 	createSystemHandler(world, EVENT_DRAW, COMPONENT_RECT, &rectDrawHandler);
 }
 
-void registerRectSystem(World *world, unsigned int entityId, int x, int y, int chr, int direction, float speed, TCOD_color_t foreColor, TCOD_color_t backColor) {
+void registerRectSystem(World *world, unsigned int entityId, int x, int y, int chr, int direction, float speed, TCOD_console_t console, TCOD_color_t foreColor, TCOD_color_t backColor) {
 	world->mask[entityId] |= COMPONENT_RECT;
 
 	RectComponent *rectComponent = &world->rect[entityId];
@@ -32,11 +32,13 @@ void registerRectSystem(World *world, unsigned int entityId, int x, int y, int c
 	rectComponent->chr = chr;
 	rectComponent->exactX = x;
 	rectComponent->exactY = y;
+	rectComponent->console = console;
 	rectComponent->foreColor = foreColor;
 	rectComponent->backColor = backColor;
 	rectComponent->ownerId = -1;
 	rectComponent->collidingWithEntityId = -1;
 	rectComponent->backgroundFlag = TCOD_BKGND_ALPHA(.1);
+
 
 	velocity(rectComponent->velocity, direction, speed);
 
@@ -124,7 +126,7 @@ void rectTickHandler(World *world, unsigned int entityId) {
 void rectDrawHandler(World *world, unsigned int entityId) {
 	RectComponent *rectComponent = &world->rect[entityId];
 
-	drawCharEx(getUiConsole(), rectComponent->x, rectComponent->y, rectComponent->chr, rectComponent->foreColor, rectComponent->backColor, rectComponent->backgroundFlag);
+	drawCharEx(rectComponent->console, rectComponent->x, rectComponent->y, rectComponent->chr, rectComponent->foreColor, rectComponent->backColor, rectComponent->backgroundFlag);
 }
 
 int isCollidingWithSolid(int x, int y) {

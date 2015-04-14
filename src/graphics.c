@@ -8,6 +8,7 @@
 #include "framework/numbers.h"
 #include "systems.h"
 #include "lights.h"
+#include "particles.h"
 #include "graphics.h"
 #include "player.h"
 #include "level.h"
@@ -196,14 +197,15 @@ void composeScene() {
 	generateFov();
 	
 	TCOD_console_t levelConsole = getLevelConsole();
-	//TCOD_console_t lightConsole = getLightConsole();
 	TCOD_console_t dynamicLightConsole = getDynamicLightConsole();
 	TCOD_console_t actorConsole = getActorConsole();
 	TCOD_console_t itemConsole = getItemConsole();
+	TCOD_console_t effectsConsole = getEffectsConsole();
 	TCOD_console_t seenConsole = getSeenConsole();
 	TCOD_console_t shadowConsole = getShadowConsole();
-	//TCOD_console_t fogConsole = getFogConsole();
-	TCOD_console_t UiConsole = getUiConsole();
+	TCOD_console_t uiConsole = getUiConsole();
+
+	TCOD_console_clear(effectsConsole);
 
 	drawActors();
 	drawDynamicLights();
@@ -213,14 +215,13 @@ void composeScene() {
 	tickSystemsWithMask(getWorld(), EVENT_DRAW);
 	
 	TCOD_console_blit(levelConsole, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, NULL, 0, 0, 1, 1);
-	//TCOD_console_blit(lightConsole, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, NULL, 0, 0, 0, .9f);
 	TCOD_console_blit(dynamicLightConsole, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, NULL, 0, 0, 0, .7f);
+	TCOD_console_blit(effectsConsole, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, NULL, 0, 0, .55f, .55f);
 	TCOD_console_blit(itemConsole, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, NULL, 0, 0, 1, 0);
 	TCOD_console_blit(actorConsole, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, NULL, 0, 0, 1, 0);
-	//TCOD_console_blit(fogConsole, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, NULL, 0, 0, 1, 0.3f);
 	TCOD_console_blit(seenConsole, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, NULL, 0, 0, 1, 1);
-	TCOD_console_blit(shadowConsole, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, NULL, 0, 0, 1, 0.55f);
-	TCOD_console_blit(UiConsole, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, NULL, 0, 0, 1, 1);
+	TCOD_console_blit(shadowConsole, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, NULL, 0, 0, 1, .55f);
+	TCOD_console_blit(uiConsole, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, NULL, 0, 0, 1, 1);
 
 	postProcess();
 }
