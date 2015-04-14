@@ -106,8 +106,6 @@ room *createRoom(roomProto *prototypeRoom, unsigned int flags) {
 		for (i = 0; i < prototypeRoom->numberOfGroupNeighbors; i ++) {
 			protoNeighbor = prototypeRoom->groupNeighbors[i];
 
-			printf("%i\n", protoNeighbor->x);
-
 			if (protoNeighbor->x < prototypeRoom->x) {
 				rm->x --;
 				width = (int) ((width * getRandomFloat(.6, .9)) + .5);

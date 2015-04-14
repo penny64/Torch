@@ -293,17 +293,18 @@ void generatePuzzles() {
 		}
 
 		if (roomPtr->flags & IS_SPECIAL_ROOM) {
-			if (!roomPtr->group) {
+			/*if (!roomPtr->group) {
 				roomPtr->flags |= IS_TREASURE_ROOM;
 				roomPtr->flags |= NEEDS_DOORS;
 
 				roomPtr = roomPtr->next;
 
 				continue;
-			}
+			}*/
+			printf("Check this\n");
 		}
 
-		if (!(roomPtr->flags & IS_MAIN_PATH) && numberOfTreasureRooms < 2 && roomPtr->numberOfNeighborRooms <= 2 && roomPtr->size < 80) {
+		if (!roomPtr->group && !(roomPtr->flags & IS_MAIN_PATH) && numberOfTreasureRooms < 2 && roomPtr->numberOfNeighborRooms <= 2 && roomPtr->size < 80) {
 			roomPtr->flags |= IS_TREASURE_ROOM;
 			roomPtr->flags |= NEEDS_DOORS;
 
@@ -508,9 +509,9 @@ void decorateRooms() {
 							}
 						}
 
-						if (!isPositionSpawnable(roomPtr, nx, ny)) {
-							continue;
-						}
+						//if (!isPositionSpawnable(roomPtr, nx, ny)) {
+						//	continue;
+						//}
 
 						if (ii == -1) {
 							invalid = 1;
@@ -530,7 +531,7 @@ void decorateRooms() {
 					}
 				}
 
-				if (isNextToWall) {
+				if (isNextToWall && isPositionSpawnable(roomPtr, x, y)) {
 					claimSpawnPositionInRoom(roomPtr, x, y);
 
 					if (roomPtr->flags & IS_TORCH_ROOM) {
@@ -545,6 +546,10 @@ void decorateRooms() {
 		if (roomPtr->flags & IS_TREASURE_ROOM) {
 			for (y = roomPtr->y; y < roomPtr->y + roomPtr->height; y++) {
 				for (x = roomPtr->x; x < roomPtr->x + roomPtr->width; x++) {
+					if (!isPositionSpawnable(roomPtr, x, y)) {
+						continue;
+					}
+
 					relX = x - roomPtr->x;
 					relY = y - roomPtr->y;
 
@@ -562,6 +567,10 @@ void decorateRooms() {
 		} else if (!getRandomInt(0, 8)) { //Grid room
 			for (y = roomPtr->y; y < roomPtr->y + roomPtr->height; y++) {
 				for (x = roomPtr->x; x < roomPtr->x + roomPtr->width; x++) {
+					if (!isPositionSpawnable(roomPtr, x, y)) {
+						continue;
+					}
+
 					relX = x - roomPtr->x;
 					relY = y - roomPtr->y;
 
@@ -579,6 +588,10 @@ void decorateRooms() {
 		} else if (!getRandomInt(0, 4) && roomPtr->size <= 90) {
 				for (y = roomPtr->y; y < roomPtr->y + roomPtr->height; y++) {
 					for (x = roomPtr->x; x < roomPtr->x + roomPtr->width; x++) {
+						if (!isPositionSpawnable(roomPtr, x, y)) {
+							continue;
+						}
+
 						relX = x - roomPtr->x;
 						relY = y - roomPtr->y;
 
@@ -619,7 +632,7 @@ void decorateRooms() {
 
 				for (y = roomPtr->y; y < roomPtr->y + roomPtr->height; y++) {
 					for (x = roomPtr->x; x < roomPtr->x + roomPtr->width; x++) {
-						if (isPositionInRoom(roomPtr, x, y) && TCOD_map_is_walkable(roomMap, x, y)) {
+						if (isPositionInRoom(roomPtr, x, y) && TCOD_map_is_walkable(roomMap, x, y) && isPositionSpawnable(roomPtr, x, y)) {
 							claimSpawnPositionInRoom(roomPtr, x, y);
 							createWoodWall(x, y);
 						}
@@ -763,7 +776,7 @@ void unblockPosition(int x, int y) {
 	resetAllActorsForNewLevel();
 }
 
-void colorRooms() {
+	void colorRooms() {
 	int i, x, y, r, g, b, rMod, gMod, bMod;
 	room *roomPtr = getRooms();
 
