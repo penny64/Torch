@@ -26,33 +26,24 @@ roomProto *createProtoRoom(int x, int y, int width, int height, roomProto *paren
 	rm->group = NULL;
 	rm->groupNeighbors = NULL;
 	rm->numberOfGroupNeighbors = 0;
+	rm->groupNeighbors = malloc(MAX_ROOMS_IN_GROUP * sizeof(roomProto*));
 
 	return rm;
 }
 
 void mergeProtoRooms(roomProto *srcRoom, roomProto *dstRoom) {
-	//srcRoom->merged = 1;
-	//dstRoom->merged = 1;
-
-	//dstRoom->parent = srcRoom;
-	//srcRoom->parent = dstRoom;
 	roomGroup *group = NULL;
 
 	if (srcRoom->group && !dstRoom->group) {
-		dstRoom->groupNeighbors = malloc(MAX_ROOMS_IN_GROUP * sizeof(roomProto*));
+
 
 		addProtoToRoomGroup(srcRoom->group, dstRoom);
 		addProtoAsGroupNeighbor(srcRoom, dstRoom);
 	} else if (dstRoom->group && !srcRoom->group) {
-		srcRoom->groupNeighbors = malloc(MAX_ROOMS_IN_GROUP * sizeof(roomProto*));
-
 		addProtoToRoomGroup(dstRoom->group, srcRoom);
-		addProtoAsGroupNeighbor(srcRoom, dstRoom);
+		addProtoAsGroupNeighbor(dstRoom, srcRoom);
 	} else {
 		group = createRoomGroup();
-
-		srcRoom->groupNeighbors = malloc(MAX_ROOMS_IN_GROUP * sizeof(roomProto*));
-		dstRoom->groupNeighbors = malloc(MAX_ROOMS_IN_GROUP * sizeof(roomProto*));
 
 		addProtoToRoomGroup(group, srcRoom);
 		addProtoToRoomGroup(group, dstRoom);
@@ -110,8 +101,12 @@ room *createRoom(roomProto *prototypeRoom, unsigned int flags) {
 	rm->y = prototypeRoom->y;
 
 	if (prototypeRoom->group) {
+		addRoomToRoomGroup(prototypeRoom->group, rm);
+
 		for (i = 0; i < prototypeRoom->numberOfGroupNeighbors; i ++) {
 			protoNeighbor = prototypeRoom->groupNeighbors[i];
+
+			printf("%i\n", protoNeighbor->x);
 
 			if (protoNeighbor->x < prototypeRoom->x) {
 				rm->x --;
@@ -252,6 +247,18 @@ int isProtoGroupNeighbor(roomProto *srcRoom, roomProto *dstRoom) {
 	return 0;
 }
 
+int isRoomInRoomGroup(roomGroup *group, room *rm) {
+	int i;
+
+	for (i = 0; i < group->numberOfRooms; i ++) {
+		if (group->rooms[i] == rm) {
+			return 1;
+		}
+	}
+
+	return 0;
+}
+
 void addProtoAsGroupNeighbor(roomProto *srcRoom, roomProto *dstRoom) {
 	if (!isProtoGroupNeighbor(srcRoom, dstRoom)) {
 		srcRoom->groupNeighbors[srcRoom->numberOfGroupNeighbors] = dstRoom;
@@ -329,38 +336,6 @@ void deleteAllRooms() {
 	}
 
 	ROOMS = NULL; //Just in case...?
-}
-
-void combineRoom(room *srcRoom, room *dstRoom) {
-	int i, newSize, **newPositionList;
-
-	srcRoom->wasCombined = 1;
-	newSize = srcRoom->size + dstRoom->size;
-
-	newPositionList = malloc(sizeof *newPositionList * newSize);
-
-	for (i = 0; i < newSize; i++) {
-		newPositionList[i] = malloc(sizeof(int) * 2);
-	}
-
-	for (i = 0; i < srcRoom->size; i++) {
-		newPositionList[i][0] = srcRoom->positionList[i][0];
-		newPositionList[i][1] = srcRoom->positionList[i][1];
-	}
-
-	for (i = 0; i < dstRoom->size; i++) {
-		newPositionList[srcRoom->size + i][0] = dstRoom->positionList[i][0];
-		newPositionList[srcRoom->size + i][1] = dstRoom->positionList[i][1];
-	}
-
-	for (i = 0; i < srcRoom->size; i++) {
-		free(srcRoom->positionList[i]);
-	}
-
-	free(srcRoom->positionList);
-	srcRoom->positionList = newPositionList;
-
-	//deleteRoom(dstRoom);
 }
 
 void addRoomDoorPosition(room *srcRoom, int x, int y) {

@@ -77,6 +77,7 @@ int isPotentialCombinedRoom(room*, room*);
 int isConnectedWith(room*, room*);
 int isPositionInRoom(room*, int, int);
 int isPositionSpawnable(room*, int, int);
+int isRoomInRoomGroup(roomGroup*, room*);
 
 room *createRoom(roomProto*, unsigned int);
 room *getRooms(void);

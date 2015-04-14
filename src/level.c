@@ -293,12 +293,14 @@ void generatePuzzles() {
 		}
 
 		if (roomPtr->flags & IS_SPECIAL_ROOM) {
-			roomPtr->flags |= IS_TREASURE_ROOM;
-			roomPtr->flags |= NEEDS_DOORS;
+			if (!roomPtr->group) {
+				roomPtr->flags |= IS_TREASURE_ROOM;
+				roomPtr->flags |= NEEDS_DOORS;
 
-			roomPtr = roomPtr->next;
+				roomPtr = roomPtr->next;
 
-			continue;
+				continue;
+			}
 		}
 
 		if (!(roomPtr->flags & IS_MAIN_PATH) && numberOfTreasureRooms < 2 && roomPtr->numberOfNeighborRooms <= 2 && roomPtr->size < 80) {
@@ -1438,6 +1440,12 @@ void carveTunnels() {
 			TCOD_map_set_properties(roomMap, tempRoom->x, tempRoom->y + tempRoom->height - 1, 0, 0);
 
 			if (parentPtr == tempRoom || isConnectedWith(parentPtr, tempRoom)) {
+				tempRoom = tempRoom->next;
+
+				continue;
+			}
+
+			if (parentPtr->group && isRoomInRoomGroup(parentPtr->group, tempRoom)) {
 				tempRoom = tempRoom->next;
 
 				continue;
