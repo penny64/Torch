@@ -44,10 +44,11 @@ struct room {
 
 struct roomProto {
 	int id, x, y, width, height, size, build, timesSplit, merged;
+	int numberOfGroupNeighbors;
 	float cost;
 	unsigned int flags; // :)
-	roomProto *parent;
 	roomGroup *group;
+	roomProto **groupNeighbors;
 };
 
 struct roomGroup {
@@ -66,10 +67,9 @@ void claimSpawnPositionInRoom(room*, int, int);
 void getNewSpawnPosition(room*, int[]);
 void addNeighbor(room*, room*);
 void connectRooms(room*, room*);
-void addPotentialCombineRoom(room*, room*);
-void combineRoom(room*, room*);
 void addProtoToRoomGroup(roomGroup*, roomProto*);
 void addRoomToRoomGroup(roomGroup*, room*);
+void addProtoAsGroupNeighbor(roomProto*, roomProto*);
 void mergeProtoRooms(roomProto*, roomProto*);
 int isNeighborWith(room *, room*);
 int isNeighborWithId(room*, int);

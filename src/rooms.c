@@ -18,13 +18,14 @@ roomProto *createProtoRoom(int x, int y, int width, int height, roomProto *paren
 	rm->width = width;
 	rm->height = height;
 	rm->size = width * height;
-	rm->parent = NULL; //ignore arg...
 	rm->build = 0;
 	rm->cost = 150;
 	rm->flags = 0x0;
 	rm->timesSplit = 1;
 	rm->merged = 0;
 	rm->group = NULL;
+	rm->groupNeighbors = NULL;
+	rm->numberOfGroupNeighbors = 0;
 
 	return rm;
 }
@@ -37,15 +38,25 @@ void mergeProtoRooms(roomProto *srcRoom, roomProto *dstRoom) {
 	//srcRoom->parent = dstRoom;
 	roomGroup *group = NULL;
 
-	if (srcRoom->group) {
+	if (srcRoom->group && !dstRoom->group) {
+		dstRoom->groupNeighbors = malloc(MAX_ROOMS_IN_GROUP * sizeof(roomProto*));
+
 		addProtoToRoomGroup(srcRoom->group, dstRoom);
-	} else if (dstRoom->group) {
+		addProtoAsGroupNeighbor(srcRoom, dstRoom);
+	} else if (dstRoom->group && !srcRoom->group) {
+		srcRoom->groupNeighbors = malloc(MAX_ROOMS_IN_GROUP * sizeof(roomProto*));
+
 		addProtoToRoomGroup(dstRoom->group, srcRoom);
+		addProtoAsGroupNeighbor(srcRoom, dstRoom);
 	} else {
 		group = createRoomGroup();
 
+		srcRoom->groupNeighbors = malloc(MAX_ROOMS_IN_GROUP * sizeof(roomProto*));
+		dstRoom->groupNeighbors = malloc(MAX_ROOMS_IN_GROUP * sizeof(roomProto*));
+
 		addProtoToRoomGroup(group, srcRoom);
 		addProtoToRoomGroup(group, dstRoom);
+		addProtoAsGroupNeighbor(srcRoom, dstRoom);
 	}
 }
 
@@ -86,6 +97,7 @@ roomProto *splitProtoRoom(roomProto *parentRoomProto, int horizSplit) {
 
 room *createRoom(roomProto *prototypeRoom, unsigned int flags) {
 	room *ptr, *rm = calloc(1, sizeof(room));
+	roomProto *protoNeighbor;
 	int i, x, y, width, height;
 
 	width = prototypeRoom->width - 1;
@@ -97,21 +109,25 @@ room *createRoom(roomProto *prototypeRoom, unsigned int flags) {
 	rm->x = prototypeRoom->x;
 	rm->y = prototypeRoom->y;
 
-	if (prototypeRoom->parent) {
-		if (prototypeRoom->parent->x < prototypeRoom->x) {
-			rm->x --;
-			width = (int) ((width * getRandomFloat(.6, .9)) + .5);
-		} else if (prototypeRoom->parent->x > prototypeRoom->x) {
-			width ++;
-			rm->x += getRandomInt(1, (prototypeRoom->width - width) - 1);
-		}
+	if (prototypeRoom->group) {
+		for (i = 0; i < prototypeRoom->numberOfGroupNeighbors; i ++) {
+			protoNeighbor = prototypeRoom->groupNeighbors[i];
 
-		if (prototypeRoom->parent->y < prototypeRoom->y) {
-			rm->y --;
-			height = (int) ((height * getRandomFloat(.6, .9)) + .5);
-		} else if (prototypeRoom->parent->y > prototypeRoom->y) {
-			height ++;
-			rm->y += getRandomInt(1, (prototypeRoom->height - height) - 1);
+			if (protoNeighbor->x < prototypeRoom->x) {
+				rm->x --;
+				width = (int) ((width * getRandomFloat(.6, .9)) + .5);
+			} else if (protoNeighbor->x > prototypeRoom->x) {
+				width ++;
+				rm->x += getRandomInt(1, (prototypeRoom->width - width) - 1);
+			}
+
+			if (protoNeighbor->y < prototypeRoom->y) {
+				rm->y --;
+				height = (int) ((height * getRandomFloat(.6, .9)) + .5);
+			} else if (protoNeighbor->y > prototypeRoom->y) {
+				height ++;
+				rm->y += getRandomInt(1, (prototypeRoom->height - height) - 1);
+			}
 		}
 	} else {
 		if (width > 9) {
@@ -222,6 +238,30 @@ void addRoomToRoomGroup(roomGroup *group, room *rm) {
 	group->rooms[group->numberOfRooms] = rm;
 	group->numberOfRooms ++;
 	rm->group = group;
+}
+
+int isProtoGroupNeighbor(roomProto *srcRoom, roomProto *dstRoom) {
+	int i;
+
+	for (i = 0; i < srcRoom->numberOfGroupNeighbors; i ++) {
+		if (dstRoom == srcRoom->groupNeighbors[i]) {
+			return 1;
+		}
+	}
+
+	return 0;
+}
+
+void addProtoAsGroupNeighbor(roomProto *srcRoom, roomProto *dstRoom) {
+	if (!isProtoGroupNeighbor(srcRoom, dstRoom)) {
+		srcRoom->groupNeighbors[srcRoom->numberOfGroupNeighbors] = dstRoom;
+		srcRoom->numberOfGroupNeighbors++;
+	}
+
+	if (!isProtoGroupNeighbor(dstRoom, srcRoom)) {
+		dstRoom->groupNeighbors[dstRoom->numberOfGroupNeighbors] = srcRoom;
+		dstRoom->numberOfGroupNeighbors++;
+	}
 }
 
 room *getRooms() {
