@@ -788,17 +788,14 @@ void unblockPosition(int x, int y) {
 		bMod = 0;
 
 		if (roomPtr->flags & IS_TREASURE_ROOM) { //CHECKED
-			printf("Treasure\n");
 			r = 120;
 			g = 101;
 			b = 23;
 		} else if (roomPtr->flags & IS_LAVA_ROOM) { //CHECKED
-			printf("Lava\n");
 			r = 200;
 			g = 200;
 			b = 200;
 		} else if (roomPtr->flags & IS_TORCH_ROOM) { //CHECKED
-			printf("Torch\n");
 			r = 140 - RED_SHIFT;
 			g = 0;
 			b = 140;
