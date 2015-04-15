@@ -14,6 +14,7 @@ struct World {
 	RectComponent rect[MAX_ENTITIES];
 	LightComponent light[MAX_ENTITIES];
 	ParticleComponent particle[MAX_ENTITIES];
+	AiComponent ai[MAX_ENTITIES];
 };
 
 #endif

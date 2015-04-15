@@ -19,6 +19,7 @@ typedef enum {
 	COMPONENT_COLLIDABLE_ACTOR = 1 << 6,
 	COMPONENT_PLAYER = 1 << 7,
 	COMPONENT_PARTICLE = 1 << 8,
+	COMPONENT_AI = 1 << 9,
 } Component;
 
 typedef enum {
@@ -73,5 +74,10 @@ typedef struct {
 	TCOD_color_t foreColor, backColor;
 	unsigned int effectFlags;
 } ParticleComponent;
+
+typedef struct {
+	unsigned int groupId, traits;
+	int hasTarget, trackPosition[2];
+} AiComponent;
 
 #endif

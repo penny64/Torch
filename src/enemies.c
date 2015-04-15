@@ -2,6 +2,7 @@
 #include "framework/actors.h"
 #include "framework/input.h"
 #include "lights.h"
+#include "ai.h"
 #include "libtcod.h"
 #include "items.h"
 #include "level.h"
@@ -9,6 +10,8 @@
 
 void createBat(int x, int y) {
 	character *actor = createActor(x, y);
+
+	registerAiWander(getWorld(), actor->entityId);
 	
 	actor->hp = 15;
 	actor->hpMax = 15;
@@ -24,6 +27,8 @@ void createBat(int x, int y) {
 
 void createRagdoll(int x, int y) {
 	character *actor = createActor(x, y);
+
+	registerAiTrack(getWorld(), actor->entityId);
 	
 	actor->hp = 25;
 	actor->hpMax = 25;
@@ -35,6 +40,7 @@ void createRagdoll(int x, int y) {
 
 	deleteDynamicLight(actor->itemLight);
 	actor->itemLight = NULL;
+
 	/*actor->itemLight->r_tint = 50;
 	actor->itemLight->g_tint = 50;
 	actor->itemLight->b_tint = 50;
@@ -45,6 +51,8 @@ void createRagdoll(int x, int y) {
 
 void createVoidWorm(int x, int y) {
 	character *actor = createActor(x, y);
+
+	registerAiWander(getWorld(), actor->entityId);
 
 	actor->hp = 15;
 	actor->hpMax = 15;

@@ -16,6 +16,7 @@
 #include "level.h"
 #include "items.h"
 #include "intro.h"
+#include "ai.h"
 #include "ui.h"
 
 
@@ -42,6 +43,7 @@ void setup() {
 	startSpells();
 	startRects();
 	startParticles();
+	startAi();
 
 	//Attract screen
 	generateLevel();

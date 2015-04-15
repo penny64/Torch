@@ -464,41 +464,6 @@ int _checkIfPositionLit(character *actor) {
 	return 0;
 }
 
-void _actorAiTrack(character *actor) {
-	if (!getPlayer()) {
-		return;
-	}
-
-	walkActor(actor, getPlayer()->x, getPlayer()->y);
-	walkActorPath(actor);
-}
-
-void _actorAi(character *actor) {
-	if (actor->delay) {
-		return;
-	}
-	
-	if (actor->aiFlags & RANDOM_WALK) {
-		moveActor(actor, getRandomInt(-1, 1), getRandomInt(-1, 1));
-	} else if (actor->aiFlags & TRACK_TARGET) {
-		_actorAiTrack(actor);
-	} else if (actor->aiFlags & WORM_WALK) {
-		//TODO: Potentially store AI info in a different struct,
-		//a linked list containing AI states per AI type
-
-		//TODO: Move to its own function
-		character *player = getPlayer();
-
-		if (!player) {
-			return;
-		}
-
-		if (TCOD_map_is_in_fov(actor->fov, player->x, player->y)) {
-			printf("Player is visible!\n");
-		}
-	}
-}
-
 void _actorLogic(character *actor) {
 	if (!actor->hp) {
 		return;
@@ -674,7 +639,7 @@ void actorLogic() {
 	while (ptr != NULL) {
 		next = ptr->next;
 
-		_actorAi(ptr);
+		tickSystemsWithMaskForEntity(getWorld(), ptr->entityId, EVENT_TICK);
 		_actorLogic(ptr);
 
 		ptr = next;
