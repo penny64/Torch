@@ -356,7 +356,7 @@ item *actorGetItemWithFlag(character *actor, unsigned int flag) {
 	int i;
 
 	for (i = 0; i < actor->numberOfItems; i ++) {
-		if (actor->inventory[i]->itemFlags & flag) {
+		if ((actor->inventory[i]->itemFlags & flag) == flag) {
 			return actor->inventory[i];
 		}
 	}
