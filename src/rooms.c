@@ -305,7 +305,7 @@ room *getRoomWithFlags(unsigned int flags) {
 }
 
 room *getRandomRoom() {
-	int roomId = getRandomInt(0, NEXT_ROOM_ID - 1);
+	int roomId = getRandomInt(1, NEXT_ROOM_ID - 1);
 
 	return getRoomViaId(roomId);
 }
@@ -338,6 +338,7 @@ void deleteAllRooms() {
 		ptr = next;
 	}
 
+	NEXT_ROOM_ID = 1;
 	ROOMS = NULL; //Just in case...?
 }
 

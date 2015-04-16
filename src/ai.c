@@ -178,8 +178,6 @@ void _aiPatrol(World *world, unsigned int entityId) {
 		aiComponent->patrolTime = getRandomInt(20, 30);
 	}
 
-	printf("%i, so %i\n", aiComponent->hasPatrolPosition, aiComponent->patrolTime);
-
 	if (!walkActor(actor, aiComponent->trackPosition[0], aiComponent->trackPosition[1])) {
 		aiComponent->hasPatrolPosition = 0;
 	} else {

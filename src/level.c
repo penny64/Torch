@@ -488,14 +488,14 @@ void decorateRooms() {
 							continue;
 						}
 
-						if ((y1 == -1 && x1 == 1) || (y1 == -1 && x1 == -1) || (y1 == 1 && x1 == 1) || (y1 == 1 && x1 == -1)) {
-							continue;
-						}
-
 						if (TCOD_map_is_walkable(TUNNEL_MAP, x + x1, y + y1)) {
 							invalid = 1;
 
 							break;
+						}
+
+						if ((y1 == -1 && x1 == 1) || (y1 == -1 && x1 == -1) || (y1 == 1 && x1 == 1) || (y1 == 1 && x1 == -1)) {
+							continue;
 						}
 
 						nx = x + x1;
