@@ -51,6 +51,21 @@ void registerAiTrack(World *world, unsigned int entityId) {
 
 //Logic
 
+void _manageLostTargets(World *world, unsigned int entityId) {
+	character *actor = getActorViaId(entityId);
+	int positionCheck = 0;
+
+	AiComponent *aiComponent = &world->ai[entityId];
+
+	if (TCOD_map_is_in_fov(actor->fov, aiComponent->trackPosition[0], aiComponent->trackPosition[1])) {
+		positionCheck |= actor->x == aiComponent->trackPosition[0] && actor->y == aiComponent->trackPosition[1];
+	}
+
+	if (positionCheck) {
+		aiComponent->hasTarget = 0;
+	}
+}
+
 void _aiManageTargets(World *world, unsigned int entityId) {
 	character *closestTarget = NULL, *targetActor = getActors(), *actor = getActorViaId(entityId);
 	int closestTargetDistance, targetDistance;
@@ -84,6 +99,8 @@ void _aiManageTargets(World *world, unsigned int entityId) {
 		aiComponent->hasTarget = 1;
 		aiComponent->trackPosition[0] = closestTarget->x;
 		aiComponent->trackPosition[1] = closestTarget->y;
+	} else {
+		_manageLostTargets(world, entityId);
 	}
 }
 
