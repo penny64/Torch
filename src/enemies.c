@@ -11,6 +11,7 @@
 void createBat(int x, int y) {
 	character *actor = createActor(x, y);
 
+	registerAi(getWorld(), actor->entityId);
 	registerAiWander(getWorld(), actor->entityId);
 	
 	actor->hp = 15;
@@ -28,6 +29,8 @@ void createBat(int x, int y) {
 void createRagdoll(int x, int y) {
 	character *actor = createActor(x, y);
 
+	registerAi(getWorld(), actor->entityId);
+	registerAiPatrol(getWorld(), actor->entityId);
 	registerAiTrack(getWorld(), actor->entityId);
 	
 	actor->hp = 25;
@@ -52,6 +55,7 @@ void createRagdoll(int x, int y) {
 void createVoidWorm(int x, int y) {
 	character *actor = createActor(x, y);
 
+	registerAi(getWorld(), actor->entityId);
 	registerAiWander(getWorld(), actor->entityId);
 
 	actor->hp = 15;

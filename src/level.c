@@ -673,20 +673,13 @@ void spawnEnemies() {
 			createVoidWorm(spawnPosition[0], spawnPosition[1]);
 
 			numberOfVoidWorms ++;
-		} else if (roomPtr->flags & IS_EXIT_ROOM) {
 		} else {
-			if (numberOfRagdolls < clip(LEVEL_NUMBER + 3, 0, 8) && !getRandomInt(0, 3 + numberOfRagdolls)) {
+			if (numberOfRagdolls < clip(LEVEL_NUMBER + 3, 0, 8) && !getRandomInt(0, 2 + numberOfRagdolls)) {
 				getNewSpawnPosition(roomPtr, spawnPosition);
 
 				createRagdoll(spawnPosition[0], spawnPosition[1]);
 				numberOfRagdolls ++;
 			}
-		}
-
-		if (roomPtr->flags & IS_FURNACE_ROOM && getRandomInt(0, 3)) {
-			getNewSpawnPosition(roomPtr, spawnPosition);
-
-			createRagdoll(spawnPosition[0], spawnPosition[1]);
 		}
 
 		roomPtr = roomPtr->next;

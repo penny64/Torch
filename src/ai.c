@@ -2,6 +2,7 @@
 
 #include "framework/actors.h"
 #include "framework/numbers.h"
+#include "rooms.h"
 #include "ai.h"
 #include "entities.h"
 #include "systems.h"
@@ -10,6 +11,7 @@
 void _aiLogicHandler(World*, unsigned int);
 void _aiManageTargets(World*, unsigned int);
 void _aiWander(World*, unsigned int);
+void _aiPatrol(World*, unsigned int);
 void _aiTrack(World*, unsigned int);
 void _aiHarass(World*, unsigned int);
 void _aiRanged(World*, unsigned int);
@@ -21,31 +23,35 @@ void startAi() {
 	createSystemHandler(world, EVENT_TICK, COMPONENT_AI, &_aiLogicHandler);
 }
 
-void _registerAi(World *world, unsigned int entityId) {
+void registerAi(World *world, unsigned int entityId) {
 	world->mask[entityId] |= COMPONENT_AI;
 
 	AiComponent *aiComponent = &world->ai[entityId];
 
 	aiComponent->hasTarget = 0;
+	aiComponent->hasPatrolPosition = 0;
+	aiComponent->patrolTime = 0;
 	aiComponent->traits = 0;
 	aiComponent->trackPosition[0] = 0;
 	aiComponent->trackPosition[1] = 0;
 }
 
 void registerAiWander(World *world, unsigned int entityId) {
-	_registerAi(world, entityId);
-
 	AiComponent *aiComponent = &world->ai[entityId];
 
 	aiComponent->traits |= AI_WANDER;
 }
 
-void registerAiTrack(World *world, unsigned int entityId) {
-	_registerAi(world, entityId);
-
+void registerAiPatrol(World *world, unsigned int entityId) {
 	AiComponent *aiComponent = &world->ai[entityId];
 
-	aiComponent->traits |= AI_WANDER | AI_TRACK;
+	aiComponent->traits |= AI_PATROL;
+}
+
+void registerAiTrack(World *world, unsigned int entityId) {
+	AiComponent *aiComponent = &world->ai[entityId];
+
+	aiComponent->traits |= AI_TRACK;
 }
 
 
@@ -117,6 +123,8 @@ void _aiLogicHandler(World *world, unsigned int entityId) {
 
 	if (aiComponent->traits & AI_WANDER) {
 		_aiWander(world, entityId);
+	} else if (aiComponent->traits & AI_PATROL) {
+		_aiPatrol(world, entityId);
 	}
 
 	if (aiComponent->traits & AI_TRACK) {
@@ -134,6 +142,53 @@ void _aiWander(World *world, unsigned int entityId) {
 	}
 
 	moveActor(actor, getRandomInt(-1, 1), getRandomInt(-1, 1));
+}
+
+void _findPatrolPosition(World *world, unsigned int entityId) {
+	room *patrolRoom = getRandomRoom();
+	int patrolPosition[2];
+
+	AiComponent *aiComponent = &world->ai[entityId];
+
+	getOpenPositionInRoom(patrolRoom, patrolPosition);
+
+	aiComponent->trackPosition[0] = patrolPosition[0];
+	aiComponent->trackPosition[1] = patrolPosition[1];
+}
+
+void _aiPatrol(World *world, unsigned int entityId) {
+	character *actor = getActorViaId(entityId);
+
+	AiComponent *aiComponent = &world->ai[entityId];
+
+	if (aiComponent->hasTarget) {
+		return;
+	}
+
+	if (aiComponent->hasPatrolPosition) {
+		if (aiComponent->patrolTime > 0) {
+			aiComponent->patrolTime --;
+
+			return;
+		}
+	} else {
+		_findPatrolPosition(world, entityId);
+
+		aiComponent->hasPatrolPosition = 1;
+		aiComponent->patrolTime = getRandomInt(20, 30);
+	}
+
+	printf("%i, so %i\n", aiComponent->hasPatrolPosition, aiComponent->patrolTime);
+
+	if (!walkActor(actor, aiComponent->trackPosition[0], aiComponent->trackPosition[1])) {
+		aiComponent->hasPatrolPosition = 0;
+	} else {
+		walkActorPath(actor);
+
+		if (actor->x == aiComponent->trackPosition[0] && actor->y == aiComponent->trackPosition[1]) {
+			aiComponent->hasPatrolPosition = 0;
+		}
+	}
 }
 
 void _aiTrack(World *world, unsigned int entityId) {

@@ -250,13 +250,13 @@ void moveActor(character *actor, int vx, int vy) {
 	setDelay(actor, getMovementCost(actor));
 }
 
-void walkActor(character *actor, int dx, int dy) {
+int walkActor(character *actor, int dx, int dy) {
 	int currentDx = -1, currentDy = -1;
 	
 	if (!isPositionWalkable(dx, dy)) {
 		printf("Invalid pathing destination: %i, %i\n", dx, dy);
 		
-		return;
+		return 0;
 	}
 	
 	if (TCOD_path_size(actor->path)) {
@@ -265,13 +265,17 @@ void walkActor(character *actor, int dx, int dy) {
 		if (dx == currentDx && dy == currentDy) {
 			printf("Existing path.\n");
 			
-			return;
+			return 1;
 		}
 	}
 	
 	if (!TCOD_path_compute(actor->path, actor->x, actor->y, dx, dy)) {
 		printf("Invalid path!\n");
+
+		return 0;
 	}
+
+	return 1;
 }
 
 void walkActorPath(character *actor) {

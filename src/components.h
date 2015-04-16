@@ -77,7 +77,7 @@ typedef struct {
 
 typedef struct {
 	unsigned int groupId, traits;
-	int hasTarget, trackPosition[2];
+	int hasTarget, hasPatrolPosition, patrolTime, trackPosition[2];
 } AiComponent;
 
 #endif

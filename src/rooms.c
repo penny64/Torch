@@ -292,7 +292,7 @@ room *getRoomWithFlags(unsigned int flags) {
 	room *roomPtr = ROOMS;
 
 	while (roomPtr) {
-		if (roomPtr->flags & flags) {
+		if ((roomPtr->flags & flags) == flags) {
 			return roomPtr;
 		}
 
@@ -302,6 +302,12 @@ room *getRoomWithFlags(unsigned int flags) {
 	printf("FATAL: Failed to return room with flags %i\n", flags);
 
 	return NULL;
+}
+
+room *getRandomRoom() {
+	int roomId = getRandomInt(0, NEXT_ROOM_ID - 1);
+
+	return getRoomViaId(roomId);
 }
 
 void deleteRoom(room *rm) {
@@ -423,8 +429,8 @@ int isPositionSpawnable(room *srcRoom, int x, int y) {
 	return 1;
 }
 
-void getNewSpawnPosition(room *srcRoom, int coordArray[]) {
-	int i, x, y, spawnIndex, invalid = 1;
+int _getSpawnIndexInRoom(room *srcRoom) {
+	int i, x, y, spawnIndex = -1, invalid = 1;
 
 	while (invalid) {
 		spawnIndex = getRandomInt(0, clip(srcRoom->size - 1, 0, 9999));
@@ -454,6 +460,18 @@ void getNewSpawnPosition(room *srcRoom, int coordArray[]) {
 		}
 	}
 
+	assert(spawnIndex > -1);
+
+	return spawnIndex;
+}
+
+void getNewSpawnPosition(room *srcRoom, int coordArray[]) {
+	int spawnIndex, x, y;
+
+	spawnIndex = _getSpawnIndexInRoom(srcRoom);
+	x = srcRoom->positionList[spawnIndex][0];
+	y = srcRoom->positionList[spawnIndex][1];
+
 	if (x == -1 || y == -1) {
 		printf("Can't find spawn position.\n");
 	}
@@ -464,6 +482,14 @@ void getNewSpawnPosition(room *srcRoom, int coordArray[]) {
 	srcRoom->numberOfOccupiedSpawnPositions ++;
 	coordArray[0] = x;
 	coordArray[1] = y;
+}
+
+void getOpenPositionInRoom(room *srcRoom, int coordArray[]) {
+	int spawnIndex;
+
+	spawnIndex = _getSpawnIndexInRoom(srcRoom);
+	coordArray[0] = srcRoom->positionList[spawnIndex][0];
+	coordArray[1] = srcRoom->positionList[spawnIndex][1];
 }
 
 void claimSpawnPositionInRoom(room *srcRoom, int x, int y) {

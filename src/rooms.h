@@ -71,6 +71,7 @@ void addProtoToRoomGroup(roomGroup*, roomProto*);
 void addRoomToRoomGroup(roomGroup*, room*);
 void addProtoAsGroupNeighbor(roomProto*, roomProto*);
 void mergeProtoRooms(roomProto*, roomProto*);
+void getOpenPositionInRoom(room*, int[]);
 int isNeighborWith(room *, room*);
 int isNeighborWithId(room*, int);
 int isPotentialCombinedRoom(room*, room*);
@@ -83,6 +84,7 @@ room *createRoom(roomProto*, unsigned int);
 room *getRooms(void);
 room *getRoomViaId(int);
 room *getRoomWithFlags(unsigned int);
+room *getRandomRoom(void);
 
 roomProto *createProtoRoom(int, int, int, int, roomProto*);
 roomProto *splitProtoRoom(roomProto*, int);

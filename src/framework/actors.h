@@ -76,7 +76,7 @@ void setDelay(character*, float);
 void setFutureStanceToAdd(character*, unsigned int);
 void setFutureStanceToRemove(character*, unsigned int);
 void moveActor(character*, int, int);
-void walkActor(character*, int, int);
+int walkActor(character*, int, int);
 void walkActorPath(character*);
 struct item *actorGetItemWithFlag(character*, unsigned int);
 int getMovementCost(character*);
