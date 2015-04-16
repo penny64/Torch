@@ -7,15 +7,14 @@
 #define ACTORS_H
 
 enum {
-	RANDOM_WALK = 0x01 << 0,
+	FREE_OR_SOMETHING = 0x01 << 0,
 	WORM_WALK = 0x01 << 1,
 	DROP_LIGHT_ON_DEATH = 0x01 << 2,
 	EXPLODE_ON_DEATH = 0x01 << 3,
 	DROP_VOID_ON_DEATH = 0x01 << 4,
 	IS_VOID_WORM = 0x01 << 5,
 	IS_IMMUNE_TO_DARKNESS = 0x01 << 6,
-	TRACK_TARGET = 0x01 << 7,
-	IS_ALIVE = 0x01 << 8,
+	IS_ALIVE = 0x01 << 7,
 } aiFlag_t;
 
 enum {
