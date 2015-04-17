@@ -31,6 +31,11 @@ roomProto *createProtoRoom(int x, int y, int width, int height, roomProto *paren
 	return rm;
 }
 
+void deleteProtoRoom(roomProto *proto) {
+	free(proto->groupNeighbors);
+	free(proto);
+}
+
 void mergeProtoRooms(roomProto *srcRoom, roomProto *dstRoom) {
 	roomGroup *group = NULL;
 

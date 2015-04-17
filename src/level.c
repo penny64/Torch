@@ -1537,6 +1537,16 @@ void carveTunnels() {
 	}
 }
 
+void cleanupProtos() {
+	int i;
+
+	printf("Cleaning up protos...\n");
+
+	for (i = 0; i < PROTO_ROOM_COUNT; i ++) {
+		deleteProtoRoom(PROTO_ROOMS[i]);
+	}
+}
+
 void generateLevel() {
 	int spawnPosition[2];
 	character *player = getPlayer();
@@ -1558,6 +1568,7 @@ void generateLevel() {
 	colorRooms();
 	placeGrass();
 	colorItems();
+	cleanupProtos();
 
 	if (!STARTING_ROOM) {
 		printf("*FATAL* No starting room\n");

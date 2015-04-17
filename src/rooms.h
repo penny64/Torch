@@ -62,6 +62,7 @@ struct roomGroup {
 void placeItemInRoom(room*, item*);
 void createAndPlaceItemInRoom(room*, void(*)(int, int));
 void deleteAllRooms(void);
+void deleteProtoRoom(roomProto*);
 void addRoomDoorPosition(room*, int, int);
 void claimSpawnPositionInRoom(room*, int, int);
 void getNewSpawnPosition(room*, int[]);
