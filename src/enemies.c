@@ -62,7 +62,7 @@ void createVoidWorm(int x, int y) {
 	actor->hp = 15;
 	actor->hpMax = 15;
 	actor->sightRange = 12;
-	actor->statSpeed = 8;
+	actor->statSpeed = 18;
 	actor->aiFlags = IS_VOID_WORM | DROP_VOID_ON_DEATH | IS_IMMUNE_TO_DARKNESS | IS_ALIVE;
 	actor->chr = 128;
 	actor->foreColor = TCOD_color_RGB(25, 205, 25);

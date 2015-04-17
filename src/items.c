@@ -431,8 +431,8 @@ void createBonfire(int x, int y) {
 
 	light *lght = createDynamicLight(x, y, NULL);
 	itm->itemLight = lght;
-	lght->fuel = 180;
-	lght->fuelMax = 180;
+	lght->fuel = 480;
+	lght->fuelMax = 480;
 	lght->size = 5;
 	lght->r_tint = 65;
 	lght->g_tint = 60;
@@ -450,7 +450,7 @@ void createBonfireKeystone(int x, int y) {
 	lght->g_tint = 70;
 	lght->b_tint = 0;
 	lght->fuel = 0;
-	lght->fuelMax = 280;
+	lght->fuelMax = 480;
 	lght->size = 5;
 
 	blockPosition(itm->x, itm->y);

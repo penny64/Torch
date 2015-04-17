@@ -607,7 +607,7 @@ void decorateRooms() {
 					}
 				}
 		} else {
-			if (!(roomPtr->flags & IS_MAIN_PATH) && roomPtr->numberOfDoorPositions > 1) {
+			if (roomPtr->numberOfDoorPositions == 2) {
 				for (i = 1; i < roomPtr->numberOfDoorPositions; i++) {
 					TCOD_path_compute(astarPath, roomPtr->doorPositions[i][0], roomPtr->doorPositions[i][1],
 									  roomPtr->doorPositions[i - 1][0], roomPtr->doorPositions[i - 1][1]);
@@ -1581,11 +1581,6 @@ void generateLevel() {
 		player->y = START_LOCATION[1];
 		player->itemLight->x = player->x;
 		player->itemLight->y = player->y;
-
-		createBoots(player->x, player->y);
-		item *ptr = getNewestItem();
-
-		ptr->itemEffectFlags = IS_FLAMING;
 
 		moveActor(player, 1, 0);
 
