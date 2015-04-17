@@ -161,19 +161,15 @@ room *createRoom(roomProto *prototypeRoom, unsigned int flags) {
 
 	//TODO: Use memcpy in the future
 	rm->positionList = malloc(sizeof *rm->positionList * rm->size);
-	if (rm->positionList)
-	{
-		for (i = 0; i < rm->size; i++)
-		{
+	if (rm->positionList) {
+		for (i = 0; i < rm->size; i++) {
 			rm->positionList[i] = malloc(sizeof(int) * 2);
 		}
 	}
 
 	rm->doorPositions = malloc(sizeof *rm->doorPositions * rm->size);
-	if (rm->doorPositions)
-	{
-		for (i = 0; i < rm->size; i++)
-		{
+	if (rm->doorPositions) {
+		for (i = 0; i < rm->size; i++) {
 			rm->doorPositions[i] = malloc(sizeof(int) * 2);
 		}
 	}
@@ -311,6 +307,8 @@ room *getRandomRoom() {
 }
 
 void deleteRoom(room *rm) {
+	int i;
+
 	if (rm == ROOMS) {
 		ROOMS = rm->next;
 	} else {
@@ -321,7 +319,24 @@ void deleteRoom(room *rm) {
 		}
 	}
 
+	if (rm->positionList) {
+		for (i = 0; i < rm->size; i++) {
+			free(rm->positionList[i]);
+		}
+	}
+
+	if (rm->doorPositions) {
+		for (i = 0; i < rm->size; i++) {
+			free(rm->doorPositions[i]);
+		}
+	}
+
+	free(rm->connectedRoomIds);
+	free(rm->combinedRoomIds);
+	free(rm->spawnPositions);
 	free(rm->neighborRoomIds);
+	free(rm->positionList);
+	free(rm->doorPositions);
 	free(rm);
 }
 
