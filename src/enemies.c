@@ -17,6 +17,7 @@ void createBat(int x, int y) {
 	actor->hp = 15;
 	actor->hpMax = 15;
 	actor->sightRange = 4;
+	actor->statSpeed = 2.5;
 	actor->aiFlags = DROP_LIGHT_ON_DEATH | IS_ALIVE;
 	actor->chr = (int)'^';
 	actor->foreColor = TCOD_color_RGB(205, 25, 25);
@@ -36,7 +37,7 @@ void createRagdoll(int x, int y) {
 	actor->hp = 25;
 	actor->hpMax = 25;
 	actor->sightRange = 4;
-	actor->statSpeed = 1.3;
+	actor->statSpeed = 4.3;
 	actor->aiFlags = IS_ALIVE | IS_IMMUNE_TO_DARKNESS;
 	actor->chr = (int)'&';
 	actor->foreColor = TCOD_color_RGB(205, 205, 205);

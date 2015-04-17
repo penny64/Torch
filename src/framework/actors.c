@@ -68,7 +68,7 @@ character *createActor(int x, int y) {
 	_c->delay = 0;
 	_c->statLevel = 1;
 	_c->statLuck = 2;
-	_c->statSpeed = 1;
+	_c->statSpeed = 5;
 	_c->statStrength = 3;
 	_c->statStabCount = 0;
 	_c->sightRange = 16;
