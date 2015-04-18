@@ -40,7 +40,7 @@ void createAllItemCards() {
 	createItemCard(&createLowSword, RARITY_LOW, IS_WEAPON | IS_SWORD);
 	createItemCard(&createLowDagger, RARITY_LOW, IS_WEAPON | IS_DAGGER);
 	createItemCard(&createBoots, RARITY_MEDIUM, IS_ARMOR | ARE_BOOTS);
-	createItemCard(&createTorchHolder, RARITY_HIGH, 0x0);
+	createItemCard(&createTorchHolder, RARITY_HIGH, IS_HELPER_ITEM);
 	createItemCard(&createKey, RARITY_KEY, IS_KEY);
 }
 

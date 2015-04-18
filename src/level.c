@@ -375,7 +375,7 @@ void placeItems() {
 		if (roomPtr->flags & IS_RARE_SPAWN) {
 			getNewSpawnPosition(roomPtr, spawnPosition);
 
-			spawnItemWithRarity(spawnPosition[0], spawnPosition[1], IS_ARMOR, RARITY_MEDIUM, RARITY_HIGH);
+			spawnItemWithRarity(spawnPosition[0], spawnPosition[1], IS_ARMOR | IS_HELPER_ITEM, RARITY_MEDIUM, RARITY_HIGH);
 		}
 
 		if (roomPtr->flags & IS_LAVA_ROOM) {

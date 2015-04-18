@@ -27,6 +27,7 @@ enum {
 	IS_ARMOR = 0x01 << 17,
 	ARE_BOOTS = 0x01 << 18,
 	IS_DAGGER = 0x01 << 19,
+	IS_HELPER_ITEM = 0x01 << 20,
 } itemFlag_t;
 
 enum {
