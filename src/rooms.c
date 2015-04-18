@@ -40,8 +40,6 @@ void mergeProtoRooms(roomProto *srcRoom, roomProto *dstRoom) {
 	roomGroup *group = NULL;
 
 	if (srcRoom->group && !dstRoom->group) {
-
-
 		addProtoToRoomGroup(srcRoom->group, dstRoom);
 		addProtoAsGroupNeighbor(srcRoom, dstRoom);
 	} else if (dstRoom->group && !srcRoom->group) {
@@ -76,6 +74,9 @@ roomProto *splitProtoRoom(roomProto *parentRoomProto, int horizSplit) {
 		nx = parentRoomProto->x + parentRoomProto->width;
 		ny = parentRoomProto->y;
 	}
+
+	nx = clip(nx, 2, WINDOW_WIDTH - 4);
+	ny = clip(ny, 2, WINDOW_HEIGHT - 4);
 
 	if (nx + nWidth > WINDOW_WIDTH - 2) {
 		nWidth -= (nx + nWidth) - (WINDOW_WIDTH - 2);
@@ -158,9 +159,9 @@ room *createRoom(roomProto *prototypeRoom, unsigned int flags) {
 	rm->flags = flags;
 	rm->prev = NULL;
 	rm->next = NULL;
-	rm->neighborRoomIds = malloc(4 * sizeof(int));
-	rm->connectedRoomIds = malloc(4 * sizeof(int));
-	rm->combinedRoomIds = malloc(4 * sizeof(int));
+	rm->neighborRoomIds = malloc(MAX_CONNECTED_ROOMS * sizeof(int));
+	rm->connectedRoomIds = malloc(MAX_CONNECTED_ROOMS * sizeof(int));
+	rm->combinedRoomIds = malloc(MAX_CONNECTED_ROOMS * sizeof(int));
 	rm->spawnPositions = malloc(rm->size * sizeof(int));
 	rm->wasCombined = 0;
 

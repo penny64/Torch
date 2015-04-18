@@ -1,7 +1,7 @@
 #include "items.h"
 
 #define MAX_ROOMS 6
-#define MAX_CONNECTED_ROOMS 5
+#define MAX_CONNECTED_ROOMS 10
 #define MAX_ROOMS_IN_GROUP 8
 
 #ifndef ROOMS_H

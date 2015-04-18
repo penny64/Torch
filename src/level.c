@@ -595,7 +595,7 @@ void decorateRooms() {
 						relX = x - roomPtr->x;
 						relY = y - roomPtr->y;
 
-						if (relX < 1 || relY < 1 || relX > roomPtr->width - 2 || relY > roomPtr->height - 2 || relY == roomPtr->height / 2) {
+						if (relX < 1 || relY < 1 || relX > roomPtr->width - 2 || relY > roomPtr->height - 2 || relY == roomPtr->height / 2 || relX == roomPtr->width / 2) {
 							continue;
 						}
 
@@ -607,7 +607,7 @@ void decorateRooms() {
 					}
 				}
 		} else {
-			if (roomPtr->numberOfDoorPositions == 2) {
+			if ((!roomPtr->group || roomPtr->group->numberOfRooms == 2) && roomPtr->numberOfNeighborRooms == 2 && roomPtr->numberOfDoorPositions == 2) {
 				for (i = 1; i < roomPtr->numberOfDoorPositions; i++) {
 					TCOD_path_compute(astarPath, roomPtr->doorPositions[i][0], roomPtr->doorPositions[i][1],
 									  roomPtr->doorPositions[i - 1][0], roomPtr->doorPositions[i - 1][1]);
@@ -1119,6 +1119,10 @@ float getPositionCost(int xFrom, int yFrom, int xTo, int yTo, void *user_data) {
 	int i, fromInRoom, toInRoom;
 	float fromCost = 999, toCost = 999;
 
+	if (xTo <= 1 || yTo <= 1 || xTo >= WINDOW_WIDTH - 2 || yTo >= WINDOW_WIDTH -2) {
+		return 0;
+	}
+
 	for (i = 0; i < PROTO_ROOM_COUNT; i ++) {
 		roomWalker = PROTO_ROOMS[i];
 
@@ -1431,6 +1435,16 @@ void carveTunnels() {
 
 	while (parentPtr) {
 		TCOD_map_clear(roomMap, 1, 1);
+
+		for (i = 0; i < WINDOW_WIDTH; i ++) {
+			TCOD_map_set_properties(roomMap, i, 0, 0, 0);
+			TCOD_map_set_properties(roomMap, i, WINDOW_HEIGHT, 0, 0);
+		}
+
+		for (i = 0; i < WINDOW_HEIGHT; i ++) {
+			TCOD_map_set_properties(roomMap, 0, i, 0, 0);
+			TCOD_map_set_properties(roomMap, WINDOW_WIDTH, i, 0, 0);
+		}
 
 		tempRoom = getRooms();
 

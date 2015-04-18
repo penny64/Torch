@@ -450,7 +450,7 @@ void createBonfireKeystone(int x, int y) {
 	lght->g_tint = 70;
 	lght->b_tint = 0;
 	lght->fuel = 0;
-	lght->fuelMax = 480;
+	lght->fuelMax = 9999;
 	lght->size = 5;
 
 	blockPosition(itm->x, itm->y);

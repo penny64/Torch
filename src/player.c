@@ -27,7 +27,7 @@ void createPlayer() {
 	PLAYER_ACTOR->itemLight->b_tint = 20;
 	PLAYER_ACTOR->itemLight->brightness = .35;
 	PLAYER_ACTOR->itemLight->size = 6;
-	PLAYER_ACTOR->itemLight->fuelMax = 650;
+	PLAYER_ACTOR->itemLight->fuelMax = 1650;
 	PLAYER_ACTOR->itemLight->fuel = PLAYER_ACTOR->itemLight->fuelMax;
 	PLAYER_ACTOR->traitFlags = TORCH_ATTACK_PENALTY;
 
