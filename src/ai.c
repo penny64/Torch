@@ -23,11 +23,13 @@ void startAi() {
 	createSystemHandler(world, EVENT_TICK, COMPONENT_AI, &_aiLogicHandler);
 }
 
-void registerAi(World *world, unsigned int entityId) {
+void registerAi(World *world, unsigned int entityId, unsigned int group, unsigned int targetGroups) {
 	world->mask[entityId] |= COMPONENT_AI;
 
 	AiComponent *aiComponent = &world->ai[entityId];
 
+	aiComponent->group = group;
+	aiComponent->targetGroups = targetGroups;
 	aiComponent->hasTarget = 0;
 	aiComponent->hasPatrolPosition = 0;
 	aiComponent->patrolTime = 0;
@@ -76,14 +78,16 @@ void _aiManageTargets(World *world, unsigned int entityId) {
 	character *closestTarget = NULL, *targetActor = getActors(), *actor = getActorViaId(entityId);
 	int closestTargetDistance, targetDistance;
 
-	AiComponent *aiComponent = &world->ai[entityId];
+	AiComponent *targetAiComponent, *aiComponent = &world->ai[entityId];
 
 	if (aiComponent->traits == AI_WANDER) {
 		return;
 	}
 
 	while (targetActor) {
-		if (actor == targetActor) {
+		targetAiComponent = &world->ai[targetActor->entityId];
+
+		if (actor == targetActor || !(targetAiComponent->group & aiComponent->targetGroups)) {
 			targetActor = targetActor->next;
 
 			continue;

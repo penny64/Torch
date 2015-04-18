@@ -76,7 +76,7 @@ typedef struct {
 } ParticleComponent;
 
 typedef struct {
-	unsigned int groupId, traits;
+	unsigned int group, targetGroups, traits;
 	int hasTarget, hasPatrolPosition, patrolTime, trackPosition[2];
 } AiComponent;
 

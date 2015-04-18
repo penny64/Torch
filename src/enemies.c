@@ -11,7 +11,7 @@
 void createBat(int x, int y) {
 	character *actor = createActor(x, y);
 
-	registerAi(getWorld(), actor->entityId);
+	registerAi(getWorld(), actor->entityId, GROUP_AMBIENT, GROUP_NONE);
 	registerAiWander(getWorld(), actor->entityId);
 	
 	actor->hp = 15;
@@ -30,7 +30,7 @@ void createBat(int x, int y) {
 void createRagdoll(int x, int y) {
 	character *actor = createActor(x, y);
 
-	registerAi(getWorld(), actor->entityId);
+	registerAi(getWorld(), actor->entityId, GROUP_RAGDOLLS, GROUP_PLAYER);
 	registerAiPatrol(getWorld(), actor->entityId);
 	registerAiTrack(getWorld(), actor->entityId);
 	
@@ -44,19 +44,12 @@ void createRagdoll(int x, int y) {
 
 	deleteDynamicLight(actor->itemLight);
 	actor->itemLight = NULL;
-
-	/*actor->itemLight->r_tint = 50;
-	actor->itemLight->g_tint = 50;
-	actor->itemLight->b_tint = 50;
-	actor->itemLight->size = 3;
-	actor->itemLight->fuelMax = 99999;
-	actor->itemLight->fuel = actor->itemLight->fuelMax;*/
 }
 
 void createVoidWorm(int x, int y) {
 	character *actor = createActor(x, y);
 
-	registerAi(getWorld(), actor->entityId);
+	registerAi(getWorld(), actor->entityId, GROUP_AMBIENT, GROUP_PLAYER);
 	registerAiWander(getWorld(), actor->entityId);
 
 	actor->hp = 15;
@@ -97,5 +90,29 @@ void createVoidWormTail(int x, int y) {
 	actor->itemLight->flickerRate = .2;
 	actor->itemLight->size = 3;
 	actor->itemLight->fuelMax = 12;
+	actor->itemLight->fuel = actor->itemLight->fuelMax;
+}
+
+void createForgottenWarrior(int x, int y) {
+	character *actor = createActor(x, y);
+
+	registerAi(getWorld(), actor->entityId, GROUP_WARRIORS, GROUP_PLAYER);
+	//registerAiPatrol(getWorld(), actor->entityId);
+	registerAiTrack(getWorld(), actor->entityId);
+
+	actor->hp = 35;
+	actor->hpMax = 35;
+	actor->sightRange = 8;
+	actor->statSpeed = 5.5;
+	actor->aiFlags = IS_ALIVE | IS_IMMUNE_TO_DARKNESS;
+	actor->chr = (int)'8';
+	actor->foreColor = TCOD_color_RGB(105, 205, 205);
+
+	actor->itemLight->r_tint = 0;
+	actor->itemLight->g_tint = 35;
+	actor->itemLight->b_tint = 0;
+	actor->itemLight->flickerRate = 0;
+	actor->itemLight->size = 3;
+	actor->itemLight->fuelMax = 9999;
 	actor->itemLight->fuel = actor->itemLight->fuelMax;
 }

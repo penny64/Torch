@@ -5,12 +5,11 @@
 #include "framework/input.h"
 #include "lights.h"
 #include "graphics.h"
-//#include "libtcod.h"
-//#include "items.h"
 #include "level.h"
 #include "entities.h"
 #include "spells.h"
 #include "ui.h"
+#include "ai.h"
 
 
 #define SIZEMOD_TIME_MAX 10;
@@ -33,6 +32,7 @@ void createPlayer() {
 
 	registerSpellSystem(getWorld(), PLAYER_ACTOR->entityId);
 	addSpell(getWorld(), PLAYER_ACTOR->entityId, SPELL_FIREBALL);
+	registerAi(getWorld(), PLAYER_ACTOR->entityId, GROUP_PLAYER, GROUP_NONE);
 
 	getWorld()->mask[PLAYER_ACTOR->entityId] |= COMPONENT_PLAYER;
 	

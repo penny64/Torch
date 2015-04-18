@@ -653,7 +653,7 @@ void decorateRooms() {
 }
 
 void spawnEnemies() {
-	int spawnPosition[2], maxNumberOfVoidWorms, numberOfRagdolls = 0, numberOfVoidWorms = 0;
+	int i, spawnPosition[2], maxNumberOfVoidWorms, numberOfForgottenWarriorGroups = 0, numberOfRagdolls = 0, numberOfVoidWorms = 0;
 	room *roomPtr = getRooms();
 
 	if (LEVEL_NUMBER >= 2) {
@@ -672,7 +672,7 @@ void spawnEnemies() {
 
 			createVoidWorm(spawnPosition[0], spawnPosition[1]);
 
-			numberOfVoidWorms ++;
+			numberOfVoidWorms++;
 		} else {
 			if (numberOfRagdolls < clip(LEVEL_NUMBER + 3, 0, 8) && !getRandomInt(0, 2 + numberOfRagdolls)) {
 				getNewSpawnPosition(roomPtr, spawnPosition);
@@ -683,6 +683,18 @@ void spawnEnemies() {
 		}
 
 		roomPtr = roomPtr->next;
+	}
+
+	roomPtr = getRandomRoom();
+
+	if (numberOfForgottenWarriorGroups < 3) {
+		for (i = 0; i < getRandomInt(2, 4); i++) {
+			getNewSpawnPosition(roomPtr, spawnPosition);
+
+			createForgottenWarrior(spawnPosition[0], spawnPosition[1]);
+		}
+
+		numberOfForgottenWarriorGroups ++;
 	}
 }
 
