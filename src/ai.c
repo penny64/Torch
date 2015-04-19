@@ -56,6 +56,23 @@ void registerAiTrack(World *world, unsigned int entityId) {
 	aiComponent->traits |= AI_TRACK;
 }
 
+int isEnemy(World *world, unsigned int entityId, unsigned int targetId) {
+	character *owner = getActorViaId(entityId);
+	character *target = getActorViaId(targetId);
+
+	if (owner == target) {
+		return 0;
+	}
+
+	AiComponent *aiComponent = &world->ai[entityId], *targetAiComponent = &world->ai[targetId];
+
+	if (targetAiComponent->group & aiComponent->targetGroups) {
+		return 1;
+	}
+
+	return 0;
+}
+
 
 //Logic
 
@@ -78,16 +95,14 @@ void _aiManageTargets(World *world, unsigned int entityId) {
 	character *closestTarget = NULL, *targetActor = getActors(), *actor = getActorViaId(entityId);
 	int closestTargetDistance, targetDistance;
 
-	AiComponent *targetAiComponent, *aiComponent = &world->ai[entityId];
+	AiComponent *aiComponent = &world->ai[entityId];
 
 	if (aiComponent->traits == AI_WANDER) {
 		return;
 	}
 
 	while (targetActor) {
-		targetAiComponent = &world->ai[targetActor->entityId];
-
-		if (actor == targetActor || !(targetAiComponent->group & aiComponent->targetGroups)) {
+		if (!isEnemy(world, entityId, targetActor->entityId)) {
 			targetActor = targetActor->next;
 
 			continue;

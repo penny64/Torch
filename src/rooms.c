@@ -146,6 +146,9 @@ room *createRoom(roomProto *prototypeRoom, unsigned int flags) {
 		}
 	}
 
+	rm->x = clip(rm->x, 2, WINDOW_WIDTH - 2);
+	rm->y = clip(rm->y, 2, WINDOW_HEIGHT - 2);
+
 	rm->size = width * height;
 	rm->width = width;
 	rm->height = height;

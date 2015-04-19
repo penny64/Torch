@@ -25,3 +25,4 @@ void registerAiPatrol(World*, unsigned int);
 void registerAiTrack(World*, unsigned int);
 void registerAiHarass(World*, unsigned int);
 void registerAiRanged(World*, unsigned int);
+int isEnemy(World*, unsigned int, unsigned int);

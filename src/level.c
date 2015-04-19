@@ -216,6 +216,7 @@ int levelLogic() {
 
 		if (!player->itemLight->sizeMod && isScreenFadedOut()) {
 			generateLevel();
+			showMessage(20, "You emerge...", NULL);
 
 			return 1;
 		}
@@ -314,7 +315,7 @@ void generatePuzzles() {
 		} else if (roomPtr->size >= 80 && roomPtr->size <= 90) {
 			if (roomPtr->numberOfNeighborRooms == 2) {
 				//roomPtr->flags |= IS_LAVA_ROOM;
-			} else if (!(roomPtr->flags & IS_MAIN_PATH)) {
+			} else if (!(roomPtr->flags & IS_MAIN_PATH) || !roomPtr->group) {
 				roomPtr->flags |= NEEDS_DOORS;
 			}
 		}

@@ -15,4 +15,4 @@ cgame-debug: $(OFILES)
 		$(CC) $(DEBUGLDFLAGS) -O0 -o $(BINNAME) $^
 
 clean:
-	rm torch src/*.o src/framework/*.o
+	rm $(BINNAME) src/*.o src/framework/*.o
