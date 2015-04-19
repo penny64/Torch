@@ -3,6 +3,8 @@
 #include "libtcod.h"
 #include "../items.h"
 
+#define MAX_INVENTORY_ITEMS 10
+
 #ifndef ACTORS_H
 #define ACTORS_H
 
@@ -42,11 +44,11 @@ enum {
 typedef struct character character;
 
 struct character {
-	int x, y, lastX, lastY, vx, vy, hp, hpMax, statLevel, statLuck, statStrength, statStabCount, chr, sightRange, numberOfItems;
-	float turns, statSpeed, delay;
+	int x, y, lastX, lastY, vx, vy, hp, hpMax, statLevel, statLuck, statStrength, statDefense, statStabCount, chr, sightRange, numberOfItems;
+	float turns, statSpeed, statStability, delay;
 	struct character *next, *prev;
 	struct light *itemLight;
-	struct item *inventory[4];
+	struct item *inventory[MAX_INVENTORY_ITEMS];
 	unsigned int entityId, aiFlags, traitFlags, stanceFlags, nextStanceFlagsToAdd, nextStanceFlagsToRemove;
 	TCOD_color_t foreColor, backColor;
 	TCOD_path_t path;
@@ -84,3 +86,5 @@ int getActorLevel(character*);
 int getActorLuck(character*);
 int getActorStrength(character*);
 int getActorSpeed(character*);
+int getActorDefense(character*);
+float getActorStability(character*);

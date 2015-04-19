@@ -97,6 +97,8 @@ int performDamage(character *attacker, character *target, float attackDamage, fl
 			showMessage("%cClumsy!%c", 4);
 		}*/
 	}
+
+	attackDamage = clip(attackDamage - getActorDefense(target), 0, 9999);
 	
 	damageReadout = attackDamage + .5;
 	
@@ -173,6 +175,7 @@ int slash(character *attacker, character *target, item *weapon) {
 	int attackerLevel = getActorLevel(attacker);
 	int attackerLuck = getActorLuck(attacker);
 	int weaponDamage = getRandomIntWithMean(0, weapon->statDamage, weapon->statDamage + (2 + attackerLevel));
+	float recoveryTime = getAttackSpeedOfWeapon(weapon) * getActorStability(attacker);
 	
 	attackerLuck = getRandomIntWithMean(0, attackerLuck, clip(attackerLuck - 1, 0, attackerLuck));
 	
@@ -195,7 +198,7 @@ int slash(character *attacker, character *target, item *weapon) {
 	
 	setStance(attacker, IS_SWINGING);
 	setFutureStanceToRemove(attacker, IS_SWINGING);
-	setDelay(attacker, getAttackSpeedOfWeapon(weapon));
+	setDelay(attacker, recoveryTime);
 	
 	attackDamage = getRandomIntWithMean(lowerDamageValue, upperDamageValue, damageMean);
 	percentageAttackDamage = attackDamage / upperDamageValue;
@@ -235,6 +238,7 @@ int stab(character *attacker, character *target, item *weapon) {
 	int attackerStrength = getActorStrength(attacker);
 	int attackerLevel = getActorLevel(attacker);
 	int attackerLuck = getActorLuck(attacker);
+	float recoveryTime = getAttackSpeedOfWeapon(weapon) * getActorStability(attacker);
 	int weaponDamage = getRandomIntWithMean(0, weapon->statDamage, weapon->statDamage + (2 + attackerLevel)) + attacker->statStabCount;
 
 	attackerLuck = getRandomIntWithMean(0, attackerLuck, clip(attackerLuck - 1, 0, attackerLuck));
@@ -258,7 +262,7 @@ int stab(character *attacker, character *target, item *weapon) {
 	attacker->statStabCount ++;
 
 	setStance(attacker, IS_STABBING);
-	setDelay(attacker, getAttackSpeedOfWeapon(weapon));
+	setDelay(attacker, recoveryTime);
 
 	attackDamage = getRandomIntWithMean(lowerDamageValue, upperDamageValue, damageMean);
 	percentageAttackDamage = attackDamage / upperDamageValue;

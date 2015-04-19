@@ -34,10 +34,10 @@ void createRagdoll(int x, int y) {
 	registerAiPatrol(getWorld(), actor->entityId);
 	registerAiTrack(getWorld(), actor->entityId);
 	
-	actor->hp = 25;
-	actor->hpMax = 25;
+	actor->hp = 18;
+	actor->hpMax = 18;
 	actor->sightRange = 4;
-	actor->statSpeed = 4.3;
+	actor->statSpeed = 5.3;
 	actor->aiFlags = IS_ALIVE | IS_IMMUNE_TO_DARKNESS;
 	actor->chr = (int)'&';
 	actor->foreColor = TCOD_color_RGB(205, 205, 205);

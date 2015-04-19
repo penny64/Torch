@@ -40,6 +40,7 @@ void createAllItemCards() {
 	createItemCard(&createLowSword, RARITY_LOW, IS_WEAPON | IS_SWORD);
 	createItemCard(&createLowDagger, RARITY_LOW, IS_WEAPON | IS_DAGGER);
 	createItemCard(&createBoots, RARITY_MEDIUM, IS_ARMOR | ARE_BOOTS);
+	createItemCard(&createChestArmor, RARITY_MEDIUM, IS_ARMOR | IS_CHEST_ARMOR);
 	createItemCard(&createTorchHolder, RARITY_HIGH, IS_HELPER_ITEM);
 	createItemCard(&createKey, RARITY_KEY, IS_KEY);
 }
@@ -81,6 +82,8 @@ item *createItem(int x, int y, char chr, TCOD_color_t foreColor, TCOD_color_t ba
 	_c->statDamage = 0;
 	_c->statSpeed = 0;
 	_c->statLevel = 1;
+	_c->statStability = 1.f;
+	_c->statDefense = 0;
 	_c->name = "null";
 	
 	if (ITEMS == NULL) {
@@ -561,6 +564,28 @@ void createBoots(int x, int y) {
 	item *itm = createItem(x, y, 'b', TCOD_color_RGB(210, 105, 30), TCOD_color_RGB(30, 30, 30), IS_ARMOR | ARE_BOOTS | CAN_PICK_UP);
 
 	randomizeBoots(itm, getLevel());
+}
+
+void randomizeChestArmor(item *itm, int quality) {
+	float typeChance = getRandomFloat(0, 1) + ((float) getLevel() / 23.f);
+
+	/*if (typeChance >= .55) {
+		itm->itemEffectFlags = IS_QUICK;
+		itm->name = "Boots of Speed";
+	} else if (typeChance >= .25) {
+		itm->itemEffectFlags = IS_FLAMING;
+		itm->name = "Burning Boots";
+	} else {
+		itm->name = "Boots";
+	}*/
+
+	itm->statDefense = clip(getRandomInt(1, 2) + quality, 1, 4);
+}
+
+void createChestArmor(int x, int y) {
+	item *itm = createItem(x, y, 'H', TCOD_color_RGB(210, 105, 110), TCOD_color_RGB(30, 30, 30), IS_ARMOR | IS_CHEST_ARMOR | CAN_PICK_UP);
+
+	randomizeChestArmor(itm, getLevel());
 }
 
 void createTorchHolder(int x, int y) {

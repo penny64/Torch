@@ -72,6 +72,8 @@ character *createActor(int x, int y) {
 	_c->statStrength = 3;
 	_c->statStabCount = 0;
 	_c->sightRange = 16;
+	_c->statStability = 1.f;
+	_c->statDefense = 0;
 	_c->numberOfItems = 0;
 	_c->prev = NULL;
 	_c->next = NULL;
@@ -222,6 +224,40 @@ int getActorStrength(character *actor) {
 	return actor->statStrength;
 }
 
+float getActorStability(character *actor) {
+	float stability = actor->statStability;
+	int inventoryIndex = 0;
+	item *itmPtr;
+
+	while (inventoryIndex < actor->numberOfItems) {
+		itmPtr = actor->inventory[inventoryIndex];
+
+		stability *= itmPtr->statStability;
+
+		inventoryIndex ++;
+	}
+
+	return stability;
+}
+
+int getActorDefense(character *actor) {
+	float defense = actor->statDefense;
+	int inventoryIndex = 0;
+	item *itmPtr;
+
+	while (inventoryIndex < actor->numberOfItems) {
+		itmPtr = actor->inventory[inventoryIndex];
+
+		defense += itmPtr->statDefense;
+
+		inventoryIndex ++;
+	}
+
+	defense *= getRandomFloat(.75, 1);
+
+	return (int)(defense + .5);
+}
+
 int getActorSpeed(character *actor) {
 	int inventoryIndex = 0, speed = actor->statSpeed;
 	item *itmPtr;
@@ -324,6 +360,12 @@ void pickUpItem(character *actor, item *itm) {
 
 	if (itm->itemFlags & (IS_ARMOR | ARE_BOOTS)) {
 		itmPtr = actorGetItemWithFlag(actor, IS_ARMOR | ARE_BOOTS);
+
+		if (itmPtr) {
+			dropItem(actor, itmPtr);
+		}
+	} else	if (itm->itemFlags & (IS_ARMOR | IS_CHEST_ARMOR)) {
+		itmPtr = actorGetItemWithFlag(actor, IS_ARMOR | IS_CHEST_ARMOR);
 
 		if (itmPtr) {
 			dropItem(actor, itmPtr);
