@@ -564,7 +564,9 @@ void createBoots(int x, int y) {
 }
 
 void createTorchHolder(int x, int y) {
-	createItem(x, y, 'U', TCOD_color_RGB(50, 50, 50), TCOD_color_RGB(10, 10, 10), IS_TORCH_HOLDER | CAN_PICK_UP);
+	item *itm = createItem(x, y, 'U', TCOD_color_RGB(50, 50, 50), TCOD_color_RGB(10, 10, 10), IS_TORCH_HOLDER | CAN_PICK_UP);
+
+	itm->name = "Torch Holder";
 }
 
 void activateAllSeeingEye(item *itm) {

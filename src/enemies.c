@@ -100,10 +100,10 @@ void createForgottenWarrior(int x, int y) {
 	//registerAiPatrol(getWorld(), actor->entityId);
 	registerAiTrack(getWorld(), actor->entityId);
 
-	actor->hp = 35;
-	actor->hpMax = 35;
+	actor->hp = 12;
+	actor->hpMax = 12;
 	actor->sightRange = 8;
-	actor->statSpeed = 5.5;
+	actor->statSpeed = 4.5;
 	actor->aiFlags = IS_ALIVE | IS_IMMUNE_TO_DARKNESS;
 	actor->chr = (int)'8';
 	actor->foreColor = TCOD_color_RGB(105, 205, 205);
