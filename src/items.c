@@ -569,6 +569,8 @@ void createBoots(int x, int y) {
 void randomizeChestArmor(item *itm, int quality) {
 	float typeChance = getRandomFloat(0, 1) + ((float) getLevel() / 23.f);
 
+	itm->name = "Chest Armor";
+
 	/*if (typeChance >= .55) {
 		itm->itemEffectFlags = IS_QUICK;
 		itm->name = "Boots of Speed";

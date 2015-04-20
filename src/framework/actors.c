@@ -358,7 +358,7 @@ void pickUpItem(character *actor, item *itm) {
 		}
 	}
 
-	if (itm->itemFlags & (IS_ARMOR | ARE_BOOTS)) {
+	if ((itm->itemFlags & (IS_ARMOR | ARE_BOOTS)) == (IS_ARMOR | ARE_BOOTS)) {
 		itmPtr = actorGetItemWithFlag(actor, IS_ARMOR | ARE_BOOTS);
 
 		if (itmPtr) {
