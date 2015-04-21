@@ -324,7 +324,7 @@ void uiInput() {
 }
 
 void uiLogic() {
-	if (FADE_DELAY < 5) {
+	if (FADE_DELAY < 9) {
 		FADE_DELAY ++;
 
 		return;
@@ -333,13 +333,13 @@ void uiLogic() {
 	FADE_DELAY = 0;
 
 	if (!DISPLAY_TEXT_FADE) {
-		DISPLAY_TEXT_TIME += 3;
+		DISPLAY_TEXT_TIME += 6;
 
 		if (DISPLAY_TEXT_TIME >= DISPLAY_TEXT_TIME_MAX + (FPS * .25)) {
 			DISPLAY_TEXT_FADE = 1;
 		}
 	} else if (DISPLAY_TEXT_FADE && DISPLAY_TEXT_TIME > 0) {
-		DISPLAY_TEXT_TIME -= 3;
+		DISPLAY_TEXT_TIME -= 5;
 	} else if (DISPLAY_TEXT[0] != '\0') {
 		DISPLAY_TEXT[0] = '\0';
 	}
