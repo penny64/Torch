@@ -64,7 +64,7 @@ void _drawMessage() {
 		foreColor = TCOD_color_RGB(255 * colorMod, 250 * colorMod, 220 * colorMod);
 		backColor = TCOD_color_RGB(1, 1, 1);
 		
-		drawString(UI_CONSOLE, (WINDOW_WIDTH / 2) - (strlen(DISPLAY_TEXT) / 2), WINDOW_HEIGHT - 1, foreColor, backColor, DISPLAY_TEXT);
+		drawString(UI_CONSOLE, (WINDOW_WIDTH / 2) - (strlen(DISPLAY_TEXT) / 2), WINDOW_HEIGHT - 2, foreColor, backColor, DISPLAY_TEXT);
 	}
 }
 
@@ -164,6 +164,36 @@ void _drawMenu() {
 	TCOD_console_set_default_background(UI_CONSOLE, TCOD_color_RGB(0, 0, 0));
 }
 
+void _drawStats() {
+	character *player = getPlayer();
+
+	if (!player) {
+		return;
+	}
+
+	char statSpeed[4], statStrength[2], statDefense[2], statLuck[2], statStability[2], statHealth[4];
+
+	sprintf(statSpeed, "%.1f", getActorSpeed(player));
+	sprintf(statStrength, "%d", getActorStrength(player));
+	sprintf(statDefense, "%d", getActorDefense(player));
+	sprintf(statLuck, "%d", getActorLuck(player));
+	sprintf(statStability, "%d", (int)((10 - (10 * getActorStability(player))) + .5));
+	sprintf(statHealth, "%d", player->hp);
+
+	drawString(UI_CONSOLE, 10, WINDOW_HEIGHT - 1, TCOD_color_RGB(0, 200, 30), TCOD_color_RGB(1, 1, 1), "SPD", NULL);
+	drawString(UI_CONSOLE, 13, WINDOW_HEIGHT - 1, TCOD_color_RGB(200, 200, 200), TCOD_color_RGB(1, 1, 1), statSpeed, NULL);
+	drawString(UI_CONSOLE, 17, WINDOW_HEIGHT - 1, TCOD_color_RGB(200, 0, 30), TCOD_color_RGB(1, 1, 1), "STR", NULL);
+	drawString(UI_CONSOLE, 20, WINDOW_HEIGHT - 1, TCOD_color_RGB(200, 200, 200), TCOD_color_RGB(1, 1, 1), statStrength, NULL);
+	drawString(UI_CONSOLE, 22, WINDOW_HEIGHT - 1, TCOD_color_RGB(100, 100, 75), TCOD_color_RGB(1, 1, 1), "DEF", NULL);
+	drawString(UI_CONSOLE, 25, WINDOW_HEIGHT - 1, TCOD_color_RGB(200, 200, 200), TCOD_color_RGB(1, 1, 1), statDefense, NULL);
+	drawString(UI_CONSOLE, 27, WINDOW_HEIGHT - 1, TCOD_color_RGB(200, 200, 0), TCOD_color_RGB(1, 1, 1), "LCK", NULL);
+	drawString(UI_CONSOLE, 30, WINDOW_HEIGHT - 1, TCOD_color_RGB(200, 200, 200), TCOD_color_RGB(1, 1, 1), statLuck, NULL);
+	drawString(UI_CONSOLE, 32, WINDOW_HEIGHT - 1, TCOD_color_RGB(200, 0, 200), TCOD_color_RGB(1, 1, 1), "STA", NULL);
+	drawString(UI_CONSOLE, 35, WINDOW_HEIGHT - 1, TCOD_color_RGB(200, 200, 200), TCOD_color_RGB(1, 1, 1), statStability, NULL);
+	drawString(UI_CONSOLE, 37, WINDOW_HEIGHT - 1, TCOD_color_RGB(255, 131, 0), TCOD_color_RGB(1, 1, 1), "HP", NULL);
+	drawString(UI_CONSOLE, 39, WINDOW_HEIGHT - 1, TCOD_color_RGB(200, 200, 200), TCOD_color_RGB(1, 1, 1), statHealth, NULL);
+}
+
 void _drawCursor() {
 	int fadeValue = abs(getAnimateFrame() - 30) * 2;
 	TCOD_color_t cursorColor;
@@ -197,6 +227,8 @@ void createMenu(char *menuItems[WINDOW_HEIGHT], void (*callback)(int, char*)) {
 
 		MENU_ITEM_COUNT ++;
 	}
+
+	printf("Created menu with count: %i\n", MENU_ITEM_COUNT);
 }
 
 void createCursor(int x, int y, TCOD_map_t fov, void (*callback)(int, int)) {
@@ -241,6 +273,7 @@ void drawUi() {
 	_drawTorchFuel();
 	_drawStance();
 	_drawMenu();
+	_drawStats();
 	_drawMessage();
 	_drawCursor();
 }
@@ -255,7 +288,7 @@ void uiInput() {
 			}
 		}
 
-		if (MENU_ITEM_INDEX < MENU_ITEM_COUNT) {
+		if (MENU_ITEM_INDEX < MENU_ITEM_COUNT - 1) {
 			if (isTCODCharPressed(TCODK_DOWN)) {
 				MENU_ITEM_INDEX++;
 			}

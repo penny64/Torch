@@ -197,8 +197,8 @@ void setDelay(character *actor, float time) {
 	actor->delay = time;
 }
 
-int getMovementCost(character *actor) {
-	int cost = getActorSpeed(actor);
+float getMovementCost(character *actor) {
+	float cost = getActorSpeed(actor);
 	item *lodgedItem = getItemLodgedInActor(actor);
 	
 	if (actor->stanceFlags & IS_CRAWLING) {
@@ -258,15 +258,16 @@ int getActorDefense(character *actor) {
 	return (int)(defense + .5);
 }
 
-int getActorSpeed(character *actor) {
-	int inventoryIndex = 0, speed = actor->statSpeed;
+float getActorSpeed(character *actor) {
+	int inventoryIndex = 0;
+	float speed = actor->statSpeed;
 	item *itmPtr;
 
 	while (inventoryIndex < actor->numberOfItems) {
 		itmPtr = actor->inventory[inventoryIndex];
 
 		if (itmPtr->itemEffectFlags & IS_QUICK) {
-			speed = clip(speed - itmPtr->statSpeed, 1, 5);
+			speed = clipFloat(speed - itmPtr->statSpeed, 1, 5);
 		}
 
 		inventoryIndex ++;
@@ -700,7 +701,7 @@ void _drawActor(character *actor) {
 	TCOD_color_t foreColor = actor->foreColor;
 	int nx, ny, occupiedPosition = 0, chr = actor->chr;
 	float healthPercentage = (float)actor->hp / (float)actor->hpMax;
-	character *actorPtr = getActors();
+	character *actorPtr = getActors(), *player = getPlayer();
 	
 	if (getAnimateFrame() / 60.f >= .5) {
 		if (actor->stanceFlags & IS_STUCK_WITH_LODGED_WEAPON) {
@@ -728,7 +729,7 @@ void _drawActor(character *actor) {
 	
 	drawChar(ACTOR_CONSOLE, actor->x, actor->y, chr, foreColor, actor->backColor);
 	
-	if (actor->vx || actor->vy) {
+	if ((actor->vx || actor->vy) && (!player || actor->delay < getMovementCost(player))) {
 		nx = actor->x + actor->vx;
 		ny = actor->y + actor->vy;
 		

@@ -55,6 +55,44 @@ void killPlayer() {
 	PLAYER_ACTOR = NULL;
 }
 
+void _inventoryMenuCallback(int menuItemIndex, char *menuItemString) {
+
+}
+
+void createInventoryMenu(character *actor) {
+	int i;
+	char *menuStrings[WINDOW_HEIGHT];
+
+	for (i = 0; i < MAX_INVENTORY_ITEMS; i ++) {
+		if (!actor->inventory[i]) {
+			if (!i) {
+				showMessage(10, "You're not carrying anything...", NULL);
+
+				return;
+			}
+			break;
+		}
+
+		menuStrings[i] = actor->inventory[i]->name;
+	}
+
+	menuStrings[i] = NULL;
+
+	createMenu(menuStrings, &_inventoryMenuCallback);
+}
+
+
+/*void createStatMenu(character *actor) {
+	int i;
+	char *menuStrings[WINDOW_HEIGHT];
+
+	menuStrings[0] =
+
+	menuStrings[i] = NULL;
+
+	createMenu(menuStrings, &_inventoryMenuCallback);
+}*/
+
 void playerLogic() {
 	if (!PLAYER_ACTOR) {
 		return;
@@ -150,6 +188,12 @@ void playerInputLogic() {
 	if (isCharPressed('.') || isCharPressed('5')) {
 		setDelay(PLAYER_ACTOR, 1);
 	}
+
+	if (isCharPressed('i') || isTCODCharPressed(TCODK_TAB)) {
+		createInventoryMenu(PLAYER_ACTOR);
+	}// else if (isCharPressed('o')) {
+	//	createStatMenu(PLAYER_ACTOR);
+	//}
 	
 	if (isCharPressed(' ')) {
 		_handlePlantTorch();

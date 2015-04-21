@@ -496,7 +496,9 @@ void createDoor(int x, int y) {
 }
 
 void createKey(int x, int y) {
-	createItem(x, y, '-', TCOD_color_RGB(30, 175, 175), TCOD_color_RGB(30, 75, 75), IS_KEY | CAN_PICK_UP);
+	item *itm = createItem(x, y, '-', TCOD_color_RGB(30, 175, 175), TCOD_color_RGB(30, 75, 75), IS_KEY | CAN_PICK_UP);
+
+	itm->name = "Key";
 }
 
 
@@ -557,6 +559,7 @@ void randomizeBoots(item *itm, int quality) {
 		itm->name = "Boots";
 	}
 
+	itm->statStability = getRandomFloat(.95f - (.05f * (float)quality), .95);
 	itm->statSpeed = clip(getRandomInt(1, 2) + quality, 1, 4);
 }
 
