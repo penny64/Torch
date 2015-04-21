@@ -41,6 +41,7 @@ void createAllItemCards() {
 	createItemCard(&createLowDagger, RARITY_LOW, IS_WEAPON | IS_DAGGER);
 	createItemCard(&createBoots, RARITY_MEDIUM, IS_ARMOR | ARE_BOOTS);
 	createItemCard(&createChestArmor, RARITY_MEDIUM, IS_ARMOR | IS_CHEST_ARMOR);
+	createItemCard(&createAmulet, RARITY_MEDIUM, IS_ARMOR | IS_AMULET);
 	createItemCard(&createTorchHolder, RARITY_HIGH, IS_HELPER_ITEM);
 	createItemCard(&createKey, RARITY_KEY, IS_KEY);
 }
@@ -559,7 +560,7 @@ void randomizeBoots(item *itm, int quality) {
 		itm->name = "Boots";
 	}
 
-	itm->statStability = getRandomFloat(.95f - (.05f * (float)quality), .95);
+	itm->statStability = getRandomFloat(.95f - (.05f * (float)quality), 1.f - (.05f * (float)quality));
 	itm->statSpeed = clip(getRandomInt(1, 2) + quality, 1, 4);
 }
 
@@ -591,6 +592,30 @@ void createChestArmor(int x, int y) {
 	item *itm = createItem(x, y, 'H', TCOD_color_RGB(210, 105, 110), TCOD_color_RGB(30, 30, 30), IS_ARMOR | IS_CHEST_ARMOR | CAN_PICK_UP);
 
 	randomizeChestArmor(itm, getLevel());
+}
+
+void randomizeAmulet(item *itm, int quality) {
+	//float typeChance = getRandomFloat(0, 1) + ((float) getLevel() / 23.f);
+	int typeChance = getRandomInt(0, 3);
+
+	if (typeChance == 3) {
+		itm->name = "Chance Amulet";
+		itm->statLuck= clip(getRandomInt(0, 1) + quality, 1, 4);
+	} else if (typeChance == 2) {
+		itm->name = "Balanced Amulet";
+		itm->statStability = getRandomFloat(.95f - (.05f * (float)quality), 1.f - (.05f * (float)quality));
+	} else if (typeChance == 1) {
+		itm->name = "Pausing Amulet";
+		itm->statSpeed = clip(getRandomInt(1, 2) + quality, 1, 4);
+	} else {
+		itm->name = "Raw Amulet";
+	}
+}
+
+void createAmulet(int x, int y) {
+	item *itm = createItem(x, y, 'o', TCOD_color_RGB(210, 32, 210), TCOD_color_RGB(30, 30, 30), IS_ARMOR | IS_AMULET | CAN_PICK_UP);
+
+	randomizeAmulet(itm, getLevel());
 }
 
 void createTorchHolder(int x, int y) {

@@ -217,7 +217,19 @@ int getActorLevel(character *actor) {
 }
 
 int getActorLuck(character *actor) {
-	return actor->statLuck;
+	int luck = actor->statLuck;
+	int inventoryIndex = 0;
+	item *itmPtr;
+
+	while (inventoryIndex < actor->numberOfItems) {
+		itmPtr = actor->inventory[inventoryIndex];
+
+		luck += itmPtr->statLuck;
+
+		inventoryIndex ++;
+	}
+
+	return luck;
 }
 
 int getActorStrength(character *actor) {
@@ -365,8 +377,14 @@ void pickUpItem(character *actor, item *itm) {
 		if (itmPtr) {
 			dropItem(actor, itmPtr);
 		}
-	} else	if (itm->itemFlags & (IS_ARMOR | IS_CHEST_ARMOR)) {
+	} else if ((itm->itemFlags & (IS_ARMOR | IS_CHEST_ARMOR)) == (IS_ARMOR | IS_CHEST_ARMOR)) {
 		itmPtr = actorGetItemWithFlag(actor, IS_ARMOR | IS_CHEST_ARMOR);
+
+		if (itmPtr) {
+			dropItem(actor, itmPtr);
+		}
+	} else if ((itm->itemFlags & (IS_ARMOR | IS_AMULET)) == (IS_ARMOR | IS_AMULET)) {
+		itmPtr = actorGetItemWithFlag(actor, IS_ARMOR | IS_AMULET);
 
 		if (itmPtr) {
 			dropItem(actor, itmPtr);

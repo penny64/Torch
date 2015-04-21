@@ -29,6 +29,7 @@ enum {
 	IS_DAGGER = 0x01 << 19,
 	IS_HELPER_ITEM = 0x01 << 20,
 	IS_CHEST_ARMOR = 0x01 << 21,
+	IS_AMULET = 0x01 << 22,
 } itemFlag_t;
 
 enum {
@@ -51,7 +52,7 @@ enum {
 typedef struct item item;
 
 struct item {
-	int x, y, vx, vy, statDamage, statDefense, statSpeed, statLevel, chr;
+	int x, y, vx, vy, chr, statDamage, statDefense, statSpeed, statLevel, statLuck;
 	float statStability;
 	unsigned int itemFlags, itemEffectFlags;
 	char *name;
@@ -105,6 +106,7 @@ void createLowSword(int, int);
 void createLowDagger(int, int);
 void createBoots(int, int);
 void createChestArmor(int, int);
+void createAmulet(int, int);
 void createWoodWall(int, int);
 void createMetalWall(int, int);
 void createStoneWall(int, int);

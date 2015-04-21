@@ -436,6 +436,14 @@ void placeItems() {
 
 		roomPtr = roomPtr->next;
 	}
+
+	for (i = 0; i < clip(getRandomInt(0 + getLevel(), 2 + getLevel()), 0, 6); i ++) {
+		roomPtr = getRandomRoom();
+
+		getNewSpawnPosition(roomPtr, spawnPosition);
+
+		spawnItemWithRarity(spawnPosition[0], spawnPosition[1], IS_ARMOR | IS_HELPER_ITEM, RARITY_LOW, RARITY_MEDIUM);
+	}
 }
 
 float roomPositionCost(int xFrom, int yFrom, int xTo, int yTo, void *user_data) {
