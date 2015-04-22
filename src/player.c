@@ -29,6 +29,8 @@ void createPlayer() {
 	PLAYER_ACTOR->itemLight->fuelMax = 1650;
 	PLAYER_ACTOR->itemLight->fuel = PLAYER_ACTOR->itemLight->fuelMax;
 	PLAYER_ACTOR->traitFlags = TORCH_ATTACK_PENALTY;
+	PLAYER_ACTOR->foreColor.g = 100;
+	PLAYER_ACTOR->foreColor.b = 100;
 
 	registerSpellSystem(getWorld(), PLAYER_ACTOR->entityId);
 	addSpell(getWorld(), PLAYER_ACTOR->entityId, SPELL_FIREBALL);
