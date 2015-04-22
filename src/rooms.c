@@ -129,11 +129,11 @@ room *createRoom(roomProto *prototypeRoom, unsigned int flags) {
 			}
 		}
 	} else {
-		if (width > 9) {
+		if (width > 7) {
 			width = (int) ((width * getRandomFloat(.6, .85)) + .5);
 		}
 
-		if (height > 9) {
+		if (height > 7) {
 			height = (int) ((height * getRandomFloat(.6, .85)) + .5);
 		}
 

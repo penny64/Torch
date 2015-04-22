@@ -497,7 +497,7 @@ void decorateRooms() {
 							continue;
 						}
 
-						if (TCOD_map_is_walkable(TUNNEL_MAP, x + x1, y + y1)) {
+						if (TCOD_map_is_walkable(TUNNEL_MAP, x + x1, y + y1) || (ROOM_MAP[x + x1][y + y1] > -1 && ROOM_MAP[x + x1][y + y1] != roomPtr->id)) {
 							invalid = 1;
 
 							break;
@@ -931,6 +931,8 @@ void pickRoomType() {
 }
 
 void resetLevel() {
+	int x, y;
+
 	TCOD_console_t dynamicLightConsole = getDynamicLightConsole();
 
 	EXIT_OPEN = 0;
@@ -948,6 +950,12 @@ void resetLevel() {
 
 	if (LEVEL_NUMBER > 1) {
 		TCOD_console_clear(dynamicLightConsole);
+	}
+
+	for (y = 0; y < WINDOW_HEIGHT; y ++) {
+		for (x = 0; x < WINDOW_WIDTH; x ++) {
+			ROOM_MAP[x][y] = -1;
+		}
 	}
 
 	deleteAllRooms();
@@ -1382,9 +1390,11 @@ void buildRooms() {
 	int x, y, positionIndex;
 
 	while (rm) {
-		for (positionIndex = 0; positionIndex < rm->size; positionIndex++) {
+		for (positionIndex = 0; positionIndex < rm->size; positionIndex ++) {
 			x = rm->positionList[positionIndex][0];
 			y = rm->positionList[positionIndex][1];
+
+			ROOM_MAP[x][y] = rm->id;
 
 			drawCharBackEx(LEVEL_CONSOLE, x, y, TCOD_color_RGB(255, 30, 255), TCOD_BKGND_SET);
 			TCOD_map_set_properties(LEVEL_MAP, x, y, 1, 1);
