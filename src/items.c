@@ -622,6 +622,9 @@ void randomizeAmulet(item *itm, int quality) {
 		itm->foreColor.b = 30;
 	} else {
 		itm->name = "Raw Amulet";
+		itm->foreColor.r = 100;
+		itm->foreColor.g = 100;
+		itm->foreColor.b = 100;
 	}
 
 	itm->chr = 248;

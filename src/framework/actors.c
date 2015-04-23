@@ -381,8 +381,8 @@ void pickUpItem(character *actor, item *itm) {
 		if (itmPtr) {
 			dropItem(actor, itmPtr);
 		}
-	} else if ((itm->itemFlags & IS_AMULET) == IS_ARMOR) {
-		itmPtr = actorGetItemWithFlag(actor, IS_AMULET);
+	} else if ((itm->itemFlags & (IS_ARMOR | IS_AMULET)) == (IS_ARMOR | IS_AMULET)) {
+		itmPtr = actorGetItemWithFlag(actor, IS_ARMOR | IS_AMULET);
 
 		if (itmPtr) {
 			dropItem(actor, itmPtr);
