@@ -393,6 +393,8 @@ void pickUpItem(character *actor, item *itm) {
 
 	actor->inventory[actor->numberOfItems] = itm;
 	actor->numberOfItems ++;
+
+	printf("Dropped\n");
 	
 	if (actor == getPlayer()) {
 		showMessage(10, "You pick up <", itm->name, ">", NULL);
@@ -405,6 +407,7 @@ void dropItem(character *actor, item *itm) {
 
 		assert(itm != NULL);
 	}
+
 	itm->x = actor->x;
 	itm->y = actor->y;
 	
@@ -683,6 +686,7 @@ void _actorLogic(character *actor) {
 	}
 
 	_checkForItemCollisions(actor);
+	
 	if (!(actor->aiFlags & IS_IMMUNE_TO_DARKNESS) && _checkIfPositionLit(actor)) {
 		return;
 	}
