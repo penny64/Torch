@@ -601,15 +601,26 @@ void randomizeAmulet(item *itm, int quality) {
 	if (typeChance == 3) {
 		itm->name = "Chance Amulet";
 		itm->statLuck= clip(getRandomInt(0, 1) + quality, 1, 4);
+		itm->foreColor.r = 150;
+		itm->foreColor.g = 0;
+		itm->foreColor.b = 150;
 	} else if (typeChance == 2) {
 		itm->name = "Balanced Amulet";
 		itm->statStability = getRandomFloat(.95f - (.05f * (float)quality), 1.f - (.05f * (float)quality));
+		itm->foreColor.r = 100;
+		itm->foreColor.g = 0;
+		itm->foreColor.b = 190;
 	} else if (typeChance == 1) {
 		itm->name = "Pausing Amulet";
 		itm->statSpeed = clip(getRandomInt(1, 2) + quality, 1, 4);
+		itm->foreColor.r = 150;
+		itm->foreColor.g = 150;
+		itm->foreColor.b = 30;
 	} else {
 		itm->name = "Raw Amulet";
 	}
+
+	itm->chr = 248;
 }
 
 void createAmulet(int x, int y) {

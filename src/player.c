@@ -37,8 +37,6 @@ void createPlayer() {
 	registerAi(getWorld(), PLAYER_ACTOR->entityId, GROUP_PLAYER, GROUP_NONE);
 
 	getWorld()->mask[PLAYER_ACTOR->entityId] |= COMPONENT_PLAYER;
-	
-	printf("Created player.\n");
 }
 
 character *getPlayer() {
