@@ -293,11 +293,11 @@ int getNumberOfLitKeytorches() {
 }
 
 //WARNING: If you delete an item, RETURN.
-void itemHandleCharacterCollision(item *itm, character *actor) {
+int itemHandleCharacterCollision(item *itm, character *actor) {
 	character *player = getPlayer();
 	
 	if (itm->owner || itm->lodgedInActor) {
-		return;
+		return 1;
 	}
 
 	if (actor->itemLight && itm->itemFlags & IS_SINGLE_USE_FUEL_SOURCE && itm->itemLight) {
@@ -323,7 +323,7 @@ void itemHandleCharacterCollision(item *itm, character *actor) {
 
 			showMessage(10, "You pick up the torch.", NULL);
 			
-			return;
+			return 1;
 		}
 
 		if (itm->itemFlags & IS_EXIT && isLevelComplete()) {
@@ -336,8 +336,12 @@ void itemHandleCharacterCollision(item *itm, character *actor) {
 		
 		if (itm->itemFlags & CAN_PICK_UP) {
 			pickUpItem(actor, itm);
+
+			return 1;
 		}
 	}
+
+	return 0;
 }
 
 int itemHandleCharacterTouch(item *itm, character *actor) {

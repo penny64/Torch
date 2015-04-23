@@ -393,8 +393,6 @@ void pickUpItem(character *actor, item *itm) {
 
 	actor->inventory[actor->numberOfItems] = itm;
 	actor->numberOfItems ++;
-
-	printf("Dropped\n");
 	
 	if (actor == getPlayer()) {
 		showMessage(10, "You pick up <", itm->name, ">", NULL);
@@ -482,8 +480,10 @@ void _checkForItemCollisions(character *actor) {
 	while (ptr != NULL) {
 		next = ptr->next;
 		
-		if (actor->x == ptr->x && actor->y == ptr->y) {
-			itemHandleCharacterCollision(ptr, actor);
+		if (!ptr->owner && actor->x == ptr->x && actor->y == ptr->y) {
+			if (itemHandleCharacterCollision(ptr, actor)) {
+				return;
+			}
 		}
 
 		ptr = next;
