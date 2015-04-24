@@ -278,8 +278,8 @@ float getActorSpeed(character *actor) {
 	while (inventoryIndex < actor->numberOfItems) {
 		itmPtr = actor->inventory[inventoryIndex];
 
-		if (itmPtr->itemEffectFlags & IS_QUICK) {
-			speed = clipFloat(speed - itmPtr->statSpeed, 1, 5);
+		if (itmPtr->itemFlags & IS_ARMOR) {
+			speed -= itmPtr->statSpeed;
 		}
 
 		inventoryIndex ++;
@@ -705,6 +705,12 @@ void actorLogic() {
 
 	while (ptr != NULL) {
 		next = ptr->next;
+
+		/*if (getPlayer() && ptr->entityId == getPlayer()->entityId) {
+			printf("\tPlayer\n");
+		} else {
+			printf("\tNPC\n");
+		}*/
 
 		tickSystemsWithMaskForEntity(getWorld(), ptr->entityId, EVENT_TICK);
 		_actorLogic(ptr);

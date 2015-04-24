@@ -556,6 +556,7 @@ void randomizeBoots(item *itm, int quality) {
 
 	if (typeChance >= .55) {
 		itm->itemEffectFlags = IS_QUICK;
+		itm->statSpeed = clip(getRandomInt(1, 2) + quality, 1, 4);
 		itm->name = "Boots of Speed";
 	} else if (typeChance >= .25) {
 		itm->itemEffectFlags = IS_FLAMING;
@@ -565,7 +566,6 @@ void randomizeBoots(item *itm, int quality) {
 	}
 
 	itm->statStability = getRandomFloat(.95f - (.05f * (float)quality), 1.f - (.05f * (float)quality));
-	itm->statSpeed = clip(getRandomInt(1, 2) + quality, 1, 4);
 }
 
 void createBoots(int x, int y) {
