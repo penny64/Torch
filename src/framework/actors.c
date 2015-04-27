@@ -550,7 +550,7 @@ void _actorOnDraw(character *actor) {
 		}
 
 		if (nearestWormDistance > 15) {
-			actor->itemLight->fuel = 10;
+			actor->itemLight->fuel = 20;
 		}
 	}
 }
@@ -567,6 +567,12 @@ void _actorLogic(character *actor) {
 	int hitActor = 0;
 	int nx = actor->x + actor->vx;
 	int ny = actor->y + actor->vy;
+	int spawnPosition[2];
+
+	if (actor->aiFlags & IS_VOID_WORM_TAIL && !getRandomInt(0, 100)) {
+		getOpenPositionInRoom(getRandomRoom(), spawnPosition);
+		createVoidWorm(spawnPosition[0], spawnPosition[1]);
+	}
 	
 	if (!actor->turns) {
 		return;
