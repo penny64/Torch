@@ -568,11 +568,6 @@ void _actorLogic(character *actor) {
 	int nx = actor->x + actor->vx;
 	int ny = actor->y + actor->vy;
 	int spawnPosition[2];
-
-	if (actor->aiFlags & IS_VOID_WORM_TAIL && !getRandomInt(0, 100)) {
-		getOpenPositionInRoom(getRandomRoom(), spawnPosition);
-		createVoidWorm(spawnPosition[0], spawnPosition[1]);
-	}
 	
 	if (!actor->turns) {
 		return;
@@ -596,8 +591,6 @@ void _actorLogic(character *actor) {
 
 	if (actor->nextStanceFlagsToRemove) {
 		tickSystemsWithMaskForEntity(getWorld(), actor->entityId, EVENT_REMOVE_STANCE);
-
-		printf("Removing!\n");
 
 		actor->stanceFlags ^= actor->nextStanceFlagsToRemove;
 		
@@ -675,6 +668,11 @@ void _actorLogic(character *actor) {
 		
 		if (isPositionWalkable(nx, ny)) {
 			moved = 1;
+
+			if (actor->aiFlags & IS_VOID_WORM && getRandomFloat(0, 1) > .85) {
+				getOpenPositionInRoom(getRandomRoom(), spawnPosition);
+				createVoidWorm(spawnPosition[0], spawnPosition[1]);
+			}
 
 			if (actor->aiFlags & IS_VOID_WORM) {
 				createVoidWormTail(actor->x, actor->y);
