@@ -78,18 +78,18 @@ void createVoidWormTail(int x, int y) {
 	actor->hp = 5;
 	actor->hpMax = 5;
 	actor->sightRange = 0;
-	actor->aiFlags = 0x0;
+	actor->aiFlags = IS_VOID_WORM_TAIL;
 	actor->chr = 177;
 	actor->foreColor = TCOD_color_RGB(15, 100, 15);
 	//deleteDynamicLight(actor->itemLight);
 	//actor->itemLight = NULL;
 	actor->stanceFlags = IS_CRAWLING;
 	actor->itemLight->r_tint = 0;
-	actor->itemLight->g_tint = 35;
+	actor->itemLight->g_tint = 66;
 	actor->itemLight->b_tint = 0;
 	actor->itemLight->flickerRate = .2;
 	actor->itemLight->size = 3;
-	actor->itemLight->fuelMax = 12;
+	actor->itemLight->fuelMax = 500;
 	actor->itemLight->fuel = actor->itemLight->fuelMax;
 }
 

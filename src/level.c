@@ -293,6 +293,11 @@ void generatePuzzles() {
 			continue;
 		}
 
+		if (roomPtr->flags & IS_EXIT_ROOM) {
+			getNewSpawnPosition(roomPtr, EXIT_LOCATION);
+			//claimSpawnPositionInRoom(roomPtr, EXIT_LOCATION[0], EXIT_LOCATION[1]);
+		}
+
 		if (roomPtr->flags & IS_SPECIAL_ROOM) {
 			/*if (!roomPtr->group) {
 				roomPtr->flags |= IS_TREASURE_ROOM;
@@ -1372,7 +1377,8 @@ void designDungeon() {
 		if (PROTO_ROOMS[i]->flags & IS_PROTO_EXIT) {
 			rm->flags |= IS_EXIT_ROOM;
 
-			getNewSpawnPosition(rm, EXIT_LOCATION);
+			//getNewSpawnPosition(rm, EXIT_LOCATION);
+			//claimSpawnPositionInRoom(rm, EXIT_LOCATION[0], EXIT_LOCATION[1]);
 		}
 
 		if (PROTO_ROOMS[i]->flags & IS_PROTO_MAIN_PATH) {

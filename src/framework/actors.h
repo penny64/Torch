@@ -15,8 +15,9 @@ enum {
 	EXPLODE_ON_DEATH = 0x01 << 3,
 	DROP_VOID_ON_DEATH = 0x01 << 4,
 	IS_VOID_WORM = 0x01 << 5,
-	IS_IMMUNE_TO_DARKNESS = 0x01 << 6,
-	IS_ALIVE = 0x01 << 7,
+	IS_VOID_WORM_TAIL = 0x01 << 6,
+	IS_IMMUNE_TO_DARKNESS = 0x01 << 7,
+	IS_ALIVE = 0x01 << 8,
 } aiFlag_t;
 
 enum {

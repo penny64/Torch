@@ -530,7 +530,34 @@ int _checkIfPositionLit(character *actor) {
 	return 0;
 }
 
+void _actorOnDraw(character *actor) {
+	character *ptr;
+	float tempDistance, nearestWormDistance = 999;
+
+	if (actor->aiFlags & IS_VOID_WORM_TAIL && actor->itemLight->fuel > 100) {
+		ptr = getActors();
+
+		while (ptr) {
+			if (ptr->aiFlags & IS_VOID_WORM) {
+				tempDistance = distance(actor->x, actor->y, ptr->x, ptr->y);
+
+				if (tempDistance < nearestWormDistance) {
+					nearestWormDistance = tempDistance;
+				}
+			}
+
+			ptr = ptr->next;
+		}
+
+		if (nearestWormDistance > 15) {
+			actor->itemLight->fuel = 10;
+		}
+	}
+}
+
 void _actorLogic(character *actor) {
+	int moved = 0;
+
 	if (!actor->hp) {
 		return;
 	}
@@ -641,6 +668,8 @@ void _actorLogic(character *actor) {
 		}
 		
 		if (isPositionWalkable(nx, ny)) {
+			moved = 1;
+
 			if (actor->aiFlags & IS_VOID_WORM) {
 				createVoidWormTail(actor->x, actor->y);
 			}
@@ -685,7 +714,9 @@ void _actorLogic(character *actor) {
 		}
 	}
 
-	_checkForItemCollisions(actor);
+	if (moved) {
+		_checkForItemCollisions(actor);
+	}
 	
 	if (!(actor->aiFlags & IS_IMMUNE_TO_DARKNESS) && _checkIfPositionLit(actor)) {
 		return;
@@ -723,6 +754,8 @@ void _drawActor(character *actor) {
 	if (actor->hp <= 0 || (isTransitionInProgress() && actor->itemLight && actor->itemLight->sizeMod == 0)) {
 		return;
 	}
+
+	_actorOnDraw(actor);
 	
 	TCOD_color_t foreColor = actor->foreColor;
 	int nx, ny, occupiedPosition = 0, chr = actor->chr;
@@ -755,7 +788,7 @@ void _drawActor(character *actor) {
 	
 	drawChar(ACTOR_CONSOLE, actor->x, actor->y, chr, foreColor, actor->backColor);
 	
-	if ((actor->vx || actor->vy) && (!player || actor->delay < getMovementCost(player))) {
+	if ((actor->vx || actor->vy) && (!player || actor->delay < getMovementCost(player) - 1)) {
 		nx = actor->x + actor->vx;
 		ny = actor->y + actor->vy;
 		
