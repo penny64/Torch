@@ -9,6 +9,7 @@
 #include "../player.h"
 #include "../combat.h"
 #include "numbers.h"
+#include "../ai.h"
 #include "../ui.h"
 #include "display.h"
 #include "logging.h"
@@ -40,6 +41,30 @@ void actorsShutdown() {
 
 		ptr = next;
 	}
+}
+
+float _actorPathCallback(int xFrom, int yFrom, int xTo, int yTo, void *userData) {
+	character *actor = userData, *ptr = getActors();
+
+	if (!TCOD_map_is_walkable(actor->fov, xTo, yTo)) {
+		return 0;
+	}
+
+	while (ptr) {
+		if (ptr == actor) {
+			ptr = ptr->next;
+
+			continue;
+		}
+
+		if (!isEnemy(getWorld(), actor->entityId, ptr->entityId) && (xTo == ptr->x && yTo == ptr->y)) {
+			return 0;
+		}
+
+		ptr = ptr->next;
+	}
+
+	return 1;
 }
 
 character *createActor(int x, int y) {
@@ -80,7 +105,8 @@ character *createActor(int x, int y) {
 	_c->itemLight = createDynamicLight(_c->x, _c->y, _c);
 	_c->hp = 100;
 	_c->fov = copyLevelMap();
-	_c->path = TCOD_path_new_using_map(_c->fov, 1.41f);
+	//_c->path = TCOD_path_new_using_map(_c->fov, 1.41f);
+	_c->path = TCOD_path_new_using_function(WINDOW_WIDTH, WINDOW_HEIGHT, _actorPathCallback, _c, 1.41f);
 	_c->chr = (int)'@';
 	_c->foreColor = TCOD_color_RGB(255, 255 - RED_SHIFT, 255 - RED_SHIFT);
 	_c->backColor = TCOD_color_RGB(255, 0, 0);
@@ -439,7 +465,7 @@ void _resetActorForNewLevel(character *actor) {
 		TCOD_path_delete(actor->path);
 	}
 	
-	actor->path = TCOD_path_new_using_map(actor->fov, 1.41f);
+	actor->path = TCOD_path_new_using_function(WINDOW_WIDTH, WINDOW_HEIGHT, _actorPathCallback, actor, 1.41f);
 
 	if (actor->itemLight) {
 		resetLight(actor->itemLight);
@@ -669,7 +695,7 @@ void _actorLogic(character *actor) {
 		if (isPositionWalkable(nx, ny)) {
 			moved = 1;
 
-			if (actor->aiFlags & IS_VOID_WORM && getRandomFloat(0, 1) > .85) {
+			if (actor->aiFlags & IS_VOID_WORM && getRandomFloat(0, 1) > .95) {
 				getOpenPositionInRoom(getRandomRoom(), spawnPosition);
 				createVoidWorm(spawnPosition[0], spawnPosition[1]);
 			}
