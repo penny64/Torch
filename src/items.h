@@ -31,6 +31,7 @@ enum {
 	IS_CHEST_ARMOR = 0x01 << 21,
 	IS_AMULET = 0x01 << 22,
 	ARE_GAUNTLETS = 0x01 << 23,
+	IS_HELMET = 0x01 << 24,
 } itemFlag_t;
 
 enum {
@@ -108,6 +109,7 @@ void createLowDagger(int, int);
 void createBoots(int, int);
 void createGauntlets(int, int);
 void createChestArmor(int, int);
+void createHelmet(int, int);
 void createAmulet(int, int);
 void createWoodWall(int, int);
 void createMetalWall(int, int);

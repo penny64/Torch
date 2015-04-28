@@ -46,7 +46,7 @@ void actorsShutdown() {
 float _actorPathCallback(int xFrom, int yFrom, int xTo, int yTo, void *userData) {
 	character *actor = userData, *ptr = getActors();
 
-	if (!TCOD_map_is_walkable(actor->fov, xTo, yTo)) {
+	if (!TCOD_map_is_walkable(actor->fov, xTo, yTo) || !TCOD_map_is_walkable(getLevelMap(), xTo, yTo)) {
 		return 0;
 	}
 
@@ -350,8 +350,6 @@ int walkActor(character *actor, int dx, int dy) {
 		TCOD_path_get_destination(actor->path, &currentDx, &currentDy);
 		
 		if (dx == currentDx && dy == currentDy) {
-			printf("Existing path.\n");
-			
 			return 1;
 		}
 	}
