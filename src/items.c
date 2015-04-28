@@ -40,6 +40,7 @@ void createAllItemCards() {
 	createItemCard(&createLowSword, RARITY_LOW, IS_WEAPON | IS_SWORD);
 	createItemCard(&createLowDagger, RARITY_LOW, IS_WEAPON | IS_DAGGER);
 	createItemCard(&createBoots, RARITY_MEDIUM, IS_ARMOR | ARE_BOOTS);
+	createItemCard(&createGauntlets, RARITY_MEDIUM, IS_ARMOR | ARE_GAUNTLETS);
 	createItemCard(&createChestArmor, RARITY_MEDIUM, IS_ARMOR | IS_CHEST_ARMOR);
 	createItemCard(&createAmulet, RARITY_MEDIUM, IS_ARMOR | IS_AMULET);
 	createItemCard(&createTorchHolder, RARITY_HIGH, IS_HELPER_ITEM);
@@ -84,6 +85,7 @@ item *createItem(int x, int y, char chr, TCOD_color_t foreColor, TCOD_color_t ba
 	_c->statSpeed = 0;
 	_c->statLevel = 1;
 	_c->statStability = 1.f;
+	_c->statStrength = 0;
 	_c->statDefense = 0;
 	_c->name = "null";
 	
@@ -590,6 +592,16 @@ void randomizeChestArmor(item *itm, int quality) {
 	}*/
 
 	itm->statDefense = clip(getRandomInt(1, 2) + quality, 1, 4);
+}
+
+void randomizeGauntlets(item *itm, int quality) {
+	itm->statStrength = clip(getRandomInt(1, 2) + quality, 1, 4);
+}
+
+void createGauntlets(int x, int y) {
+	item *itm = createItem(x, y, 'g', TCOD_color_RGB(25, 205, 180), TCOD_color_RGB(30, 30, 30), IS_ARMOR | ARE_GAUNTLETS | CAN_PICK_UP);
+
+	randomizeGauntlets(itm, getLevel());
 }
 
 void createChestArmor(int x, int y) {

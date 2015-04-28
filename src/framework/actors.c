@@ -259,7 +259,19 @@ int getActorLuck(character *actor) {
 }
 
 int getActorStrength(character *actor) {
-	return actor->statStrength;
+	int strength = actor->statStrength;
+	int inventoryIndex = 0;
+	item *itmPtr;
+
+	while (inventoryIndex < actor->numberOfItems) {
+		itmPtr = actor->inventory[inventoryIndex];
+
+		strength += itmPtr->statStrength;
+
+		inventoryIndex ++;
+	}
+
+	return strength;
 }
 
 float getActorStability(character *actor) {
