@@ -772,11 +772,14 @@ void _actorLogic(character *actor) {
 }
 
 void actorLogic() {
-	character *next = NULL, *ptr = CHARACTERS;
+	character *next = NULL, *ptr = CHARACTERS, *player = getPlayer();
 
 	while (ptr != NULL) {
 		next = ptr->next;
 
+		if (player && player == ptr) {
+			ptr = next;
+		}
 		/*if (getPlayer() && ptr->entityId == getPlayer()->entityId) {
 			printf("\tPlayer\n");
 		} else {
@@ -787,6 +790,12 @@ void actorLogic() {
 		_actorLogic(ptr);
 
 		ptr = next;
+	}
+
+	if (player) {
+		ptr = player;
+		tickSystemsWithMaskForEntity(getWorld(), ptr->entityId, EVENT_TICK);
+		_actorLogic(ptr);
 	}
 }
 
