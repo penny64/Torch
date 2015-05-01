@@ -355,7 +355,7 @@ int walkActor(character *actor, int dx, int dy) {
 	}
 	
 	if (!TCOD_path_compute(actor->path, actor->x, actor->y, dx, dy)) {
-		printf("Invalid path!\n");
+		//printf("Invalid path!\n");
 
 		return 0;
 	}
